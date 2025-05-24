@@ -40,7 +40,9 @@ jobs:
         environment_variables: CFLAGS CXXFLAGS
         shutdown_vm: false
         sync_files: runner-to-vm
-        run: ${{ matrix.platform.install-cmd }}
+        run: |
+          ${{ matrix.platform.install-cmd }}
+          ls -ar
 
     - name: Run CMake
       uses: cross-platform-actions/action@v0.28.0
@@ -53,7 +55,9 @@ jobs:
         environment_variables: CFLAGS CXXFLAGS
         shutdown_vm: false
         sync_files: false
-        run: ls && cmake -B build -DCMAKE_BUILD_TYPE=${{ matrix.Configuration }} -DCMAKE_UNITY_BUILD=ON
+        run: |
+          ls -ar
+          cmake -B build -DCMAKE_BUILD_TYPE=${{ matrix.Configuration }} -DCMAKE_UNITY_BUILD=ON
 
     - name: Run CMake Build
       uses: cross-platform-actions/action@v0.28.0
