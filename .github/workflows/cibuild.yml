@@ -42,7 +42,7 @@ jobs:
         sync_files: runner-to-vm
         run: |
           ${{ matrix.platform.install-cmd }}
-          ls -ar
+          cd .. && ls -ar
 
     - name: Run CMake
       uses: cross-platform-actions/action@v0.28.0
