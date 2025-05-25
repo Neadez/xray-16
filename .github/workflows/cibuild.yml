@@ -54,7 +54,7 @@ jobs:
         memory: 13G
         environment_variables: CFLAGS CXXFLAGS
         shutdown_vm: false
-        sync_files: false
+        sync_files: runner-to-vm
         run: |
           ls -ar
           cmake -B build -DCMAKE_BUILD_TYPE=${{ matrix.Configuration }} -DCMAKE_UNITY_BUILD=ON
