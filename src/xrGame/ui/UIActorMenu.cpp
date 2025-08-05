@@ -72,7 +72,7 @@ void CUIActorMenu::InitPartnerInfo()
     if (m_pPartnerInvOwner)
     {
         CBaseMonster* monster = smart_cast<CBaseMonster*>(m_pPartnerInvOwner);
-        if (monster || m_pPartnerInvOwner->use_simplified_visual())
+        if (monster)
         {
             GetModeSpecificPartnerInfo(m_currMenuMode)->ClearInfo();
             if (monster)
@@ -985,7 +985,7 @@ void CUIActorMenu::UpdateActorMP()
     int money = Game().local_player->money_for_round;
 
     string64 buf;
-    xr_sprintf(buf, "%d RU", money);
+    xr_sprintf(buf, "%d %s", money, StringTable().GetCurrency().c_str());
     m_ActorMoney->SetText(buf);
 
     GetModeSpecificActorInfo()->InitCharacterMP(Game().local_player->getName(), "ui_npc_u_nebo_1");
