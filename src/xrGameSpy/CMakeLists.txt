@@ -4,7 +4,6 @@ else()
     add_library(xrGameSpy SHARED)
 endif()
 
-
 target_sources_grouped(
     TARGET xrGameSpy
     NAME "Kernel"

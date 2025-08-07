@@ -1,3 +1,5 @@
+include_guard()
+
 function(target_sources_grouped)
     cmake_parse_arguments(
         PARSED_ARGS

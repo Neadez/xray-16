@@ -74,6 +74,8 @@ target_sources_grouped(
     stdafx.h
 )
 
+set_source_files_properties(guids.cpp PROPERTIES SKIP_PRECOMPILE_HEADERS ON)
+
 target_sources_grouped(
     TARGET xrSound
     NAME "Source"
@@ -120,7 +122,6 @@ target_include_directories(xrSound
     PRIVATE
     "${CMAKE_SOURCE_DIR}/src"
     "${CMAKE_SOURCE_DIR}/src/xrEngine"
-    "${OPENAL_INCLUDE_DIR}"
 )
 
 target_link_libraries(xrSound
@@ -130,7 +131,7 @@ target_link_libraries(xrSound
     xrAPI
     xrCDB
     xrMaterialSystem
-    ${OPENAL_LIBRARY}
+    OpenAL::OpenAL
     Ogg::Ogg
     Vorbis::Vorbis
     Vorbis::VorbisFile

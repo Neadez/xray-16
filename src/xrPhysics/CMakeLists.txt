@@ -386,7 +386,8 @@ target_sources_grouped(
     tri-colliderknoopc/dTriSphere.cpp
     tri-colliderknoopc/dTriSphere.h
     tri-colliderknoopc/dxTriList.h
-    tri-colliderknoopc/TriPrimitiveCollideClassDef.h)
+    tri-colliderknoopc/TriPrimitiveCollideClassDef.h
+)
 
 target_sources_grouped(
     TARGET xrPhysics
@@ -395,7 +396,6 @@ target_sources_grouped(
     collisiondamagereceiver.cpp
     icollisiondamagereceiver.h
 )
-
 
 target_include_directories(xrPhysics
     PUBLIC

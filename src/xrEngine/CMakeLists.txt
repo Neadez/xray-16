@@ -421,7 +421,7 @@ target_link_libraries(xrEngine
     xrScriptEngine
     xrNetServer
     xrImGui
-    ${OPENAL_LIBRARY}
+    OpenAL::OpenAL
     Ogg::Ogg
     Theora::Theora
 )
