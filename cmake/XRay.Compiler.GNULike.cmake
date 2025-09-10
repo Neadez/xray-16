@@ -1,24 +1,15 @@
 include_guard()
 
-set(CMAKE_CXX_STANDARD 17)
-set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
-
-option(CMAKE_VERBOSE_MAKEFILE "Verbose build output" OFF)
-message(STATUS "CMAKE_VERBOSE_MAKEFILE: ${CMAKE_VERBOSE_MAKEFILE}")
-
-if (CMAKE_VERBOSE_MAKEFILE)
-    set(CMAKE_EXECUTE_PROCESS_COMMAND_ECHO STDOUT)
-endif()
-
-if (CMAKE_VERSION VERSION_EQUAL "3.28.2" AND CMAKE_UNITY_BUILD)
-    # https://gitlab.kitware.com/cmake/cmake/-/issues/25650
-    message(WARNING "In CMake 3.28.2, precompiled headers are broken when Unity build is enabled. This breaks project from compiling. \
-                     Please, update to CMake 3.28.3 or downgrade to 3.28.1.")
-    set(CMAKE_UNITY_BUILD OFF)
-endif()
-
-if (NOT CMAKE_BUILD_TYPE)
-    set(CMAKE_BUILD_TYPE "Release" CACHE STRING "" FORCE)
+if (APPLE)
+    if (NOT CMAKE_OSX_DEPLOYMENT_TARGET)
+        if ($ENV{MACOSX_DEPLOYMENT_TARGET})
+            set(CMAKE_OSX_DEPLOYMENT_TARGET $ENV{MACOSX_DEPLOYMENT_TARGET})
+        else()
+            message(NOTICE "CMAKE_OSX_DEPLOYMENT_TARGET is not set, defaulting it to your system's version: ${CMAKE_SYSTEM_VERSION}")
+            set(CMAKE_OSX_DEPLOYMENT_TARGET ${CMAKE_SYSTEM_VERSION})
+        endif()
+    endif()
+    message(STATUS "CMAKE_OSX_DEPLOYMENT_TARGET: ${CMAKE_OSX_DEPLOYMENT_TARGET}")
 endif()
 
 # Redirecting the default installation path /usr/local to /usr no need to use -DCMAKE_INSTALL_PREFIX =/usr
@@ -27,17 +18,6 @@ if (CMAKE_INSTALL_PREFIX_INITIALIZED_TO_DEFAULT)
 endif()
 
 include(GNUInstallDirs)
-include(packaging)
-
-set_git_info()
-
-# Output all libraries and executable to one folder
-set(COMPILE_OUTPUT_FOLDER "${CMAKE_SOURCE_DIR}/bin/${CMAKE_SYSTEM_PROCESSOR}/${CMAKE_BUILD_TYPE}")
-set(CMAKE_RUNTIME_OUTPUT_DIRECTORY "${COMPILE_OUTPUT_FOLDER}")
-set(CMAKE_LIBRARY_OUTPUT_DIRECTORY "${COMPILE_OUTPUT_FOLDER}")
-set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY "${COMPILE_OUTPUT_FOLDER}")
-set(CMAKE_PDB_OUTPUT_DIRECTORY "${COMPILE_OUTPUT_FOLDER}")
-set(CMAKE_COMPILE_PDB_OUTPUT_DIRECTORY "${COMPILE_OUTPUT_FOLDER}")
 
 if (DISABLE_PORTABLE_MODE)
     add_compile_definitions(DISABLE_PORTABLE_MODE)
@@ -45,40 +25,6 @@ endif()
 
 set(CMAKE_BUILD_RPATH_USE_ORIGIN TRUE)
 set(CMAKE_MACOSX_RPATH TRUE)
-
-message(STATUS "CMAKE_SYSTEM_PROCESSOR: ${CMAKE_SYSTEM_PROCESSOR}")
-if (CMAKE_SYSTEM_PROCESSOR STREQUAL "aarch64" OR CMAKE_SYSTEM_PROCESSOR STREQUAL "arm64")
-    set(PROJECT_PLATFORM_ARM64 TRUE)
-elseif (CMAKE_SYSTEM_PROCESSOR MATCHES "armv*")
-    set(PROJECT_PLATFORM_ARM TRUE)
-elseif (CMAKE_SYSTEM_PROCESSOR STREQUAL "e2k")
-    set(PROJECT_PLATFORM_E2K TRUE)
-elseif (CMAKE_SYSTEM_PROCESSOR STREQUAL "ppc" OR CMAKE_SYSTEM_PROCESSOR STREQUAL "ppc64le")
-    set(PROJECT_PLATFORM_PPC TRUE)
-endif()
-
-if (CMAKE_BUILD_TYPE STREQUAL "Release" OR CMAKE_BUILD_TYPE STREQUAL "RelWithDebInfo")
-    set(MASTER_GOLD_DEFAULT_VALUE ON)
-else()
-    set(MASTER_GOLD_DEFAULT_VALUE OFF)
-endif()
-message(STATUS "CMAKE_BUILD_TYPE: ${CMAKE_BUILD_TYPE}")
-
-option(MASTER_GOLD "Build with MASTER_GOLD" ${MASTER_GOLD_DEFAULT_VALUE})
-if (MASTER_GOLD)
-    add_compile_definitions(MASTER_GOLD)
-endif()
-message(STATUS "MASTER_GOLD: ${MASTER_GOLD}")
-
-option(STATIC_BUILD "Use static build" ${MASTER_GOLD})
-if (STATIC_BUILD)
-    # XXX: Uncomment only after build with XRAY_STATIC_BUILD is fixed
-    #add_compile_definitions(XRAY_STATIC_BUILD)
-endif()
-message(STATUS "STATIC_BUILD: ${STATIC_BUILD}")
-
-option(CMAKE_UNITY_BUILD "Use unity build" OFF)
-message(STATUS "CMAKE_UNITY_BUILD: ${CMAKE_UNITY_BUILD}")
 
 find_program(CCACHE_FOUND ccache)
 if (CCACHE_FOUND)
@@ -88,10 +34,8 @@ if (CCACHE_FOUND)
 endif ()
 
 if (CMAKE_CXX_COMPILER_ID MATCHES "GNU")
-    if (CMAKE_CXX_COMPILER_VERSION VERSION_LESS 8.0 AND NOT PROJECT_PLATFORM_E2K)
+    if (CMAKE_CXX_COMPILER_VERSION VERSION_LESS 8.0)
         message(FATAL_ERROR "Building with a gcc version less than 8.0 is not supported.")
-    elseif (CMAKE_CXX_COMPILER_VERSION VERSION_LESS 7.0 AND PROJECT_PLATFORM_E2K)
-        message(FATAL_ERROR "Building with a MCST lcc version less than 1.25 is not supported.")
     endif()
 elseif (CMAKE_CXX_COMPILER_ID MATCHES "Clang")
     # XXX: Remove -fdelayed-template-parsing
@@ -119,12 +63,16 @@ if (CMAKE_CXX_COMPILER_ID MATCHES "Clang" AND NOT XRAY_USE_DEFAULT_CXX_LIB)
 
     if (XRAY_CXX_LIB STREQUAL "libstdc++")
         add_compile_options(-stdlib=libstdc++)
+        add_link_options(-stdlib=libstdc++)
     elseif (XRAY_CXX_LIB STREQUAL "libc++")
         add_compile_options(-stdlib=libc++)
+        add_link_options(-stdlib=libc++)
         if (CMAKE_SYSTEM_NAME STREQUAL "FreeBSD")
             add_compile_options(-lcxxrt)
+            add_link_options(-lcxxrt)
         else()
             add_compile_options(-lc++abi)
+            add_link_options(-lc++abi)
         endif()
     endif()
 endif()
@@ -137,9 +85,7 @@ else()
 endif()
 
 # TODO test
-option(USE_ADDRESS_SANITIZER "Use AddressSanitizer" OFF)
-
-if (USE_ADDRESS_SANITIZER)
+if (XRAY_USE_ASAN)
     add_compile_options(
         -fsanitize=address
         -fsanitize=leak
@@ -157,24 +103,15 @@ if (USE_ADDRESS_SANITIZER)
     )
 endif()
 
-message(STATUS "USE_ADDRESS_SANITIZER: ${USE_ADDRESS_SANITIZER}")
-
-option(USE_LTO "Use Link Time Optimization" ${MASTER_GOLD})
-if (USE_LTO)
-    include(CheckIPOSupported)
-    check_ipo_supported(RESULT LTO_SUPPORTED)
-
-    if (LTO_SUPPORTED)
-        # With clang cmake only enables '-flto=thin' but we want full LTO
-        if (CMAKE_CXX_COMPILER_ID MATCHES "Clang")
-            add_compile_options(-flto=full)
-        else()
-            set(CMAKE_INTERPROCEDURAL_OPTIMIZATION ON)
-        endif()
-    endif()
+if (CMAKE_SYSTEM_PROCESSOR STREQUAL "aarch64" OR CMAKE_SYSTEM_PROCESSOR STREQUAL "arm64")
+    set(PROJECT_PLATFORM_ARM64 TRUE)
+elseif (CMAKE_SYSTEM_PROCESSOR MATCHES "armv*")
+    set(PROJECT_PLATFORM_ARM TRUE)
+elseif (CMAKE_SYSTEM_PROCESSOR STREQUAL "e2k")
+    set(PROJECT_PLATFORM_E2K TRUE)
+elseif (CMAKE_SYSTEM_PROCESSOR STREQUAL "ppc" OR CMAKE_SYSTEM_PROCESSOR STREQUAL "ppc64le")
+    set(PROJECT_PLATFORM_PPC TRUE)
 endif()
-
-message(STATUS "USE_LTO: ${USE_LTO}")
 
 if (PROJECT_PLATFORM_ARM)
     add_compile_options(-mfpu=neon)
@@ -200,10 +137,6 @@ if (XRAY_LINKER)
 endif()
 
 if (CMAKE_BUILD_TYPE STREQUAL "Debug")
-    add_compile_definitions(
-        DEBUG
-        MIXED
-    )
     add_compile_options(-Og)
 endif()
 
@@ -214,16 +147,6 @@ add_compile_definitions(
 
 if (NOT WIN32)
     find_package(SDL2 2.0.18 REQUIRED)
-    # Fix to support older SDL2
-    # https://github.com/OpenXRay/xray-16/issues/1595
-    if (NOT TARGET SDL2::SDL2 AND DEFINED SDL2_LIBRARIES)
-        add_library(SDL2::SDL2 UNKNOWN IMPORTED)
-        set_target_properties(
-            SDL2::SDL2 PROPERTIES
-            IMPORTED_LOCATION "${SDL2_LIBRARIES}"
-            INTERFACE_INCLUDE_DIRECTORIES "${SDL2_INCLUDE_DIRS}"
-        )
-    endif()
     find_package(OpenAL REQUIRED)
     find_package(JPEG)
     find_package(Ogg REQUIRED)
@@ -245,9 +168,7 @@ if (MEMORY_ALLOCATOR STREQUAL "mimalloc" AND NOT mimalloc_FOUND)
     message(FATAL_ERROR "mimalloc allocator requested but not found. Please, install mimalloc package or select standard allocator.")
 endif()
 
-message("Using ${MEMORY_ALLOCATOR} memory allocator")
-
-option(XRAY_USE_LUAJIT "Use LuaJIT" ON)
+message(STATUS "Using ${MEMORY_ALLOCATOR} memory allocator")
 
 get_property(LIB64 GLOBAL PROPERTY FIND_LIBRARY_USE_LIB64_PATHS)
 
@@ -257,7 +178,7 @@ else()
     set(LIBSUFFIX "")
 endif()
 
-add_compile_options(
+set(XRAY_ENABLE_WARNINGS
     -Wall
     #-Werror
     -Wextra
@@ -280,3 +201,5 @@ add_compile_options(
     $<$<CXX_COMPILER_ID:GNU>:$<$<COMPILE_LANGUAGE:CXX>:-Wno-class-memaccess>>
     $<$<CXX_COMPILER_ID:GNU>:$<$<COMPILE_LANGUAGE:CXX>:-Wno-interference-size>>
 )
+
+set(XRAY_DISABLE_WARNINGS "-w")

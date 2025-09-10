@@ -1,4 +1,4 @@
-add_library(xrEngine SHARED)
+add_library(xrEngine)
 
 target_sources_grouped(
     TARGET xrEngine
@@ -441,6 +441,8 @@ target_precompile_headers(xrEngine
     stdafx.h
 )
 
-install(TARGETS xrEngine LIBRARY
-    DESTINATION "${CMAKE_INSTALL_LIBDIR}"
-)
+if (BUILD_SHARED_LIBS)
+    install(TARGETS xrEngine LIBRARY
+        DESTINATION "${CMAKE_INSTALL_LIBDIR}"
+    )
+endif()

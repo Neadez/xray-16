@@ -1,4 +1,4 @@
-add_library(xrUICore SHARED)
+add_library(xrUICore)
 
 target_sources(xrUICore PRIVATE
     pch.cpp
@@ -149,7 +149,6 @@ target_compile_definitions(xrUICore
 
 set_target_properties(xrUICore PROPERTIES
     PREFIX ""
-    POSITION_INDEPENDENT_CODE ON
 )
 
 target_precompile_headers(xrUICore
@@ -157,6 +156,8 @@ target_precompile_headers(xrUICore
     pch.hpp
 )
 
-install(TARGETS xrUICore LIBRARY
-    DESTINATION "${CMAKE_INSTALL_LIBDIR}"
-)
+if (BUILD_SHARED_LIBS)
+    install(TARGETS xrUICore LIBRARY
+        DESTINATION "${CMAKE_INSTALL_LIBDIR}"
+    )
+endif()

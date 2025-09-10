@@ -1,4 +1,4 @@
-add_library(xrGame SHARED)
+add_library(xrGame)
 
 target_sources(xrGame PRIVATE
     abstract_location_selector.h
@@ -2511,12 +2511,12 @@ target_compile_definitions(xrGame
 )
 
 # E2K hack: MCST lcc compiler does not support object files greater than 4Gb due to a bug in EDG frontend
-if (PROJECT_PLATFORM_E2K)
+if (CMAKE_CXX_COMPILER_ID MATCHES "LCC")
     target_compile_options(xrGame
         PRIVATE
-        $<$<CONFIG:Debug,RelWithDebInfo>:-g0>
+        -g0
     )
-    message("Debug information generation is disabled for xrGame when compiling Debug and RelWithDebInfo, because MCST lcc compiler does not support object files greater than 4 GB (EDG frontend bug).")
+    message("Debug information generation is disabled for xrGame, because MCST lcc compiler does not support object files greater than 4 GB (EDG frontend bug).")
 endif()
 
 set_target_properties(xrGame PROPERTIES
@@ -2530,6 +2530,8 @@ target_precompile_headers(xrGame
     $<$<COMPILE_LANGUAGE:CXX>:pch_script.h>
 )
 
-install(TARGETS xrGame LIBRARY
-    DESTINATION "${CMAKE_INSTALL_LIBDIR}"
-)
+if (BUILD_SHARED_LIBS)
+    install(TARGETS xrGame LIBRARY
+        DESTINATION "${CMAKE_INSTALL_LIBDIR}"
+    )
+endif()

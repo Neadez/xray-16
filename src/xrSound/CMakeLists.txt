@@ -1,4 +1,4 @@
-add_library(xrSound SHARED)
+add_library(xrSound)
 
 target_sources_grouped(
     TARGET xrSound
@@ -151,6 +151,8 @@ target_precompile_headers(xrSound
     stdafx.h
 )
 
-install(TARGETS xrSound LIBRARY
-    DESTINATION "${CMAKE_INSTALL_LIBDIR}"
-)
+if (BUILD_SHARED_LIBS)
+    install(TARGETS xrSound LIBRARY
+        DESTINATION "${CMAKE_INSTALL_LIBDIR}"
+    )
+endif()
