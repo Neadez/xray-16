@@ -475,6 +475,10 @@ void CActor::Load(LPCSTR section)
     m_sCarCharacterUseAction = "car_character_use";
     m_sInventoryItemUseAction = "inventory_item_use";
     m_sInventoryBoxUseAction = "inventory_box_use";
+
+    m_sCharacterUseActionIcon = "ui_hud_icon_talk";
+    m_sInventoryItemUseActionIcon = "ui_hud_icon_pickup";
+    m_sDefaultIcon = "ui_hud_icon_interact";
     //---------------------------------------------------------------------
     m_sHeadShotParticle = READ_IF_EXISTS(pSettings, r_string, section, "HeadShotParticle", 0);
 }
@@ -1353,6 +1357,7 @@ void CActor::shedule_Update(u32 DT)
     if (m_holder || !getEnabled() || !Ready())
     {
         m_sDefaultObjAction = nullptr;
+        m_sDefaultActionIcon = nullptr;
         inherited::shedule_Update(DT);
         return;
     }
@@ -1549,18 +1554,24 @@ void CActor::shedule_Update(u32 DT)
             if (m_pUsableObject && m_pUsableObject->tip_text())
             {
                 m_sDefaultObjAction = StringTable().translate(m_pUsableObject->tip_text());
+                if (m_pUsableObject->tip_icon())
+                {
+                    m_sDefaultActionIcon = m_pUsableObject->tip_icon();
+                }
             }
             else
             {
                 if (m_pPersonWeLookingAt && pEntityAlive->g_Alive() && m_pPersonWeLookingAt->IsTalkEnabled())
                 {
                     m_sDefaultObjAction = m_sCharacterUseAction;
+                    m_sDefaultActionIcon = m_sCharacterUseActionIcon;
                 }
                 else if (pEntityAlive && !pEntityAlive->g_Alive())
                 {
                     if (m_pPersonWeLookingAt && m_pPersonWeLookingAt->deadbody_closed_status())
                     {
                         m_sDefaultObjAction = m_sDeadCharacterDontUseAction;
+                        m_sDefaultActionIcon = m_sDefaultIcon;
                     }
                     else
                     {
@@ -1568,25 +1579,30 @@ void CActor::shedule_Update(u32 DT)
                         if (b_allow_drag)
                         {
                             m_sDefaultObjAction = m_sDeadCharacterUseOrDragAction;
+                            m_sDefaultActionIcon = m_sDefaultIcon;
                         }
                         else if (pEntityAlive->cast_inventory_owner())
                         {
                             m_sDefaultObjAction = m_sDeadCharacterUseAction;
+                            m_sDefaultActionIcon = m_sDefaultIcon;
                         }
                     } // m_pPersonWeLookingAt
                 }
                 else if (m_pVehicleWeLookingAt)
                 {
                     m_sDefaultObjAction = m_pVehicleWeLookingAt->m_sUseAction != nullptr ? m_pVehicleWeLookingAt->m_sUseAction : m_sCarCharacterUseAction;
+                    m_sDefaultActionIcon = m_sDefaultIcon;
                 }
                 else if (m_pObjectWeLookingAt && m_pObjectWeLookingAt->cast_inventory_item() &&
                     m_pObjectWeLookingAt->cast_inventory_item()->CanTake())
                 {
                     m_sDefaultObjAction = m_sInventoryItemUseAction;
+                    m_sDefaultActionIcon = m_sInventoryItemUseActionIcon;
                 }
                 else
                 {
                     m_sDefaultObjAction = nullptr;
+                    m_sDefaultActionIcon = nullptr;
                 }
             }
         }
@@ -1595,6 +1611,7 @@ void CActor::shedule_Update(u32 DT)
     {
         m_pPersonWeLookingAt = nullptr;
         m_sDefaultObjAction = nullptr;
+        m_sDefaultActionIcon = nullptr;
         m_pUsableObject = nullptr;
         m_pObjectWeLookingAt = nullptr;
         m_pVehicleWeLookingAt = nullptr;

@@ -448,6 +448,8 @@ public:
     ////////////////////////////use calback///////////////////////////////////////////////
     void SetTipText(LPCSTR tip_text);
     void SetTipTextDefault();
+    void SetTipIcon(LPCSTR tip_icon);
+    void SetTipIconDefault();
     void SetNonscriptUsable(bool nonscript_usable);
     ///////////////////////////////////////////////////////////////////////////////////////////
     void set_fastcall(const luabind::functor<bool>& functor, const luabind::adl::object& object);

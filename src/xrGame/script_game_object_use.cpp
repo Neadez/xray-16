@@ -20,6 +20,8 @@
 
 void CScriptGameObject::SetTipText(LPCSTR tip_text) { object().set_tip_text(tip_text); }
 void CScriptGameObject::SetTipTextDefault() { object().set_tip_text_default(); }
+void CScriptGameObject::SetTipIcon(LPCSTR tip_icon) { object().set_tip_icon(tip_icon); }
+void CScriptGameObject::SetTipIconDefault() { object().set_tip_icon_default(); }
 void CScriptGameObject::SetNonscriptUsable(bool nonscript_usable) { object().set_nonscript_usable(nonscript_usable); }
 Fvector CScriptGameObject::GetCurrentDirection()
 {

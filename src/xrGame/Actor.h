@@ -359,6 +359,7 @@ public:
     CGameObject* ObjectWeLookingAt() { return m_pObjectWeLookingAt; }
     CInventoryOwner* PersonWeLookingAt() { return m_pPersonWeLookingAt; }
     pcstr GetDefaultActionForObject() const { return m_sDefaultObjAction.c_str(); }
+    LPCSTR GetDefaultActionIcon() { return *m_sDefaultActionIcon; }
 
 protected:
     CGameObject* m_pUsableObject;
@@ -377,6 +378,13 @@ protected:
     shared_str m_sCarCharacterUseAction;
     shared_str m_sInventoryItemUseAction;
     shared_str m_sInventoryBoxUseAction;
+
+    // Icon for action for object we're looking at
+    shared_str m_sCharacterUseActionIcon;
+    shared_str m_sInventoryItemUseActionIcon;
+    shared_str m_sDefaultIcon;
+
+    shared_str m_sDefaultActionIcon;
 
     //	shared_str				m_quick_use_slots[4];
     //режим подбирания предметов

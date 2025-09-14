@@ -106,6 +106,7 @@ void CUIMainIngameWnd::Init()
     //---------------------------------------------------------
 
     // Подсказки, которые возникают при наведении прицела на объект
+    UIStaticInteractIcon = UIHelper::CreateStatic(uiXml, "interact_icon", this);
     UIStaticQuickHelp = UIHelper::CreateStatic(uiXml, "quick_info", this);
 
     uiXml.SetLocalRoot(uiXml.GetRoot());
@@ -406,17 +407,30 @@ void CUIMainIngameWnd::RenderQuickInfos()
 
     static CGameObject* pObject = NULL;
     LPCSTR actor_action = pActor->GetDefaultActionForObject();
+    LPCSTR action_icon = pActor->GetDefaultActionIcon();
     UIStaticQuickHelp->Show(NULL != actor_action);
+    UIStaticInteractIcon->Show(NULL != action_icon);
 
     if (NULL != actor_action)
     {
         if (xr_stricmp(actor_action, UIStaticQuickHelp->GetText()))
+        {
             UIStaticQuickHelp->SetTextST(actor_action);
+        }
+    }
+
+    if (NULL != action_icon)
+    {
+        if (xr_stricmp(actor_action, UIStaticQuickHelp->GetText()))
+        {
+            UIStaticInteractIcon->InitTexture(action_icon);
+        }
     }
 
     if (pObject != pActor->ObjectWeLookingAt())
     {
         UIStaticQuickHelp->SetTextST(actor_action ? actor_action : " ");
+        UIStaticInteractIcon->InitTexture(action_icon ? action_icon : "");
         UIStaticQuickHelp->ResetColorAnimation();
         pObject = pActor->ObjectWeLookingAt();
     }

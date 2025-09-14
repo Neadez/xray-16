@@ -85,6 +85,7 @@ bool CInventoryBox::net_Spawn(CSE_Abstract* DC)
     setVisible(TRUE);
     setEnabled(TRUE);
     set_tip_text("inventory_box_use");
+    set_tip_icon("ui_hud_icon_interact");
 
     CSE_ALifeInventoryBox* pSE_box = smart_cast<CSE_ALifeInventoryBox*>(DC);
     if (/*IsGameTypeSingle() &&*/ pSE_box)
@@ -92,6 +93,7 @@ bool CInventoryBox::net_Spawn(CSE_Abstract* DC)
         m_can_take = pSE_box->m_can_take;
         m_closed = pSE_box->m_closed;
         set_tip_text(pSE_box->m_tip_text.c_str());
+        set_tip_icon(pSE_box->m_tip_text.c_str());
     }
 
     return TRUE;
@@ -125,10 +127,12 @@ void CInventoryBox::set_closed(bool status, LPCSTR reason)
     if (reason && xr_strlen(reason))
     {
         set_tip_text(reason);
+        set_tip_icon(reason);
     }
     else
     {
         set_tip_text("inventory_box_use");
+        set_tip_icon("ui_hud_icon_interact");
     }
     SE_update_status();
 }

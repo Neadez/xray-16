@@ -30,6 +30,8 @@ public:
 protected:
     CUIStatic* UIStaticDiskIO{};
     CUIStatic* UIStaticQuickHelp{};
+    CUIStatic* UIStaticTalkIcon{};
+    CUIStatic* UIStaticInteractIcon{};
     CUIMotionIcon* UIMotionIcon{};
     CUIZoneMap* UIZoneMap{};
 
