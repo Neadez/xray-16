@@ -688,9 +688,9 @@ public:
         const bool compat = ClearSkyMode || ShadowOfChernobylMode;
         StaticDrawableWrapper* _s = CurrentGameUI()->AddCustomStatic("game_saved", true, compat ? 3.0f : -1.0f);
 
-        pstr save_name;
-        STRCONCAT(save_name, StringTable().translate("st_game_saved").c_str(), ": ", S);
-        _s->wnd()->TextItemControl()->SetText(save_name);
+        //pstr save_name;
+        //STRCONCAT(save_name, StringTable().translate("st_game_saved").c_str(), ": ", S);
+        //_s->wnd()->TextItemControl()->SetText(save_name);
 
         xr_strcat(S, ".dds");
         FS.update_path(S1, "$game_saves$", S);
