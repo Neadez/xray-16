@@ -117,6 +117,7 @@ void CUIMainIngameWnd::Init()
     m_ind_radiation = UIHelper::CreateStatic(uiXml, "indicator_radiation", this, false);
     m_ind_starvation = UIHelper::CreateStatic(uiXml, "indicator_starvation", this, false);
     m_ind_dehydration = UIHelper::CreateStatic(uiXml, "indicator_dehydration", this, false);
+    m_ind_psy_health = UIHelper::CreateStatic(uiXml, "indicator_psy_health", this, false);
     m_ind_weapon_broken = UIHelper::CreateStatic(uiXml, "indicator_weapon_broken", this, false);
     m_ind_helmet_broken = UIHelper::CreateStatic(uiXml, "indicator_helmet_broken", this, false);
     m_ind_outfit_broken = UIHelper::CreateStatic(uiXml, "indicator_outfit_broken", this, false);
