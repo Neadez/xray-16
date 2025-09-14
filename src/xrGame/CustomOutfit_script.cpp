@@ -64,7 +64,7 @@ void CHelmet::script_register(lua_State* luaState)
     ];
 }
 
-void CBackpack_Export(lua_State* luaState)
+void CBackpack::script_register(lua_State* luaState)
 {
     using namespace luabind;
 

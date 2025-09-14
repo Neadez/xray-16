@@ -8,6 +8,8 @@ CBackpack::CBackpack()
     m_flags.set(FUsingCondition, false);
 }
 
+CBackpack::~CBackpack() {}
+
 void CBackpack::Load(pcstr section)
 {
     inherited::Load(section);

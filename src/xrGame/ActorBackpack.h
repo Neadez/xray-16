@@ -8,6 +8,8 @@ class CBackpack final : public CInventoryItemObject
 public:
     CBackpack();
 
+    virtual ~CBackpack();
+
     void Load(pcstr section) override;
 
     virtual void Hit(float P, ALife::EHitType hit_type);
@@ -24,4 +26,6 @@ public:
 
 protected:
     bool install_upgrade_impl(pcstr section, bool test) override;
+private:
+    DECLARE_SCRIPT_REGISTER_FUNCTION(CGameObject);
 };
