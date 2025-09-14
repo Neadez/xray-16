@@ -26,6 +26,7 @@ CUICellItem::CUICellItem()
     m_text = NULL;
     //-	m_mark				= NULL;
     m_upgrade = NULL;
+    m_unique = NULL;
     m_pConditionState = NULL;
     m_drawn_frame = 0;
     SetAccelerator(0);
@@ -74,6 +75,13 @@ void CUICellItem::init()
     CUIXmlInit::InitStatic(uiXml, "cell_item_upgrade", 0, m_upgrade);
     m_upgrade_pos = m_upgrade->GetWndPos();
     m_upgrade->Show(false);
+
+    m_unique = xr_new<CUIStatic>("Unique");
+    m_unique->SetAutoDelete(true);
+    AttachChild(m_unique);
+    CUIXmlInit::InitStatic(uiXml, "cell_item_unique", 0, m_unique);
+    m_unique_pos = m_unique->GetWndPos();
+    m_unique->Show(false);
 
     // Try progress first and then progess
     m_pConditionState = UIHelper::CreateProgressBar(uiXml, "condition_progress_bar", this, false);
@@ -136,6 +144,25 @@ void CUICellItem::Update()
         }
         m_upgrade->Show(m_has_upgrade);
     }
+
+    if (m_unique)
+    { 
+        if (pSettings->line_exist(item->m_section_id, "unique")) 
+        {
+            auto icon = pSettings->r_string(item->m_section_id, "unique");
+            if (item)
+            {
+                m_unique->InitTexture(icon);
+                Fvector2 pos;
+                pos.set(m_unique_pos);
+                const float y = GetWndSize().y;
+                pos.y += y - 21.0f;
+                m_unique->SetWndPos(pos);
+            }
+            m_unique->Show(true);
+        }
+    }
+
 }
 
 bool CUICellItem::OnMouseAction(float x, float y, EUIMessages mouse_action)
