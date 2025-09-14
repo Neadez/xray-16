@@ -102,7 +102,7 @@ void CUIActorMenu::SendEvent_Item2Belt(PIItem pItem, u16 recipient)
     P.w_u16(pItem->object().ID());
     CGameObject::u_EventSend(P);
 
-    PlaySnd(eItemToBelt);
+    //PlaySnd(eItemToBelt);
     clear_highlight_lists();
 };
 
@@ -596,10 +596,10 @@ bool CUIActorMenu::ToSlot(CUICellItem* itm, bool force_place, u16 slot_id)
         SendEvent_ActivateSlot(slot_id, m_pActorInvOwner->object_id());
 
         // ColorizeItem						( itm, false );
-        if (slot_id == OUTFIT_SLOT)
-        {
-            MoveArtefactsToBag();
-        }
+        //if (slot_id == OUTFIT_SLOT)
+        //{
+        //    MoveArtefactsToBag();
+        //}
         return true;
     }
     else
@@ -767,11 +767,12 @@ bool CUIActorMenu::ToBelt(CUICellItem* itm, bool b_use_cursor_pos)
             SendEvent_Item2Belt(iitem, m_pActorInvOwner->object_id());
 
         // ColorizeItem						(itm, false);
+        PlaySnd(eItemToBelt);
         return true;
     }
     else
     { // in case belt slot is busy
-        if (!iitem->Belt() || m_pActorInvOwner->inventory().BeltWidth() == 0)
+        if (!iitem->Belt() || m_pActorInvOwner->inventory().BeltMaxWidth() == 0)
             return false;
 
         CUIDragDropListEx* belt_list = NULL;
@@ -1549,6 +1550,7 @@ void CUIActorMenu::UpdateOutfit()
     const u32 maxCount = m_pActorInvOwner->inventory().BeltMaxWidth();
     const Ivector2 maxCap = m_pLists[eInventoryBeltList]->CalculateCapacity(maxCount);
     m_pLists[eInventoryBeltList]->SetMaxCellsCapacity(maxCap);
+    m_pLists[eInventoryBeltList]->SetCellsCapacity(maxCap);
 
     CCustomOutfit* outfit = m_pActorInvOwner->GetOutfit();
     if (m_pLists[eInventoryHelmetList])
