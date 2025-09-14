@@ -78,6 +78,7 @@ protected:
         eAttachAddon,
         eDetachAddon,
         eItemUse,
+        eUnload,
         eSndMax
     };
 

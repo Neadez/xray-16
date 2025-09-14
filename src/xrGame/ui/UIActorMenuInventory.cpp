@@ -1506,6 +1506,7 @@ void CUIActorMenu::ProcessPropertiesBoxClicked(CUIWindow* w, void* d)
         break;
     case INVENTORY_UNLOAD_MAGAZINE:
     {
+        PlaySnd(eUnload);
         CWeaponMagazined* weap_mag = smart_cast<CWeaponMagazined*>((CWeapon*)cell_item->m_pData);
         if (!weap_mag)
         {
