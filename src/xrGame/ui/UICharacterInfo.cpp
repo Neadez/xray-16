@@ -397,3 +397,19 @@ bool CUICharacterInfo::ignore_community(shared_str const& check_community)
     }
     return false;
 }
+
+// call from using dead monster
+void CUICharacterInfo::InitMonsterCharacter(shared_str monster_tex_name)
+{
+    if (m_icons[eIcon])
+    {
+        m_icons[eIcon]->InitTexture(monster_tex_name.c_str());
+        m_icons[eIcon]->SetStretchTexture(true);
+        //m_icons[eIcon]->SetColor(m_deadbody_color); // (color_argb(255, 255, 160, 160));
+        m_icons[eIcon]->Show(true);
+    }
+    if (m_icons[eIconOver])
+    {
+        m_icons[eIconOver]->Show(true);
+    }
+}
