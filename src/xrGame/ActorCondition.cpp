@@ -128,6 +128,9 @@ void CActorCondition::LoadCondition(LPCSTR entity_section)
     m_fV_HydrationPower = pSettings->r_float(section, "hydration_power_v");
     m_fV_HydrationHealth = pSettings->r_float(section, "hydration_health_v");
 
+    m_fPsyHealthCritical = pSettings->r_float(section, "psy_health_critical");
+    clamp(m_fPsyHealthCritical, 0.0f, 1.0f);
+
     m_MaxWalkWeight = pSettings->r_float(section, "max_walk_weight");
 
     m_zone_max_power[ALife::infl_rad] = pSettings->read_if_exists<float>(section, "radio_zone_max_power", 1.0f);

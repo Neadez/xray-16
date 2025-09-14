@@ -123,6 +123,8 @@ public:
     IC float const& V_HydrationHealth() { return m_fV_HydrationHealth; }
     IC float const& HydrationCritical() { return m_fHydrationCritical; }
 
+    IC float const& PsyHealthCritical() { return m_fPsyHealthCritical; }
+
     float GetZoneMaxPower(ALife::EInfluenceType type) const;
     float GetZoneMaxPower(ALife::EHitType hit_type) const;
 
@@ -154,6 +156,7 @@ protected:
     float m_fV_HydrationHealth;
     float m_fHydrationCritical;
 
+    float m_fPsyHealthCritical;
     //--
     float m_fPowerLeakSpeed;
 

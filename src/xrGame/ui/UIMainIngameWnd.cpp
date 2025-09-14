@@ -764,6 +764,27 @@ void CUIMainIngameWnd::UpdateMainIndicators()
         }
     }
 
+    // Psy health icon
+    if (m_ind_psy_health)
+    {
+        const float psy_health = pActor->conditions().GetPsyHealth();
+        const float psy_health_critical = pActor->conditions().PsyHealthCritical();
+        const float psy_health_koef = (psy_health - psy_health_critical) /
+            (psy_health >= psy_health_critical ? 1 - psy_health_critical : psy_health_critical);
+        if (psy_health_koef > 0.5)
+            m_ind_psy_health->Show(false);
+        else
+        {
+            m_ind_psy_health->Show(true);
+            if (psy_health_koef > 0.0f)
+                m_ind_psy_health->InitTexture("ui_inGame2_circle_psy_health_green");
+            else if (psy_health_koef > -0.5f)
+                m_ind_psy_health->InitTexture("ui_inGame2_circle_psy_health_yellow");
+            else
+                m_ind_psy_health->InitTexture("ui_inGame2_circle_psy_health_red");
+        }
+    }
+
     // Armor broken icon
     if (m_ind_outfit_broken)
     {
