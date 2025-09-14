@@ -36,10 +36,11 @@ constexpr std::tuple<u32, cpcstr, cpcstr, float, bool, cpcstr> af_immunity[] =
 constexpr std::tuple<ALife::EConditionRestoreType, cpcstr, cpcstr, float, bool, cpcstr> af_restore[] =
 {
     //{ ALife::EConditionRestoreType,   "section",                  "caption",          magnitude, sign_inverse, "unit" }
-    { ALife::eHealthRestoreSpeed,       "health_restore_speed",     "ui_inv_health",    1.0f,      false,        "%" },
-    { ALife::eSatietyRestoreSpeed,      "satiety_restore_speed",    "ui_inv_satiety",   1.0f,      false,        "%" },
+    { ALife::eHealthRestoreSpeed,       "health_restore_speed",     "ui_inv_health",    1.0f,      false,        nullptr },
+    { ALife::eSatietyRestoreSpeed,      "satiety_restore_speed",    "ui_inv_satiety",   1.0f,      false,        nullptr },
+    { ALife::eHydrationRestoreSpeed,    "hydration_restore_speed",  "ui_inv_hydration", 1.0f,      false,        nullptr },
     { ALife::ePowerRestoreSpeed,        "power_restore_speed",      "ui_inv_power",     1.0f,      false,        nullptr },
-    { ALife::eBleedingRestoreSpeed,     "bleeding_restore_speed",   "ui_inv_bleeding", -1.0f,      true,         "%" },
+    { ALife::eBleedingRestoreSpeed,     "bleeding_restore_speed",   "ui_inv_bleeding", -1.0f,      true,         nullptr },
     { ALife::eRadiationRestoreSpeed,    "radiation_restore_speed",  "ui_inv_radiation", 1.0f,      true,         nullptr },
 };
 static_assert(std::size(af_restore) == ALife::eRestoreTypeMax,

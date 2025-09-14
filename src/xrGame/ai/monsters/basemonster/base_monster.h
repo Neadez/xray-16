@@ -148,6 +148,9 @@ public:
     float GetSatiety() { return 0.5f; }
     void ChangeSatiety(float v) {}
 
+    float GetHydration() { return 0.5f; }
+    void ChangeHydration(float v) {}
+
     // ---------------------------------------------------------------------------------
     // Process scripts
     // ---------------------------------------------------------------------------------
