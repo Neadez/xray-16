@@ -100,6 +100,7 @@ public:
 private:
     CGameTask* m_task{};
     CUI3tButton* m_name{};
+    CUIStatic* m_time{};
     CUICheckButton* m_bt_view{};
     CUIStatic* m_st_story{};
     CUI3tButton* m_bt_focus{};

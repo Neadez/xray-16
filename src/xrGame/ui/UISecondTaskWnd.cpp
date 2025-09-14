@@ -227,6 +227,7 @@ bool UITaskListWndItem::init_task(CGameTask* task, UITaskListWnd* parent)
     m_bt_view = UIHelper::CreateCheck(xml, "second_task_wnd:task_item:btn_view", this, false);
     m_st_story = UIHelper::CreateStatic(xml, "second_task_wnd:task_item:st_story", this, false);
     m_bt_focus = UIHelper::Create3tButton(xml, "second_task_wnd:task_item:btn_focus", this);
+    m_time = UIHelper::CreateStatic(xml, "second_task_wnd:task_item:t_time", this, false);
 
     m_color_states[stt_activ] = CUIXmlInit::GetColor(xml, "second_task_wnd:task_item:activ", 0, u32(-1));
     m_color_states[stt_unread] = CUIXmlInit::GetColor(xml, "second_task_wnd:task_item:unread", 0, u32(-1));
@@ -251,7 +252,7 @@ void UITaskListWndItem::Update()
     inherited::Update();
     update_view();
 
-    if (m_task && m_name->CursorOverWindow() && show_hint_can)
+    if (m_task && (m_name->CursorOverWindow() || m_st_story->CursorOverWindow()) && show_hint_can)
     {
         if (Device.dwTimeGlobal > (m_name->FocusReceiveTime() + 700 * Device.time_factor()))
         {
@@ -284,12 +285,14 @@ void UITaskListWndItem::update_view()
 
     if (m_st_story)
     {
-        if (m_task->GetTaskType() == eTaskTypeStoryline)
+        m_st_story->InitTexture(m_task->m_icon_texture_name.c_str());
+       /* if (m_task->GetTaskType() == eTaskTypeStoryline)
             m_st_story->InitTexture("ui_inGame2_PDA_icon_Primary_mission");
         else
-            m_st_story->InitTexture("ui_inGame2_PDA_icon_Secondary_mission");
+            m_st_story->InitTexture("ui_inGame2_PDA_icon_Secondary_mission");*/
     }
-
+    
+    m_time->TextItemControl()->SetText(InventoryUtilities::GetTimeAndDateAsString(m_task->m_ReceiveTime).c_str());
     m_name->TextItemControl()->SetTextST(m_task->m_Title.c_str());
     m_name->AdjustHeightToText();
     float h1 = m_name->GetWndPos().y + m_name->GetHeight() + 10.0f;
@@ -336,7 +339,7 @@ void UITaskListWndItem::SendMessage(CUIWindow* pWnd, s16 msg, void* pData)
         }
     }
 
-    if (pWnd == m_name)
+    if (pWnd == m_name || pWnd == m_st_story)
     {
         if (msg == BUTTON_DOWN)
         {
