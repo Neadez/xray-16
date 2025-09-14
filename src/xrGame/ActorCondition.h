@@ -135,6 +135,10 @@ public:
     virtual bool ApplyBooster(const SBooster& B, const shared_str& sect);
     float GetMaxPowerRestoreSpeed() const { return m_max_power_restore_speed; };
     //
+    float GetMaxHealthRestoreSpeed() const { return m_max_health_restore_speed; };
+    float GetMaxBleedingRestoreSpeed() const { return m_max_bleeding_restore_speed; };
+    float GetMaxRadiationRestoreSpeed() const { return m_max_radiation_restore_speed; };
+    float GetMaxSatietyRestoreSpeed() const { return m_max_satiety_restore_speed; };
     float GetMaxHydrationRestoreSpeed() const { return m_max_hydration_restore_speed; };
     //
     float GetMaxWoundProtection() const { return m_max_wound_protection; };
@@ -179,6 +183,10 @@ protected:
     float m_f_time_affected;
     float m_max_power_restore_speed;
     //
+    float m_max_health_restore_speed;
+    float m_max_bleeding_restore_speed;
+    float m_max_radiation_restore_speed;
+    float m_max_satiety_restore_speed;
     float m_max_hydration_restore_speed;
     //
     float m_max_wound_protection;

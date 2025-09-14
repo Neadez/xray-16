@@ -72,6 +72,10 @@ CActorCondition::CActorCondition(CActor* object) : inherited(object)
 
     m_max_power_restore_speed = 0.0f;
     //
+    m_max_health_restore_speed = 0.0f;
+    m_max_bleeding_restore_speed = 0.0f;
+    m_max_radiation_restore_speed = 0.0f;
+    m_max_satiety_restore_speed = 0.0f;
     m_max_hydration_restore_speed = 0.0f;
     //
     m_max_wound_protection = 0.0f;
@@ -141,6 +145,10 @@ void CActorCondition::LoadCondition(LPCSTR entity_section)
 
     m_max_power_restore_speed = pSettings->read_if_exists<float>(section, "max_power_restore_speed", 1.0f);
     //
+    m_max_health_restore_speed = pSettings->read_if_exists<float>(section, "max_health_restore_speed", 1.0f);
+    m_max_bleeding_restore_speed = pSettings->read_if_exists<float>(section, "max_bleeding_restore_speed", 1.0f);
+    m_max_radiation_restore_speed = pSettings->read_if_exists<float>(section, "max_radiation_restore_speed", 1.0f);
+    m_max_satiety_restore_speed = pSettings->read_if_exists<float>(section, "max_satiety_restore_speed", 1.0f);
     m_max_hydration_restore_speed = pSettings->read_if_exists<float>(section, "max_hydration_restore_speed", 1.0f);
     //
     m_max_wound_protection = pSettings->read_if_exists<float>(section, "max_wound_protection", 1.0f);
@@ -152,6 +160,11 @@ void CActorCondition::LoadCondition(LPCSTR entity_section)
     VERIFY(!fis_zero(m_zone_max_power[ALife::infl_psi]));
     VERIFY(!fis_zero(m_zone_max_power[ALife::infl_electra]));
     VERIFY(!fis_zero(m_max_power_restore_speed));
+    //
+    VERIFY(!fis_zero(m_max_health_restore_speed));
+    VERIFY(!fis_zero(m_max_bleeding_restore_speed));
+    VERIFY(!fis_zero(m_max_radiation_restore_speed));
+    VERIFY(!fis_zero(m_max_satiety_restore_speed));
     VERIFY(!fis_zero(m_max_hydration_restore_speed));
 }
 

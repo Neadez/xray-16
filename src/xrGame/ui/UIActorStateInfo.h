@@ -41,8 +41,23 @@ private:
         stt_psi,
         stt_wound,
         stt_fire_wound,
+        stt_fire_wound_head,
         stt_shock,
         stt_power,
+        //
+        stt_bleed,
+        stt_helth,
+        stt_rada,
+        stt_sati,
+        stt_hydr,
+        stt_weight,
+        stt_satiety,
+        stt_hydration,
+        stt_psy,
+
+        // 
+        stt_strike,
+        stt_expl,
         stt_count
     };
     ui_actor_state_item* m_state[stt_count]{};
@@ -79,6 +94,8 @@ protected:
     UI_Arrow* m_arrow{};
     UI_Arrow* m_arrow_shadow{};
     float m_magnitude;
+    shared_str m_unit_str;
+    bool m_sign_inverse;
 
 public:
     ui_actor_state_item();

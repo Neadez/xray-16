@@ -1571,9 +1571,9 @@ void CUIActorMenu::UpdateOutfit()
         return;
     }
 
-    const u32 af_count = m_pActorInvOwner->inventory().BeltWidth();
-    const Ivector2 cap = m_pLists[eInventoryBeltList]->CalculateCapacity(af_count);
-    m_pLists[eInventoryBeltList]->SetCellsCapacity(cap);
+    //const u32 af_count = m_pActorInvOwner->inventory().BeltWidth();
+    //const Ivector2 cap = m_pLists[eInventoryBeltList]->CalculateCapacity(af_count);
+    //m_pLists[eInventoryBeltList]->SetCellsCapacity(cap);
 }
 
 void CUIActorMenu::MoveArtefactsToBag()
