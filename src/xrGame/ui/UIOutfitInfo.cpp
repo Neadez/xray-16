@@ -50,7 +50,7 @@ bool CUIOutfitImmunity::InitFromXml(CUIXml& xml_doc, pcstr base_str, pcstr immun
     m_progress.InitFromXml(xml_doc, buf);
 
     strconcat(sizeof(buf), buf, base_str, ":", immunity, ":static_value");
-    if (xml_doc.NavigateToNode(buf, 0) && !CallOfPripyatMode)
+    if (xml_doc.NavigateToNode(buf, 0))
     {
         CUIXmlInit::InitStatic(xml_doc, buf, 0, &m_value);
         m_value.Show(true);
@@ -68,10 +68,23 @@ void CUIOutfitImmunity::SetProgressValue(float cur, float comp)
 {
     cur *= m_magnitude;
     comp *= m_magnitude;
-    m_progress.SetTwoPos(cur, comp);
+    //m_progress.SetTwoPos(cur, comp);
     string32 buf;
     //	xr_sprintf( buf, sizeof(buf), "%d %%", (int)cur );
-    xr_sprintf(buf, sizeof(buf), "%.0f", cur);
+    m_progress.SetTwoPos(cur, comp);
+    if (cur == comp)
+    {
+        m_value.SetTextColor(color_rgba(170, 170, 170, 255));
+    }
+    else if (cur < comp)
+    {
+        m_value.SetTextColor(color_rgba(255, 0, 0, 255));
+    }
+    else
+    {
+        m_value.SetTextColor(color_rgba(0, 255, 0, 255));
+    }
+    xr_sprintf(buf, sizeof(buf), "%.0f%%", cur);
     m_value.SetText(buf);
 }
 

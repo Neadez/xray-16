@@ -58,4 +58,5 @@ public:
 protected:
     CUIDoubleProgressBar m_progress; // red or green
     CUIStatic m_text;
+    CUIStatic m_value;
 };

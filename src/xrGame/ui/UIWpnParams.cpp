@@ -254,10 +254,11 @@ bool CUIWpnParams::Check(const shared_str& wpn_section)
 // -------------------------------------------------------------------------------------------------
 
 CUIConditionParams::CUIConditionParams()
-    : CUIWindow("Condition Params"), m_text("Text")
+    : CUIWindow("Condition Params"), m_text("Text"), m_value("Value")
 {
     AttachChild(&m_progress);
     AttachChild(&m_text);
+    AttachChild(&m_value);
 }
 
 bool CUIConditionParams::InitFromXml(CUIXml& xml_doc)
@@ -266,6 +267,7 @@ bool CUIConditionParams::InitFromXml(CUIXml& xml_doc)
         return false;
     CUIXmlInit::InitWindow(xml_doc, "condition_params", 0, this);
     CUIXmlInit::InitStatic(xml_doc, "condition_params:caption", 0, &m_text);
+    CUIXmlInit::InitStatic(xml_doc, "condition_params:static_value", 0, &m_value);
     m_progress.InitFromXml(xml_doc, "condition_params:progress_state");
     return true;
 }
@@ -274,12 +276,31 @@ void CUIConditionParams::SetInfo(CInventoryItem const* slot_item, CInventoryItem
 {
     float cur_value = cur_item.GetConditionToShow() * 100.0f + 1.0f - EPS;
     float slot_value = cur_value;
+    float cur = cur_item.GetConditionToShow() * 100.0f;
+    float slot = cur;
+    string32 buf;
 
     if (slot_item &&
         (slot_item !=
             &cur_item) /*&& (cur_item.object().cNameSect()._get() == slot_item->object().cNameSect()._get())*/)
     {
         slot_value = slot_item->GetConditionToShow() * 100.0f + 1.0f - EPS;
+        slot = slot_item->GetConditionToShow() * 100.0f;
     }
     m_progress.SetTwoPos(cur_value, slot_value);
+
+    if (cur == slot)
+    {
+        m_value.SetTextColor(color_rgba(170, 170, 170, 255));
+    }
+    else if (cur < slot)
+    {
+        m_value.SetTextColor(color_rgba(255, 0, 0, 255));
+    }
+    else
+    {
+        m_value.SetTextColor(color_rgba(0, 255, 0, 255));
+    }
+    xr_sprintf(buf, sizeof(buf), "%.0f%%", cur);
+    m_value.SetText(buf);
 }
