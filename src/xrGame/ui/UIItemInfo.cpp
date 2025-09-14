@@ -41,6 +41,7 @@ CUIItemInfo::CUIItemInfo() : CUIWindow(CUIItemInfo::GetDebugType())
     UIWpnParams = NULL;
     UIProperties = NULL;
     UIOutfitInfo = NULL;
+    UIWeightInfo = nullptr;
     UIBoosterInfo = NULL;
     UIArtefactParams = NULL;
     UIName = NULL;
@@ -57,6 +58,7 @@ CUIItemInfo::~CUIItemInfo()
     xr_delete(UIArtefactParams);
     xr_delete(UIProperties);
     xr_delete(UIOutfitInfo);
+    xr_delete(UIWeightInfo);
     xr_delete(UIBoosterInfo);
 }
 
@@ -109,6 +111,10 @@ bool CUIItemInfo::InitItemInfo(cpcstr xml_name)
         UIBoosterInfo = xr_new<CUIBoosterInfo>();
         if (!UIBoosterInfo->InitFromXml(uiXml))
             xr_delete(UIBoosterInfo);
+        
+        UIWeightInfo = xr_new<CUIWeightInfo>();
+        if (!UIWeightInfo->InitFromXml(uiXml))
+            xr_delete(UIWeightInfo);
 
         // UIDesc_line						= xr_new<CUIStatic>("Description line");
         // AttachChild						(UIDesc_line);
@@ -282,6 +288,7 @@ void CUIItemInfo::InitItem(CUICellItem* pCellItem, CInventoryItem* pCompareItem,
         TryAddWpnInfo(*pInvItem, pCompareItem);
         TryAddArtefactInfo(*pInvItem);
         TryAddOutfitInfo(*pInvItem, pCompareItem);
+        TryAddWeightInfo(*pInvItem, pCompareItem);
         TryAddUpgradeInfo(*pInvItem);
         TryAddBoosterInfo(*pInvItem);
 
@@ -331,7 +338,8 @@ void CUIItemInfo::TryAddConditionInfo(CInventoryItem& pInvItem, CInventoryItem* 
 
     CWeapon* weapon = smart_cast<CWeapon*>(&pInvItem);
     CCustomOutfit* outfit = smart_cast<CCustomOutfit*>(&pInvItem);
-    if (weapon || outfit)
+    CHelmet* helmet = smart_cast<CHelmet*>(&pInvItem);
+    if (weapon || outfit || helmet)
     {
         UIConditionWnd->SetInfo(pCompareItem, pInvItem);
         UIDesc->AddWindow(UIConditionWnd, false);
@@ -369,6 +377,7 @@ void CUIItemInfo::TryAddOutfitInfo(CInventoryItem& pInvItem, CInventoryItem* pCo
 
     CCustomOutfit* outfit = smart_cast<CCustomOutfit*>(&pInvItem);
     CHelmet* helmet = smart_cast<CHelmet*>(&pInvItem);
+    CBackpack* backpack = smart_cast<CBackpack*>(&pInvItem);
     if (outfit)
     {
         CCustomOutfit* comp_outfit = smart_cast<CCustomOutfit*>(pCompareItem);
@@ -380,6 +389,31 @@ void CUIItemInfo::TryAddOutfitInfo(CInventoryItem& pInvItem, CInventoryItem* pCo
         CHelmet* comp_helmet = smart_cast<CHelmet*>(pCompareItem);
         UIOutfitInfo->UpdateInfo(helmet, comp_helmet);
         UIDesc->AddWindow(UIOutfitInfo, false);
+    }    
+    if (backpack)
+    {
+        return;
+    }
+}
+
+void CUIItemInfo::TryAddWeightInfo(CInventoryItem& pInvItem, CInventoryItem* pCompareItem)
+{
+    if (!UIWeightInfo)
+        return;
+
+    CBackpack* backpack = smart_cast<CBackpack*>(&pInvItem);
+    CCustomOutfit* outfit = smart_cast<CCustomOutfit*>(&pInvItem);
+    if (outfit)
+    {
+        CCustomOutfit* comp_outfit = smart_cast<CCustomOutfit*>(pCompareItem);
+        UIWeightInfo->SetInfo(outfit, comp_outfit);
+        UIDesc->AddWindow(UIWeightInfo, false);
+    }
+    if (backpack)
+    {
+        CBackpack* comp_backpack = smart_cast<CBackpack*>(pCompareItem);
+        UIWeightInfo->SetInfo(backpack, comp_backpack);
+        UIDesc->AddWindow(UIWeightInfo, false);
     }
 }
 

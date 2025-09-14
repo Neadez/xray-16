@@ -320,6 +320,10 @@ float CInventoryOwner::MaxCarryWeight() const
     if (outfit)
         ret += outfit->m_additional_weight2;
 
+    const CBackpack* backpack = GetBackpack();
+    if (backpack)
+        ret += backpack->m_additional_weight2;
+
     return ret;
 }
 

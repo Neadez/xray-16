@@ -231,3 +231,94 @@ void CUIOutfitInfo::UpdateInfo(CHelmet* cur_helmet, CHelmet* slot_helmet)
         fireWoundItem->SetProgressValue(cur, slot);
     }
 }
+
+void CUIOutfitInfo::UpdateInfo(CBackpack* cur_backpack, CBackpack* slot_backpack)
+{
+    CActor* actor = smart_cast<CActor*>(Level().CurrentViewEntity());
+    if (!actor || !cur_backpack)
+    {
+        return;
+    }
+}
+
+CUIWeightInfo::CUIWeightInfo() : CUIWindow("Weight Params"), m_name("Name"), m_unit_str("")
+{
+    AttachChild(&m_name);
+}
+
+bool CUIWeightInfo::InitFromXml(CUIXml& xml_doc)
+{
+    if (!xml_doc.NavigateToNode("additional_inventory_weight", 0))
+        return false;
+    CUIXmlInit::InitWindow(xml_doc, "additional_inventory_weight", 0, this);
+    m_icon = UIHelper::CreateStatic(xml_doc, "additional_inventory_weight:icon", this, false);
+    CUIXmlInit::InitStatic(xml_doc, "additional_inventory_weight:caption", 0, &m_name);
+    m_value = UIHelper::CreateStatic(xml_doc, "additional_inventory_weight:static_value", this, false);
+    LPCSTR unit_str = xml_doc.ReadAttrib("additional_inventory_weight:static_value", 0, "unit_str", "");
+    m_unit_str._set(StringTable().translate(unit_str));
+    return true;
+}
+
+void CUIWeightInfo::SetInfo(CCustomOutfit* cur_outfit, CCustomOutfit* slot_outfit)
+{
+    float weight = cur_outfit->m_additional_weight;
+    float weight2 = weight;
+
+    if (slot_outfit)
+    {
+        if (slot_outfit)
+            weight2 = slot_outfit->m_additional_weight;
+    }
+
+    if (m_value)
+    {
+        string128 str;
+        float diff = weight2 - weight;
+        if (weight == weight2)
+        {
+            m_value->SetTextColor(color_rgba(170, 170, 170, 255));
+        }
+        else if (weight < weight2)
+        {
+            m_value->SetTextColor(color_rgba(255, 0, 0, 255));
+        }
+        else
+        {
+            m_value->SetTextColor(color_rgba(0, 255, 0, 255));
+        }
+        xr_sprintf(str, sizeof(str), "%.0f %s", weight, m_unit_str.c_str());
+        m_value->SetText(str);
+    }
+}
+
+void CUIWeightInfo::SetInfo(CBackpack* cur_backpack, CBackpack* slot_backpack)
+{
+    float weight = cur_backpack->m_additional_weight;
+    float weight2 = weight;
+
+    if (slot_backpack)
+    {
+        if (slot_backpack)
+            weight2 = slot_backpack->m_additional_weight;
+    }
+
+    if (m_value)
+    {
+        string128 str;
+        float diff = weight2 - weight;
+        if (weight == weight2)
+        {
+            m_value->SetTextColor(color_rgba(170, 170, 170, 255));
+        }
+        else if (weight < weight2)
+        {
+            m_value->SetTextColor(color_rgba(255, 0, 0, 255));
+        }
+        else
+        {
+            m_value->SetTextColor(color_rgba(0, 255, 0, 255));
+        }
+        xr_sprintf(str, sizeof(str), "%.0f %s", weight, m_unit_str.c_str());
+        m_value->SetText(str);
+    }
+}

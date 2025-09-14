@@ -984,13 +984,14 @@ void CUIActorMenu::PropertiesBoxForSlots(PIItem item, bool& b_show)
 {
     CCustomOutfit* pOutfit = smart_cast<CCustomOutfit*>(item);
     CHelmet* pHelmet = smart_cast<CHelmet*>(item);
+    CBackpack* pBackpack = smart_cast<CBackpack*>(item);
     CInventory& inv = m_pActorInvOwner->inventory();
 
     // Флаг-признак для невлючения пункта контекстного меню: Dreess Outfit, если костюм уже надет
     bool bAlreadyDressed = false;
     u16 cur_slot = item->BaseSlot();
 
-    if (!pOutfit && !pHelmet && cur_slot != NO_ACTIVE_SLOT && !inv.SlotIsPersistent(cur_slot) &&
+    if (!pOutfit && !pHelmet && !pBackpack && cur_slot != NO_ACTIVE_SLOT && !inv.SlotIsPersistent(cur_slot) &&
         inv.ItemFromSlot(cur_slot) != item /*&& inv.CanPutInSlot(item, cur_slot)*/)
     {
         m_UIPropertiesBox->AddItem("st_move_to_slot", NULL, INVENTORY_TO_SLOT_ACTION);
@@ -1008,11 +1009,15 @@ void CUIActorMenu::PropertiesBoxForSlots(PIItem item, bool& b_show)
         {
             if (!pHelmet)
             {
-                const bool has_translation = StringTable().translate("st_unequip", nullptr);
-                if (m_currMenuMode == mmDeadBodySearch || !has_translation)
-                    m_UIPropertiesBox->AddItem("st_move_to_bag", nullptr, INVENTORY_TO_BAG_ACTION);
+                if (!pBackpack)
+                {
+                    if (m_currMenuMode == mmDeadBodySearch)
+                        m_UIPropertiesBox->AddItem("st_move_to_bag", nullptr, INVENTORY_TO_BAG_ACTION);
+                    else
+                        m_UIPropertiesBox->AddItem("st_unequip", nullptr, INVENTORY_TO_BAG_ACTION);
+                }
                 else
-                    m_UIPropertiesBox->AddItem("st_unequip", nullptr, INVENTORY_TO_BAG_ACTION);
+                    m_UIPropertiesBox->AddItem("st_undress_backpack", NULL, INVENTORY_TO_BAG_ACTION);
             }
             else
                 m_UIPropertiesBox->AddItem("st_undress_helmet", NULL, INVENTORY_TO_BAG_ACTION);
@@ -1033,6 +1038,12 @@ void CUIActorMenu::PropertiesBoxForSlots(PIItem item, bool& b_show)
     if (pHelmet && !bAlreadyDressed && (!outfit_in_slot || outfit_in_slot->bIsHelmetAvaliable))
     {
         m_UIPropertiesBox->AddItem("st_dress_helmet", NULL, INVENTORY_TO_SLOT_ACTION);
+        b_show = true;
+    }
+
+    if (pBackpack && !bAlreadyDressed)
+    {
+        m_UIPropertiesBox->AddItem("st_dress_backpack", NULL, INVENTORY_TO_SLOT_ACTION);
         b_show = true;
     }
 }

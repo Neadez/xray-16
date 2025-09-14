@@ -5,6 +5,7 @@
 
 class CCustomOutfit;
 class CHelmet;
+class CBackpack;
 class CUIStatic;
 class CUIDoubleProgressBar;
 class CUIXml;
@@ -37,6 +38,7 @@ public:
     void InitFromXml(CUIXml& xml_doc);
     void UpdateInfo(CCustomOutfit* cur_outfit, CCustomOutfit* slot_outfit = nullptr);
     void UpdateInfo(CHelmet* cur_helmet, CHelmet* slot_helmet = nullptr);
+    void UpdateInfo(CBackpack* cur_backpack, CBackpack* slot_backpack = nullptr);
 
     pcstr GetDebugType() override { return "CUIOutfitInfo"; }
 
@@ -45,3 +47,22 @@ protected:
     CUIStatic* m_Prop_line{};
     xr_unordered_map<ALife::EHitType, CUIOutfitImmunity*> m_items;
 }; // class CUIOutfitInfo
+
+
+class CUIWeightInfo final : public CUIWindow
+{
+public:
+    CUIWeightInfo();
+
+    bool InitFromXml(CUIXml& xml_doc);
+    void SetInfo(CCustomOutfit* cur_outfit, CCustomOutfit* slot_outfit);
+    void SetInfo(CBackpack* cur_backpack, CBackpack* slot_backpack);
+
+    pcstr GetDebugType() override { return "CUIWeightInfo"; }
+
+protected:
+    CUIStatic* m_icon; // texture
+    CUIStatic m_name; // name
+    shared_str m_unit_str; //kg
+    CUIStatic* m_value; // xxx
+};

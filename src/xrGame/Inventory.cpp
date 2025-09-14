@@ -47,7 +47,8 @@ bool defaultSlotActiveness[] =
     false, // detector
     false, // torch
     true, // artefact
-    false // helmet
+    false, // helmet
+    false // backpack
 };
 
 CInventory::CInventory()
