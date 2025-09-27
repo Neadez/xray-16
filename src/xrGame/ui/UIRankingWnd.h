@@ -74,3 +74,33 @@ protected:
     void get_best_monster();
     void get_favorite_weapon();
 }; // class CUIRankingWnd
+
+
+class CUIRelationsWnd final : public CUIWindow, public CUIWndCallback
+{
+    using inherited = CUIWindow;
+
+    CUIScrollView* m_factions_list{};
+
+    u32 m_delay;
+    u32 m_previous_time;
+
+public:
+    CUIRelationsWnd();
+    ~CUIRelationsWnd() override;
+
+    virtual void Show(bool status);
+    virtual void Update();
+    virtual void ResetAll();
+
+    bool Init();
+    void update_info();
+
+    pcstr GetDebugType() override { return "CUIRelationsWnd"; }
+
+protected:
+    void add_faction(CUIXml& xml, shared_str const& faction_id);
+    void clear_all_factions();
+    bool SortingLessFunction(CUIWindow* left, CUIWindow* right);
+
+};

@@ -47,6 +47,7 @@ CUIPdaWnd::CUIPdaWnd() : CUIDialogWnd(CUIPdaWnd::GetDebugType())
     pUIRankingWnd = nullptr;
     pUILogsWnd = nullptr;
     pUIEncyclopediaWnd = nullptr;
+    pUIRelationsWnd = nullptr;
     m_hint_wnd = nullptr;
     Init();
 }
@@ -67,6 +68,8 @@ CUIPdaWnd::~CUIPdaWnd()
         delete_data(pUILogsWnd);
     if (pUIEncyclopediaWnd)
         delete_data(pUIEncyclopediaWnd);
+    if (pUIRelationsWnd)
+        delete_data(pUIRelationsWnd);
     delete_data(m_hint_wnd);
     if (UINoice)
         delete_data(UINoice);
@@ -130,6 +133,10 @@ void CUIPdaWnd::Init()
         pUIEncyclopediaWnd = xr_new<CUIEncyclopediaWnd>();
         if (!pUIEncyclopediaWnd->Init())
             xr_delete(pUIEncyclopediaWnd);
+
+        pUIRelationsWnd = xr_new<CUIRelationsWnd>();
+        if (!pUIRelationsWnd->Init())
+            xr_delete(pUIRelationsWnd);
     }
 
     UITabControl = xr_new<CUITabControl>();
@@ -292,6 +299,7 @@ void CUIPdaWnd::SetActiveSubdialog(const shared_str& section)
         { "eptRanking",     pUIRankingWnd },
         { "eptLogs",        pUILogsWnd },
         { "eptNotes",       pUIEncyclopediaWnd },
+        { "eptRelations",   pUIRelationsWnd },
     };
 
     for (const auto& [id, wnd] : availableWindowsList)
@@ -427,6 +435,12 @@ void CUIPdaWnd::UpdateRankingWnd()
         pUIRankingWnd->Update();
 }
 
+void CUIPdaWnd::UpdateRelationsWnd()
+{
+    if (pUIRelationsWnd)
+        pUIRelationsWnd->Update();
+}
+
 void CUIPdaWnd::Reset()
 {
     inherited::ResetAll();
@@ -445,6 +459,8 @@ void CUIPdaWnd::Reset()
         pUILogsWnd->ResetAll();
     if (pUIEncyclopediaWnd)
         pUIEncyclopediaWnd->ResetAll();
+    if (pUIRelationsWnd)
+        pUIRelationsWnd->ResetAll();
 }
 
 void CUIPdaWnd::SetCaption(pcstr text) { m_caption->SetText(text); }

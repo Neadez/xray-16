@@ -9507,6 +9507,9 @@
     <ClCompile Include="..\xrServerEntities\object_factory_spawner.cpp">
       <Filter>Core\Common\ObjectFactory</Filter>
     </ClCompile>
+    <ClCompile Include="ui\UIRelationsWnd.cpp">
+      <Filter>UI\Common\PDA\Statistics &amp; Rankings</Filter>
+    </ClCompile>
     <ClCompile Include="ui\UIEncyclopediaWnd.cpp">
       <Filter>UI\Common\PDA\Encyclopedia</Filter>
     </ClCompile>

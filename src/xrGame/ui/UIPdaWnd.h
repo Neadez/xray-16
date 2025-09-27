@@ -21,6 +21,8 @@ class CUIAnimatedStatic;
 class UIHint;
 
 class CUIEncyclopediaWnd;
+class CUIRelationsWnd;
+
 class CUIPdaWnd final : public CUIDialogWnd
 {
     typedef CUIDialogWnd inherited;
@@ -50,6 +52,8 @@ public:
     CUIActorInfoWnd* pUIActorInfo;
     CUIRankingWnd* pUIRankingWnd;
     CUILogsWnd* pUILogsWnd;
+    CUIRelationsWnd* pUIRelationsWnd;
+
     CUIEncyclopediaWnd* pUIEncyclopediaWnd;
 
     virtual void Reset();
@@ -92,6 +96,7 @@ public:
     bool NeedCursor() const override;
     void UpdatePda();
     void UpdateRankingWnd();
+    void UpdateRelationsWnd();
 
     pcstr GetDebugType() override { return "CUIPdaWnd"; }
 };
