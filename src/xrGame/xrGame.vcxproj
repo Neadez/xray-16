@@ -1274,6 +1274,8 @@
     <ClInclude Include="ui\UIDragDropListEx.h" />
     <ClInclude Include="ui\UIDragDropReferenceList.h" />
     <ClInclude Include="ui\UIEditKeyBind.h" />
+    <ClInclude Include="ui\UIEncyclopediaArticleWnd.h" />
+    <ClInclude Include="ui\UIEncyclopediaWnd.h" />
     <ClInclude Include="ui\UIFactionWarWnd.h" />
     <ClInclude Include="ui\UIGameLog.h" />
     <ClInclude Include="ui\UIGameTutorial.h" />
@@ -1340,6 +1342,7 @@
     <ClInclude Include="ui\UITaskWnd.h" />
     <ClInclude Include="ui\UITextVote.h" />
     <ClInclude Include="ui\UITradeBar.h" />
+    <ClInclude Include="ui\UITreeBranch.h" />
     <ClInclude Include="ui\UIVote.h" />
     <ClInclude Include="ui\UIVoteStatusWnd.h" />
     <ClInclude Include="ui\UIVotingCategory.h" />
@@ -3106,6 +3109,8 @@
     <ClCompile Include="ui\UIDragDropListEx.cpp" />
     <ClCompile Include="ui\UIDragDropReferenceList.cpp" />
     <ClCompile Include="ui\UIEditKeyBind.cpp" />
+    <ClCompile Include="ui\UIEncyclopediaArticleWnd.cpp" />
+    <ClCompile Include="ui\UIEncyclopediaWnd.cpp" />
     <ClCompile Include="ui\UIFactionWarWnd.cpp" />
     <ClCompile Include="ui\UIGameLog.cpp" />
     <ClCompile Include="ui\UIGameTutorial.cpp">
@@ -3225,6 +3230,7 @@
     <ClCompile Include="ui\UITaskWnd.cpp" />
     <ClCompile Include="ui\UITextVote.cpp" />
     <ClCompile Include="ui\UITradeBar.cpp" />
+    <ClCompile Include="ui\UITreeBranch.cpp" />
     <ClCompile Include="ui\UIVote.cpp" />
     <ClCompile Include="ui\UIVoteStatusWnd.cpp" />
     <ClCompile Include="ui\UIVotingCategory.cpp" />

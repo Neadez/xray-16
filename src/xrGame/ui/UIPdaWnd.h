@@ -20,6 +20,7 @@ class CUILogsWnd;
 class CUIAnimatedStatic;
 class UIHint;
 
+class CUIEncyclopediaWnd;
 class CUIPdaWnd final : public CUIDialogWnd
 {
     typedef CUIDialogWnd inherited;
@@ -49,6 +50,7 @@ public:
     CUIActorInfoWnd* pUIActorInfo;
     CUIRankingWnd* pUIRankingWnd;
     CUILogsWnd* pUILogsWnd;
+    CUIEncyclopediaWnd* pUIEncyclopediaWnd;
 
     virtual void Reset();
 
