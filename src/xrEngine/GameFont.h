@@ -36,6 +36,8 @@ private:
         EAligment align;
     };
 
+    float fScale{};
+
 protected:
     Fvector2 vHalfPixel;
     Ivector2 vTS;
@@ -92,6 +94,9 @@ public:
     virtual void OutSkip(float val = 1.f) override;
     virtual void OnRender() override;
     virtual void Clear() override { strings.clear(); }
+
+    float GetScale() const;
+    virtual void SetScale(float f) { fScale = f; };
 #ifdef DEBUG
     shared_str m_font_name;
 #endif

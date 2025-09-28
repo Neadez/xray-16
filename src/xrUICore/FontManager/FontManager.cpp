@@ -88,6 +88,12 @@ void CFontManager::InitializeFont(CGameFont*& F, LPCSTR section, u32 flags)
     }
     if (pSettings->line_exist(section, "interval"))
         F->SetInterval(pSettings->r_fvector2(section, "interval"));
+
+    if (!(flags & CGameFont::fsDeviceIndependent)) //честно стырил идею и часть кода из OGSR
+    {
+        if (pSettings->line_exist(section, "scale"))
+            F->SetScale(pSettings->r_float(section, "scale"));
+    }
 }
 
 CFontManager::~CFontManager()
