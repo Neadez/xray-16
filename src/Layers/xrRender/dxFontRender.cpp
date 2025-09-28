@@ -179,7 +179,6 @@ void dxFontRender::OnRender(CGameFont& owner)
 
 inline void dxFontRender::ImprintChar(Fvector l, const CGameFont& owner, FVF::TL*& v, float& X, float Y2, u32 clr2, float Y, u32 clr, xr_wide_char* wsStr, int j)
 {
-    float scw = l.z * g_current_font_scale.x;
     float scw = l.z * g_current_font_scale.x * owner.GetScale();
 
     float fTCWidth = l.z / owner.vTS.x;
@@ -205,7 +204,6 @@ inline void dxFontRender::ImprintChar(Fvector l, const CGameFont& owner, FVF::TL
     {
         X -= 2;
         if (IsNeedSpaceCharacter(wsStr[1 + j]))
-            X += owner.fXStep;
             X += owner.fXStep * owner.GetScale();
     }
 }
