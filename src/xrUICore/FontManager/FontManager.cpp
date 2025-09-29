@@ -39,6 +39,13 @@ void CFontManager::InitializeFonts()
     InitializeFont(pFontStat, "stat_font", CGameFont::fsDeviceIndependent);
 }
 
+CGameFont* CFontManager::InitNewFont(LPCSTR section)
+{
+    CGameFont* pFontAdd = NULL;
+    InitializeFont(pFontAdd, section);
+    return pFontAdd;
+}
+
 LPCSTR CFontManager::GetFontTexName(LPCSTR section)
 {
     constexpr pcstr tex_names[] = { "texture800", "texture", "texture1600" };

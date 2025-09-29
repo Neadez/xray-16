@@ -720,8 +720,13 @@ bool CUIXmlInitBase::InitFont(const CUIXml& xml_doc, pcstr path, int index, u32&
         }
         else
         {
-            R_ASSERT3(0, "unknown font", font_name);
-            pFnt = nullptr;
+            pFnt = UI().Font().InitNewFont(font_name);
+
+            if (!pFnt)
+            {
+                R_ASSERT3(0, "unknown font", font_name);
+                pFnt = nullptr;
+            }
         }
     }
     return true;
