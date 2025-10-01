@@ -201,7 +201,7 @@ void CUIWpnParams::SetInfo(CInventoryItem* slot_wpn, CInventoryItem& cur_wpn)
             m_stAmmoType1->TextureOn();
             m_stAmmoType1->SetStretchTexture(true);
             m_stAmmoType1->SetWndSize(
-                Fvector2().set((tex_rect.x2 - tex_rect.x1) * UI().get_current_kx(), tex_rect.y2 - tex_rect.y1));
+                Fvector2().set((tex_rect.x2 - tex_rect.x1) * UI().get_current_kx() / (INV_GRID_WIDTH/50.0f), (tex_rect.y2 - tex_rect.y1) / (INV_GRID_HEIGHT/50.0f)));
         }
 
         if (m_stAmmoType2)
@@ -223,7 +223,7 @@ void CUIWpnParams::SetInfo(CInventoryItem* slot_wpn, CInventoryItem& cur_wpn)
             m_stAmmoType2->TextureOn();
             m_stAmmoType2->SetStretchTexture(true);
             m_stAmmoType2->SetWndSize(
-                Fvector2().set((tex_rect.x2 - tex_rect.x1) * UI().get_current_kx(), tex_rect.y2 - tex_rect.y1));
+                Fvector2().set((tex_rect.x2 - tex_rect.x1) * UI().get_current_kx() / (INV_GRID_WIDTH/50.0f), (tex_rect.y2 - tex_rect.y1) / (INV_GRID_HEIGHT/50.0f)));
         }
     }
 }

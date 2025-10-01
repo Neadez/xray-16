@@ -540,9 +540,9 @@ void CUIHudStatesWnd::SetAmmoIcon(const shared_str& sect_name)
         // now perform only width scale for ammo, which (W)size >2
         if (texture_rect.width() > 2.01f * INV_GRID_WIDTH)
             w = INV_GRID_WIDTH * 1.5f;
-        m_ui_weapon_icon->SetWidth(w * UI().get_current_kx());
+        m_ui_weapon_icon->SetWidth(w * UI().get_current_kx() / (INV_GRID_WIDTH/50.0f));
     }
-    m_ui_weapon_icon->SetHeight(h);
+    m_ui_weapon_icon->SetHeight(h / (INV_GRID_HEIGHT/50.0f));
 }
 // ------------------------------------------------------------------------------------------------
 void CUIHudStatesWnd::UpdateZones()
