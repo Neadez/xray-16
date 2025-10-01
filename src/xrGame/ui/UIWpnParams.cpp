@@ -88,6 +88,7 @@ bool CUIWpnParams::InitFromXml(CUIXml& xml_doc)
         m_textAmmoUsedType = UIHelper::CreateStatic(xml_doc, "wpn_params:cap_ammo_used_type", this, false);
         m_stAmmoType1 = UIHelper::CreateStatic(xml_doc, "wpn_params:static_ammo_type1", this, false);
         m_stAmmoType2 = UIHelper::CreateStatic(xml_doc, "wpn_params:static_ammo_type2", this, false);
+        m_stAmmoType3 = UIHelper::CreateStatic(xml_doc, "wpn_params:static_ammo_type3", this, false);
     }
     return true;
 }
@@ -223,6 +224,28 @@ void CUIWpnParams::SetInfo(CInventoryItem* slot_wpn, CInventoryItem& cur_wpn)
             m_stAmmoType2->TextureOn();
             m_stAmmoType2->SetStretchTexture(true);
             m_stAmmoType2->SetWndSize(
+                Fvector2().set((tex_rect.x2 - tex_rect.x1) * UI().get_current_kx() / (INV_GRID_WIDTH/50.0f), (tex_rect.y2 - tex_rect.y1) / (INV_GRID_HEIGHT/50.0f)));
+        }
+
+        if (m_stAmmoType3)
+        {
+            m_stAmmoType3->SetShader(InventoryUtilities::GetEquipmentIconsShader());
+            if (ammo_types.size() == 2 && m_stAmmoType2)
+            {
+                tex_rect.set(0, 0, 1, 1);
+            }
+            else
+            {
+                tex_rect.x1 = float(pSettings->r_u32(ammo_types[2].c_str(), "inv_grid_x") * INV_GRID_WIDTH);
+                tex_rect.y1 = float(pSettings->r_u32(ammo_types[2].c_str(), "inv_grid_y") * INV_GRID_HEIGHT);
+                tex_rect.x2 = float(pSettings->r_u32(ammo_types[2].c_str(), "inv_grid_width") * INV_GRID_WIDTH);
+                tex_rect.y2 = float(pSettings->r_u32(ammo_types[2].c_str(), "inv_grid_height") * INV_GRID_HEIGHT);
+                tex_rect.rb.add(tex_rect.lt);
+            }
+            m_stAmmoType3->SetTextureRect(tex_rect);
+            m_stAmmoType3->TextureOn();
+            m_stAmmoType3->SetStretchTexture(true);
+            m_stAmmoType3->SetWndSize(
                 Fvector2().set((tex_rect.x2 - tex_rect.x1) * UI().get_current_kx() / (INV_GRID_WIDTH/50.0f), (tex_rect.y2 - tex_rect.y1) / (INV_GRID_HEIGHT/50.0f)));
         }
     }
