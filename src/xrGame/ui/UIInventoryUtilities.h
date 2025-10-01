@@ -6,8 +6,8 @@
 class CUIStatic;
 
 //размеры сетки в текстуре инвентаря
-#define INV_GRID_WIDTH pSettings->read_if_exists<float>("inventory", cell_w, 50.0f)
-#define INV_GRID_HEIGHT pSettings->read_if_exists<float>("inventory", cell_h, 50.0f)
+#define INV_GRID_WIDTH pSettings->read_if_exists<float>("inventory", "cell_w", 50.0f)
+#define INV_GRID_HEIGHT pSettings->read_if_exists<float>("inventory", "cell_h", 50.0f)
 
 //размеры сетки в текстуре иконок персонажей
 #define ICON_GRID_WIDTH 64.0f
