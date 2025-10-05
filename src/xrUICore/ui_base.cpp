@@ -149,21 +149,42 @@ void UICore::PushScissor(const Frect& r_tgt, bool overlapped)
     if (UI().m_currentPointType == IUIRender::pttLIT)
         return;
 
-    Frect r_top = {0.0f, 0.0f, UI_BASE_WIDTH, UI_BASE_HEIGHT};
     Frect result = r_tgt;
-    if (!m_Scissors.empty() && !overlapped)
+    if (!UI().is_widescreen())
     {
-        r_top = m_Scissors.top();
-    }
-    if (!result.intersection(r_top, r_tgt))
-        result.set(0.0f, 0.0f, 0.0f, 0.0f);
+        Frect r_top = {0.0f, 0.0f, UI_BASE_WIDTH, UI_BASE_HEIGHT};
+        if (!m_Scissors.empty() && !overlapped)
+        {
+            r_top = m_Scissors.top();
+        }
+        if (!result.intersection(r_top, r_tgt))
+            result.set(0.0f, 0.0f, 0.0f, 0.0f);
 
-    if (!(result.x1 >= 0 && result.y1 >= 0 && result.x2 <= UI_BASE_WIDTH && result.y2 <= UI_BASE_HEIGHT))
-    {
-        Msg("! r_tgt [%.3f][%.3f][%.3f][%.3f]", r_tgt.x1, r_tgt.y1, r_tgt.x2, r_tgt.y2);
-        Msg("! result [%.3f][%.3f][%.3f][%.3f]", result.x1, result.y1, result.x2, result.y2);
-        VERIFY(result.x1 >= 0 && result.y1 >= 0 && result.x2 <= UI_BASE_WIDTH && result.y2 <= UI_BASE_HEIGHT);
+        if (!(result.x1 >= 0 && result.y1 >= 0 && result.x2 <= UI_BASE_WIDTH && result.y2 <= UI_BASE_HEIGHT))
+        {
+            Msg("! r_tgt [%.3f][%.3f][%.3f][%.3f]", r_tgt.x1, r_tgt.y1, r_tgt.x2, r_tgt.y2);
+            Msg("! result [%.3f][%.3f][%.3f][%.3f]", result.x1, result.y1, result.x2, result.y2);
+            VERIFY(result.x1 >= 0 && result.y1 >= 0 && result.x2 <= UI_BASE_WIDTH && result.y2 <= UI_BASE_HEIGHT);
+        }
     }
+    else
+    {
+        Frect r_top = {0.0f, 0.0f, UI_BASE_WIDTH_W, UI_BASE_HEIGHT};
+        if (!m_Scissors.empty() && !overlapped)
+        {
+            r_top = m_Scissors.top();
+        }
+        if (!result.intersection(r_top, r_tgt))
+            result.set(0.0f, 0.0f, 0.0f, 0.0f);
+
+        if (!(result.x1 >= 0 && result.y1 >= 0 && result.x2 <= UI_BASE_WIDTH_W && result.y2 <= UI_BASE_HEIGHT))
+        {
+            Msg("! r_tgt [%.3f][%.3f][%.3f][%.3f]", r_tgt.x1, r_tgt.y1, r_tgt.x2, r_tgt.y2);
+            Msg("! result [%.3f][%.3f][%.3f][%.3f]", result.x1, result.y1, result.x2, result.y2);
+            VERIFY(result.x1 >= 0 && result.y1 >= 0 && result.x2 <= UI_BASE_WIDTH_W && result.y2 <= UI_BASE_HEIGHT);
+        }
+    }
+    
     m_Scissors.push(result);
 
     result.lt.x = ClientToScreenScaledX(result.lt.x);
@@ -226,7 +247,10 @@ UICore::UICore()
 
 void UICore::OnDeviceReset()
 {
-    m_scale_.set(float(Device.dwWidth) / UI_BASE_WIDTH, float(Device.dwHeight) / UI_BASE_HEIGHT);
+    if(!UI().is_widescreen())
+        m_scale_.set(float(Device.dwWidth) / UI_BASE_WIDTH, float(Device.dwHeight) / UI_BASE_HEIGHT);
+    else
+        m_scale_.set(float(Device.dwWidth) / UI_BASE_WIDTH_W, float(Device.dwHeight) / UI_BASE_HEIGHT);
 
     m_2DFrustum.CreateFromRect(Frect().set(0.0f, 0.0f, float(Device.dwWidth), float(Device.dwHeight)));
 }
@@ -294,8 +318,11 @@ void UICore::pp_start()
 {
     m_bPostprocess = true;
 
-    m_pp_scale_.set(float(Device.dwWidth) / float(UI_BASE_WIDTH),
-        float(Device.dwHeight) / float(UI_BASE_HEIGHT));
+    if (!UI().is_widescreen())
+        m_pp_scale_.set(float(Device.dwWidth) / float(UI_BASE_WIDTH), float(Device.dwHeight) / float(UI_BASE_HEIGHT));
+    else
+       m_pp_scale_.set(float(Device.dwWidth) / float(UI_BASE_WIDTH_W), float(Device.dwHeight) / float(UI_BASE_HEIGHT));
+
     m_2DFrustumPP.CreateFromRect(Frect().set(0.0f, 0.0f, float(Device.dwWidth),
         float(Device.dwHeight)));
 
@@ -327,8 +354,12 @@ float UICore::get_current_kx()
 {
     float h = float(Device.dwHeight);
     float w = float(Device.dwWidth);
+    float res;
 
-    float res = (h / w) / (UI_BASE_HEIGHT / UI_BASE_WIDTH);
+    if (!is_widescreen())
+        res = (h / w) / (UI_BASE_HEIGHT / UI_BASE_WIDTH);
+    else
+        res = (h / w) / (UI_BASE_HEIGHT / UI_BASE_WIDTH_W);
     return res;
 }
 

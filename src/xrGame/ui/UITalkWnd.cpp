@@ -34,7 +34,10 @@ CUITalkWnd::CUITalkWnd() : CUIDialogWnd(CUITalkWnd::GetDebugType())
 
 void CUITalkWnd::InitTalkWnd()
 {
-    inherited::SetWndRect(Frect().set(0, 0, UI_BASE_WIDTH, UI_BASE_HEIGHT));
+    if (!UI().is_widescreen())
+        inherited::SetWndRect(Frect().set(0, 0, UI_BASE_WIDTH, UI_BASE_HEIGHT));
+    else
+        inherited::SetWndRect(Frect().set(0, 0, UI_BASE_WIDTH_W, UI_BASE_HEIGHT));
 
     UITalkDialogWnd = xr_new<CUITalkDialogWnd>();
     UITalkDialogWnd->SetAutoDelete(true);

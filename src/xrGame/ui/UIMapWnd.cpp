@@ -794,7 +794,10 @@ void CUIMapWnd::ShowHint(bool extra)
     Frect vis_rect;
     if (extra)
     {
-        vis_rect.set(Frect().set(0.0f, 0.0f, UI_BASE_WIDTH, UI_BASE_HEIGHT));
+        if (!UI().is_widescreen())
+            vis_rect.set(Frect().set(0.0f, 0.0f, UI_BASE_WIDTH, UI_BASE_HEIGHT));
+        else
+            vis_rect.set(Frect().set(0.0f, 0.0f, UI_BASE_WIDTH_W, UI_BASE_HEIGHT));
     }
     else
     {

@@ -211,7 +211,10 @@ void CDialogHolder::StartDialog(CUIDialogWnd* pDialog, bool bDoHideIndicators)
 {
     if (pDialog && pDialog->NeedCenterCursor())
     {
-        GetUICursor().SetUICursorPosition({ UI_BASE_WIDTH / 2.0f, UI_BASE_HEIGHT / 2.0f });
+        if (!UI().is_widescreen())
+            GetUICursor().SetUICursorPosition({ UI_BASE_WIDTH / 2.0f, UI_BASE_HEIGHT / 2.0f });
+        else
+            GetUICursor().SetUICursorPosition({ UI_BASE_WIDTH_W / 2.0f, UI_BASE_HEIGHT / 2.0f });
     }
     StartMenu(pDialog, bDoHideIndicators);
 }

@@ -15,7 +15,10 @@
 UIHint::UIHint() : CUIWindow("UIHint")
 {
     m_visible = false;
-    m_rect.set(0.0f, 0.0f, UI_BASE_WIDTH, UI_BASE_HEIGHT);
+    if (!UI().is_widescreen())
+        m_rect.set(0.0f, 0.0f, UI_BASE_WIDTH, UI_BASE_HEIGHT);
+    else
+        m_rect.set(0.0f, 0.0f, UI_BASE_WIDTH_W, UI_BASE_HEIGHT);
 }
 
 void UIHint::init_from_xml(CUIXml& xml, LPCSTR path)

@@ -24,6 +24,8 @@ typedef FactoryPtr<IUIShader> ui_shader;
 constexpr float UI_BASE_WIDTH = 1024.0f;
 constexpr float UI_BASE_HEIGHT = 768.0f;
 
+constexpr float UI_BASE_WIDTH_W = 1280.0f;
+
 enum EUIItemAlign
 {
     alNone = 0x0000,
