@@ -115,10 +115,10 @@ public:
         }
         case waRight:
         {
-            if(!UI().is_widescreen())
-                res.set(width - m_wndSize.x, m_wndPos.y, width, m_wndPos.y + m_wndSize.y);
-            else
+            if (UI().is_widescreen() && UI().new_widescreen())
                 res.set(width_w - m_wndSize.x, m_wndPos.y, width_w, m_wndPos.y + m_wndSize.y);
+            else
+                res.set(width - m_wndSize.x, m_wndPos.y, width, m_wndPos.y + m_wndSize.y);
             break;
         }
         case waTop:

@@ -60,10 +60,10 @@ void SBinocVisibleObj::create_default(u32 color)
     m_rt.SetTextureColor(clr);
     m_rb.SetTextureColor(clr);
 
-    if (!UI().is_widescreen())
-        cur_rect.set(0, 0, UI_BASE_WIDTH, UI_BASE_HEIGHT);
-    else
+    if (UI().is_widescreen() && UI().new_widescreen())
         cur_rect.set(0, 0, UI_BASE_WIDTH_W, UI_BASE_HEIGHT);
+    else
+        cur_rect.set(0, 0, UI_BASE_WIDTH, UI_BASE_HEIGHT);
 
     m_flags.zero();
 }
@@ -116,15 +116,15 @@ void SBinocVisibleObj::Update()
         return;
 
     std::swap(mn.y, mx.y);
-    if (!UI().is_widescreen())
-    {
-        mn.x = (1.f + mn.x) / 2.f * UI_BASE_WIDTH;
-        mx.x = (1.f + mx.x) / 2.f * UI_BASE_WIDTH;   
-    }
-    else
+    if (UI().is_widescreen() && UI().new_widescreen())
     {
         mn.x = (1.f + mn.x) / 2.f * UI_BASE_WIDTH_W;
         mx.x = (1.f + mx.x) / 2.f * UI_BASE_WIDTH_W;   
+    }
+    else
+    {
+        mn.x = (1.f + mn.x) / 2.f * UI_BASE_WIDTH;
+        mx.x = (1.f + mx.x) / 2.f * UI_BASE_WIDTH;   
     }
     mn.y = (1.f - mn.y) / 2.f * UI_BASE_HEIGHT;
     mx.y = (1.f - mx.y) / 2.f * UI_BASE_HEIGHT;

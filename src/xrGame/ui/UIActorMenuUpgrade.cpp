@@ -112,10 +112,10 @@ bool CUIActorMenu::SetInfoCurUpgrade(Upgrade_type* upgrade_type, CInventoryItem*
     {
         return false;
     }
-    if (!UI().is_widescreen())
-        fit_in_rect(m_upgrade_info, Frect().set(0.0f, 0.0f, UI_BASE_WIDTH, UI_BASE_HEIGHT), 0.0f, GetWndRect().left);
-    else
+    if (UI().is_widescreen() && UI().new_widescreen())
         fit_in_rect(m_upgrade_info, Frect().set(0.0f, 0.0f, UI_BASE_WIDTH_W, UI_BASE_HEIGHT), 0.0f, GetWndRect().left);
+    else
+        fit_in_rect(m_upgrade_info, Frect().set(0.0f, 0.0f, UI_BASE_WIDTH, UI_BASE_HEIGHT), 0.0f, GetWndRect().left);
     return res;
 }
 

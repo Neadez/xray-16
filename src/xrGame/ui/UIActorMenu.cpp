@@ -483,10 +483,10 @@ void CUIActorMenu::InfoCurItem(CUICellItem* cell_item)
 
     //	m_ItemInfo->InitItem	( current_item, compare_item );
     float dx_pos = GetWndRect().left;
-    if (!UI().is_widescreen())
-        fit_in_rect(m_ItemInfo, Frect().set(0.0f, 0.0f, UI_BASE_WIDTH - dx_pos, UI_BASE_HEIGHT), 10.0f, dx_pos);
-    else
+    if (UI().is_widescreen() && UI().new_widescreen())
         fit_in_rect(m_ItemInfo, Frect().set(0.0f, 0.0f, UI_BASE_WIDTH_W - dx_pos, UI_BASE_HEIGHT), 10.0f, dx_pos);
+    else
+        fit_in_rect(m_ItemInfo, Frect().set(0.0f, 0.0f, UI_BASE_WIDTH - dx_pos, UI_BASE_HEIGHT), 10.0f, dx_pos);
 }
 
 CUIItemInfo* CUIActorMenu::GetModeSpecificItemInfo()

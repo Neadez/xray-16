@@ -160,10 +160,10 @@ void CUIButton::Update()
 
         Fvector2 c_pos = GetUICursor().GetCursorPosition();
         Frect vis_rect;
-        if (!UI().is_widescreen())
-            vis_rect.set(0, 0, UI_BASE_WIDTH, UI_BASE_HEIGHT);
-        else
+        if (UI().is_widescreen() && UI().new_widescreen())
             vis_rect.set(0, 0, UI_BASE_WIDTH_W, UI_BASE_HEIGHT);
+        else
+            vis_rect.set(0, 0, UI_BASE_WIDTH, UI_BASE_HEIGHT);
 
         // select appropriate position
         Frect r;

@@ -166,15 +166,15 @@ SHitMark::SHitMark(const ui_shader& sh, const Fvector& dir)
     m_HitDirection = dir.getH();
     m_UIStaticItem = xr_new<CUIStaticItem>();
     m_UIStaticItem->SetShader(sh);
-    if (!UI().is_widescreen())
-    {
-        m_UIStaticItem->SetPos(POS_X, POS_Y);
-        m_UIStaticItem->SetSize(SIZE);    
-    }
-    else
+    if (UI().is_widescreen() && UI().new_widescreen())
     {
         m_UIStaticItem->SetPos(POS_X_W, POS_Y);
         m_UIStaticItem->SetSize(SIZE_W);    
+    }
+    else
+    {
+        m_UIStaticItem->SetPos(POS_X, POS_Y);
+        m_UIStaticItem->SetSize(SIZE);    
     }
 
 }
@@ -204,10 +204,10 @@ SGrenadeMark::SGrenadeMark(const ui_shader& sh, CGrenade* grn)
     m_UIStaticItem->SetShader(sh);
     float xs = 640.0f;
     float ys = 640.0f;
-    if (!UI().is_widescreen())
-        m_UIStaticItem->SetPos((UI_BASE_WIDTH - xs) * 0.5f, (UI_BASE_HEIGHT - ys) * 0.5f);
-    else
+    if (UI().is_widescreen() && UI().new_widescreen())
         m_UIStaticItem->SetPos((UI_BASE_WIDTH_W - xs) * 0.5f, (UI_BASE_HEIGHT - ys) * 0.5f);
+    else
+        m_UIStaticItem->SetPos((UI_BASE_WIDTH - xs) * 0.5f, (UI_BASE_HEIGHT - ys) * 0.5f);
     m_UIStaticItem->SetSize(Fvector2().set(xs, ys));
 }
 
