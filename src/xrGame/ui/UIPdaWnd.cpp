@@ -427,6 +427,8 @@ void CUIPdaWnd::UpdatePda()
     {
         pUITaskWnd->ReloadTaskInfo();
     }
+    if (pUIEncyclopediaWnd)
+        pUIEncyclopediaWnd->ReloadArticles();
 }
 
 void CUIPdaWnd::UpdateRankingWnd()
@@ -458,7 +460,7 @@ void CUIPdaWnd::Reset()
     if (pUILogsWnd)
         pUILogsWnd->ResetAll();
     if (pUIEncyclopediaWnd)
-        pUIEncyclopediaWnd->ResetAll();
+        pUIEncyclopediaWnd->Reset();
     if (pUIRelationsWnd)
         pUIRelationsWnd->ResetAll();
 }

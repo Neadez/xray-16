@@ -13,7 +13,6 @@
 #include "xrUICore/ScrollView/UIScrollView.h"
 #include "xrUICore/ListWnd/UIListWnd.h"
 #include "xrUICore/ListWnd/UITreeViewItem.h"
-#include "UITreeBranch.h"
 #include "UIEncyclopediaArticleWnd.h"
 #include "Actor.h"
 #include "alife_registry_wrappers.h"
@@ -23,7 +22,10 @@
 
 constexpr pcstr PDA_ENCYCLOPEDIA_XML = "pda_encyclopedia.xml";
 
-CUIEncyclopediaWnd::CUIEncyclopediaWnd() : CUIWindow("CUIEncyclopediaWnd") { prevArticlesCount = 0; }
+CUIEncyclopediaWnd::CUIEncyclopediaWnd() : CUIWindow(CUIEncyclopediaWnd::GetDebugType())
+{
+    prevArticlesCount = 0;
+}
 
 CUIEncyclopediaWnd::~CUIEncyclopediaWnd() { DeleteArticles(); }
 
@@ -38,18 +40,22 @@ bool CUIEncyclopediaWnd::Init()
     // Load xml data
     UIEncyclopediaIdxBkg = UIHelper::CreateFrameWindow(uiXml, "left_frame_window", this, false);
 
+    UIEncyclopediaInfoBkg = UIHelper::CreateFrameWindow(uiXml, "right_frame_window", this, false);
+
     CUIXmlInit::InitFont(uiXml, "tree_item_font", 0, m_uTreeItemColor, m_pTreeItemFont);
     R_ASSERT(m_pTreeItemFont);
     CUIXmlInit::InitFont(uiXml, "tree_root_font", 0, m_uTreeRootColor, m_pTreeRootFont);
     R_ASSERT(m_pTreeRootFont);
 
-    UIEncyclopediaIdxHeader = UIHelper::CreateStatic(uiXml, "left_frame_line", UIEncyclopediaIdxBkg, false);
+    std::ignore = UIHelper::CreateFrameLine(uiXml, "left_frame_line", UIEncyclopediaIdxBkg, false);
+    std::ignore = UIHelper::CreateFrameLine(uiXml, "right_frame_line", UIEncyclopediaInfoBkg, false);
 
-    UIEncyclopediaInfoBkg = UIHelper::CreateFrameWindow(uiXml, "right_frame_window", this, false);
+    UIEncyclopediaIdxHeader = UIHelper::CreateStatic(uiXml, "left_frame_line_text", UIEncyclopediaIdxBkg, false);
 
-    UIEncyclopediaInfoHeader = UIHelper::CreateStatic(uiXml, "right_frame_line", UIEncyclopediaInfoBkg, false);
+    UIEncyclopediaInfoHeader = UIHelper::CreateStatic(uiXml, "right_frame_line_text", UIEncyclopediaInfoBkg, false);
+    
     UIArticleHeader = UIHelper::CreateStatic(uiXml, "article_header_static", UIEncyclopediaInfoBkg, false);
-    xr_string caption = "FFD@32-45//Diary//";
+    xr_string caption = "FFD@32-45";
     UIEncyclopediaInfoHeader->SetTextST(caption.c_str());
 
     UIInfoList = UIHelper::CreateScrollView(uiXml, "info_list", UIEncyclopediaInfoBkg, false);
@@ -66,10 +72,10 @@ bool CUIEncyclopediaWnd::Init()
 
 void CUIEncyclopediaWnd::SendMessage(CUIWindow* pWnd, s16 msg, void* pData)
 {
-    if (pWnd == UIIdxList && msg == LIST_ITEM_CLICKED)
+    if (UIIdxList == pWnd && LIST_ITEM_CLICKED == msg)
     {
-        xr_string caption = "FFD@32-45//Diary//";
-        CUITreeViewItem* pTVItem = static_cast<CUITreeViewItem*>(pData);
+        xr_string caption = "FFD@32-45";
+        CUITreeViewItem* pTVItem = (CUITreeViewItem*)(pData);
         R_ASSERT(pTVItem);
 
         if (pTVItem->vSubItems.size())
@@ -204,7 +210,8 @@ void CUIEncyclopediaWnd::AddArticle(shared_str article_id, bool bReaded)
 
     // Теперь создаем иерархию вещи по заданному пути
 
-    CreateTreeBranch(a->data()->group, a->data()->name, UIIdxList, m_ArticlesDB.size() - 1, m_pTreeRootFont,
+    auto b = xr_new<CUITreeBranch>();
+    b->CreateTreeBranch(a->data()->group, a->data()->name, UIIdxList, m_ArticlesDB.size() - 1, m_pTreeRootFont,
         m_uTreeRootColor, m_pTreeItemFont, m_uTreeItemColor, bReaded);
 }
 

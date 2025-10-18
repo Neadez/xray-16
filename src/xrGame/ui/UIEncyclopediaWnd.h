@@ -1,6 +1,5 @@
 #pragma once
 #include "xrUICore/Windows/UIWindow.h"
-#include "xrUICore/Callbacks/UIWndCallback.h"
 #include "encyclopedia_article_defs.h"
 
 class CEncyclopediaArticle;
@@ -12,7 +11,7 @@ class CUIEncyclopediaCore;
 class CUIScrollView;
 class CUITreeViewItem;
 
-class CUIEncyclopediaWnd : public CUIWindow, public CUIWndCallback
+class CUIEncyclopediaWnd : public CUIWindow
 {
 private:
     typedef CUIWindow inherited;
@@ -48,10 +47,8 @@ protected:
     CUIStatic* UIArticleHeader;
 
     // Хранилище статей
-    using ArticlesDB = xr_vector<CEncyclopediaArticle*>;
-    using ArticlesDB_it = ArticlesDB::iterator;
-    //typedef xr_vector<CEncyclopediaArticle*> ArticlesDB;
-    //typedef ArticlesDB::iterator ArticlesDB_it;
+    typedef xr_vector<CEncyclopediaArticle*> ArticlesDB;
+    typedef ArticlesDB::iterator ArticlesDB_it;
 
     ArticlesDB m_ArticlesDB;
     CGameFont* m_pTreeRootFont;

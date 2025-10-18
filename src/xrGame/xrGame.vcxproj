@@ -1342,7 +1342,6 @@
     <ClInclude Include="ui\UITaskWnd.h" />
     <ClInclude Include="ui\UITextVote.h" />
     <ClInclude Include="ui\UITradeBar.h" />
-    <ClInclude Include="ui\UITreeBranch.h" />
     <ClInclude Include="ui\UIVote.h" />
     <ClInclude Include="ui\UIVoteStatusWnd.h" />
     <ClInclude Include="ui\UIVotingCategory.h" />
@@ -3231,7 +3230,6 @@
     <ClCompile Include="ui\UITaskWnd.cpp" />
     <ClCompile Include="ui\UITextVote.cpp" />
     <ClCompile Include="ui\UITradeBar.cpp" />
-    <ClCompile Include="ui\UITreeBranch.cpp" />
     <ClCompile Include="ui\UIVote.cpp" />
     <ClCompile Include="ui\UIVoteStatusWnd.cpp" />
     <ClCompile Include="ui\UIVotingCategory.cpp" />
