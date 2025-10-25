@@ -157,12 +157,14 @@ public:
     virtual void InitAddons();
 
     //для отоброажения иконок апгрейдов в интерфейсе
-    int GetScopeX() { return pSettings->r_s32(m_scopes[m_cur_scope], "scope_x"); }
-    int GetScopeY() { return pSettings->r_s32(m_scopes[m_cur_scope], "scope_y"); }
-    int GetSilencerX() { return m_iSilencerX; }
-    int GetSilencerY() { return m_iSilencerY; }
-    int GetGrenadeLauncherX() { return m_iGrenadeLauncherX; }
-    int GetGrenadeLauncherY() { return m_iGrenadeLauncherY; }
+    int scale_x = (int)(INV_GRID_WIDTH/50.0f);
+    int scale_y = (int)(INV_GRID_HEIGHT/50.0f);
+    int GetScopeX() { return pSettings->r_s32(m_scopes[m_cur_scope], "scope_x") * scale_x; }
+    int GetScopeY() { return pSettings->r_s32(m_scopes[m_cur_scope], "scope_y") * scale_y; }
+    int GetSilencerX() { return m_iSilencerX * scale_x; }
+    int GetSilencerY() { return m_iSilencerY * scale_y; }
+    int GetGrenadeLauncherX() { return m_iGrenadeLauncherX * scale_x; }
+    int GetGrenadeLauncherY() { return m_iGrenadeLauncherY * scale_y; }
     const shared_str& GetGrenadeLauncherName() const { return m_sGrenadeLauncherName; }
     const shared_str GetScopeName() const { return pSettings->r_string(m_scopes[m_cur_scope], "scope_name"); }
     const shared_str& GetSilencerName() const { return m_sSilencerName; }
