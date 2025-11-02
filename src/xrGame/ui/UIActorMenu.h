@@ -97,6 +97,8 @@ protected:
 
         eInventoryBagList,
 
+        eInventoryTorchList,
+
         eTradeActorList,
         eTradeActorBagList,
 

@@ -222,6 +222,8 @@ void CUIActorMenu::InitializeUniversal(CUIXml& uiXml)
         { eTrashList,              "dragdrop_trash",           nullptr,               nullptr,                   nullptr,            false },
 
         { eInventoryBackpackList,  "dragdrop_backpack",        nullptr,               "backpack_slot_highlight", nullptr,            false },
+
+        { eInventoryTorchList,     "dragdrop_torch",           nullptr,               "torch_slot_highlight",    nullptr,            false },
     };
     static_assert(std::size(inventory_lists) == eListCount,
         "All lists should be listed in the tuple above.");
@@ -533,6 +535,8 @@ void CUIActorMenu::InitCallbacks()
     BindDragDropListEvents(m_pLists[eInventoryDetectorList]);
 
     BindDragDropListEvents(m_pLists[eInventoryBagList]);
+    
+    BindDragDropListEvents(m_pLists[eInventoryTorchList]);
 
     BindDragDropListEvents(m_pLists[eTradeActorBagList]);
     BindDragDropListEvents(m_pLists[eTradeActorList]);

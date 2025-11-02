@@ -54,6 +54,8 @@ void CUIActorMenu::InitInventoryMode()
     ShowIfExist(m_pLists[eTrashList], true);
     ShowIfExist(m_clock_value, true);
 
+    ShowIfExist(m_pLists[eInventoryTorchList], true);
+
     InitInventoryContents(m_pLists[eInventoryBagList]);
 
     VERIFY(CurrentGameUI());
@@ -247,7 +249,7 @@ void CUIActorMenu::OnInventoryAction(PIItem pItem, u16 action_type)
     {
         m_pLists[eInventoryBeltList], m_pLists[eInventoryKnifeList], m_pLists[eInventoryPistolList], m_pLists[eInventoryAutomaticList],
         m_pLists[eInventoryBackpackList], m_pLists[eInventoryOutfitList], m_pLists[eInventoryHelmetList], m_pLists[eInventoryDetectorList],
-        m_pLists[eInventoryBagList], m_pLists[eTradeActorBagList], m_pLists[eTradeActorList]
+        m_pLists[eInventoryBagList], m_pLists[eTradeActorBagList], m_pLists[eTradeActorList], m_pLists[eInventoryTorchList]
     };
 
     switch (action_type)
@@ -467,8 +469,8 @@ void CUIActorMenu::InitInventoryContents(CUIDragDropListEx* pBagList, bool onlyB
         InitCellForSlot(ARTEFACT_SLOT);
     if (!m_pActorInvOwner->inventory().SlotIsPersistent(PDA_SLOT))
         InitCellForSlot(PDA_SLOT);
-    //if (!m_pActorInvOwner->inventory().SlotIsPersistent(TORCH_SLOT))
-    //    InitCellForSlot(TORCH_SLOT); // Alundaio: TODO find out why this crash when you unequip
+    if (!m_pActorInvOwner->inventory().SlotIsPersistent(TORCH_SLOT))
+        InitCellForSlot(TORCH_SLOT); // Alundaio: TODO find out why this crash when you unequip
 
     //for custom slots that exist past LAST_SLOT
     for (u16 i = SLOTS_COUNT; i <= m_pActorInvOwner->inventory().LastSlot(); ++i)
@@ -820,7 +822,7 @@ CUIDragDropListEx* CUIActorMenu::GetSlotList(u16 slot_idx)
     case DETECTOR_SLOT: return m_pLists[eInventoryDetectorList]; break;
 
     case PDA_SLOT:
-    case TORCH_SLOT:
+    case TORCH_SLOT: return m_pLists[eInventoryTorchList]; break;
     case ARTEFACT_SLOT:
     case BINOCULAR_SLOT:
 

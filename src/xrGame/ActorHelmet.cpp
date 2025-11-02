@@ -111,31 +111,31 @@ void CHelmet::OnH_A_Chield()
 void CHelmet::OnMoveToSlot(const SInvItemPlace& previous_place)
 {
     inherited::OnMoveToSlot(previous_place);
-    if (m_pInventory && (previous_place.type == eItemPlaceSlot))
-    {
-        CActor* pActor = smart_cast<CActor*>(H_Parent());
-        if (pActor)
-        {
-            CTorch* pTorch = smart_cast<CTorch*>(pActor->inventory().ItemFromSlot(TORCH_SLOT));
-            if (pTorch && pTorch->GetNightVisionStatus())
-                pTorch->SwitchNightVision(true, false);
-        }
-    }
+    //if (m_pInventory && (previous_place.type == eItemPlaceSlot))
+    //{
+    //    CActor* pActor = smart_cast<CActor*>(H_Parent());
+    //    if (pActor)
+    //    {
+    //        CTorch* pTorch = smart_cast<CTorch*>(pActor->inventory().ItemFromSlot(TORCH_SLOT));
+    //        if (pTorch && pTorch->GetNightVisionStatus())
+    //            pTorch->SwitchNightVision(true, false);
+    //    }
+    //}
 }
 
 void CHelmet::OnMoveToRuck(const SInvItemPlace& previous_place)
 {
     inherited::OnMoveToRuck(previous_place);
-    if (m_pInventory && (previous_place.type == eItemPlaceSlot))
-    {
-        CActor* pActor = smart_cast<CActor*>(H_Parent());
-        if (pActor)
-        {
-            CTorch* pTorch = smart_cast<CTorch*>(pActor->inventory().ItemFromSlot(TORCH_SLOT));
-            if (pTorch)
-                pTorch->SwitchNightVision(false);
-        }
-    }
+    //if (m_pInventory && (previous_place.type == eItemPlaceSlot))
+    //{
+    //    CActor* pActor = smart_cast<CActor*>(H_Parent());
+    //    if (pActor)
+    //    {
+    //        CTorch* pTorch = smart_cast<CTorch*>(pActor->inventory().ItemFromSlot(TORCH_SLOT));
+    //        if (pTorch)
+    //            pTorch->SwitchNightVision(false);
+    //    }
+    //}
 }
 
 void CHelmet::Hit(float hit_power, ALife::EHitType hit_type)

@@ -348,6 +348,9 @@ EDDListType CUIActorMenu::GetListType(CUIDragDropListEx* l)
     if (l == m_pLists[eInventoryDetectorList] && m_pLists[eInventoryDetectorList] != nullptr)
         return iActorSlot;
 
+    if (l == m_pLists[eInventoryTorchList] && m_pLists[eInventoryTorchList] != nullptr)
+        return iActorSlot;
+
     if (l == m_pLists[eTradeActorBagList])
         return iActorBag;
     if (l == m_pLists[eTradeActorList])
@@ -569,6 +572,9 @@ void CUIActorMenu::clear_highlight_lists()
     m_pLists[eInventoryBagList]->clear_select_armament();
     if (m_pQuickSlot)
         m_pQuickSlot->Highlight(false);
+
+    if (m_pLists[eInventoryTorchList])
+        m_pLists[eInventoryTorchList]->Highlight(false);
 
     switch (m_currMenuMode)
     {
@@ -929,6 +935,9 @@ void CUIActorMenu::ClearAllLists()
     m_pLists[eInventoryAutomaticList]->ClearAll(true);
     if (m_pQuickSlot)
         m_pQuickSlot->ClearAll(true);
+
+    if (m_pLists[eInventoryTorchList])
+        m_pLists[eInventoryTorchList]->ClearAll(true);
 
     m_pLists[eTradeActorBagList]->ClearAll(true);
     m_pLists[eTradeActorList]->ClearAll(true);

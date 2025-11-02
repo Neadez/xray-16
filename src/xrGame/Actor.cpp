@@ -2008,18 +2008,18 @@ void CActor::UpdateArtefactsOnBeltAndOutfit()
         conditions().ChangeHydration(outfit->m_fHydrationRestoreSpeed * f_update_time);
         conditions().ChangeRadiation(outfit->m_fRadiationRestoreSpeed * f_update_time);
     }
-    else
-    {
-        CHelmet* pHelmet = smart_cast<CHelmet*>(inventory().ItemFromSlot(HELMET_SLOT));
-        if (!pHelmet)
-        {
-            CTorch* pTorch = smart_cast<CTorch*>(inventory().ItemFromSlot(TORCH_SLOT));
-            if (pTorch && pTorch->GetNightVisionStatus())
-            {
-                pTorch->SwitchNightVision(false);
-            }
-        }
-    }
+    //else
+    //{
+    //    CHelmet* pHelmet = smart_cast<CHelmet*>(inventory().ItemFromSlot(HELMET_SLOT));
+    //    if (!pHelmet)
+    //    {
+    //        CTorch* pTorch = smart_cast<CTorch*>(inventory().ItemFromSlot(TORCH_SLOT));
+    //        if (pTorch && pTorch->GetNightVisionStatus())
+    //        {
+    //            pTorch->SwitchNightVision(false);
+    //        }
+    //    }
+    //}
 }
 
 float CActor::HitArtefactsOnBelt(float hit_power, ALife::EHitType hit_type)
