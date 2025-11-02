@@ -482,7 +482,10 @@ void CUIActorMenu::InfoCurItem(CUICellItem* cell_item)
             m_ItemInfo->InitItem(cell_item, compare_item, item_price);
     }
     else
-        m_ItemInfo->InitItem(cell_item, compare_item, u32(-1));
+    {
+        u32 price = current_item->Cost();
+        m_ItemInfo->InitItem(cell_item, compare_item, price);
+    }
 
     //	m_ItemInfo->InitItem	( current_item, compare_item );
     float dx_pos = GetWndRect().left;
