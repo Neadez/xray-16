@@ -87,6 +87,8 @@ void CUIHudStatesWnd::InitFromXml(CUIXml& xml, LPCSTR path)
     m_back = UIHelper::CreateStatic(xml, "back", this);
     m_back_v = UIHelper::CreateStatic(xml, "back_v", this, false);
 
+    m_progress_self = UIHelper::CreateProgressShape(xml, "progress", this, false);
+
     // XXX: replace with UIHelper
     if (xml.NavigateToNode("arrow"))
     {
@@ -144,6 +146,7 @@ void CUIHudStatesWnd::InitFromXml(CUIXml& xml, LPCSTR path)
     m_lanim_name = xml.ReadAttrib("indik_rad", 0, "light_anim", "");
 
     m_ui_weapon_sign_ammo = UIHelper::CreateStatic(xml, "static_ammo", weaponsParent, false);
+    m_ui_weapon_ammo_name = UIHelper::CreateStatic(xml, "static_ammo_name", weaponsParent, false);
     //m_ui_weapon_sign_ammo->SetEllipsis( CUIStatic::eepEnd, 2 );
 
     m_ui_weapon_cur_ammo = UIHelper::CreateStatic(xml, "static_cur_ammo", this, false);
@@ -157,8 +160,6 @@ void CUIHudStatesWnd::InitFromXml(CUIXml& xml, LPCSTR path)
     m_ui_weapon_icon->SetShader(InventoryUtilities::GetEquipmentIconsShader());
     //	m_ui_weapon_icon->Enable	( false );
     m_ui_weapon_icon_rect = m_ui_weapon_icon->GetWndRect();
-
-    m_progress_self = UIHelper::CreateProgressShape(xml, "progress", this, false);
 
     if ((m_bleeding = UIHelper::CreateStatic(xml, "bleeding", this, false)))
     {
@@ -382,6 +383,12 @@ void CUIHudStatesWnd::UpdateActiveItemInfo(CActor* actor)
             m_ui_weapon_third_ammo->SetTextColor(color_rgba(238, 155, 23, 150));
         }
 
+        if (m_ui_weapon_ammo_name)
+        {
+            m_ui_weapon_ammo_name->Show(true);
+            m_ui_weapon_ammo_name->SetText(m_item_info.name.c_str());
+        }
+
         if (m_ui_weapon_sign_ammo)
         {
             if (m_item_info.cur_ammo.size() && m_item_info.total_ammo.size())
@@ -391,24 +398,6 @@ void CUIHudStatesWnd::UpdateActiveItemInfo(CActor* actor)
 
                 m_ui_weapon_sign_ammo->Show(true);
                 m_ui_weapon_sign_ammo->SetText(temp);
-
-                // hack ^ begin
-                CGameFont* pFont32 = GEnv.UI->Font().pFontGraffiti32Russian;
-                CGameFont* pFont22 = GEnv.UI->Font().pFontGraffiti22Russian;
-                CGameFont* pFont = pFont32;
-
-                if (UICore::is_widescreen())
-                {
-                    pFont = pFont22;
-                }
-                else
-                {
-                    if (xr_strlen(temp) > 5)
-                    {
-                        pFont = pFont22;
-                    }
-                }
-                m_ui_weapon_sign_ammo->SetFont(pFont);
             }
             else
             {
@@ -461,6 +450,9 @@ void CUIHudStatesWnd::UpdateActiveItemInfo(CActor* actor)
 
         if (m_ui_weapon_sign_ammo)
             m_ui_weapon_sign_ammo->Show(false);
+        
+        if (m_ui_weapon_ammo_name)
+            m_ui_weapon_ammo_name->Show(false);
 
         m_fire_mode->Show(false);
 
@@ -494,7 +486,7 @@ void CUIHudStatesWnd::SetAmmoIcon(const shared_str& sect_name)
     if (ShadowOfChernobylMode)
     {
         h = texture_rect.height() * 0.8f;
-        w = texture_rect.width() * (UI().is_widescreen() ? 0.7f : 0.8f);
+        w = texture_rect.width() * 0.8f;
         float posx_16 = 30.0f;
         float posx = 32.0f;
         if (texture_rect.width() > 2.01f * INV_GRID_WIDTH)
@@ -503,13 +495,13 @@ void CUIHudStatesWnd::SetAmmoIcon(const shared_str& sect_name)
         }
         if (texture_rect.width() < 1.01f * INV_GRID_WIDTH)
         {
-            m_ui_weapon_icon->SetTextureOffset(UI().is_widescreen() ? posx_16 : posx, 5.0f);
+            m_ui_weapon_icon->SetTextureOffset(posx, 5.0f);
         }
         else
         {
             posx_16 = 12.f;
             posx = 14.f;
-            m_ui_weapon_icon->SetTextureOffset(UI().is_widescreen() ? posx_16 : posx, 5.0f);
+            m_ui_weapon_icon->SetTextureOffset(posx, 5.0f);
         }
         m_ui_weapon_icon->SetWidth(w);
     }
@@ -525,13 +517,13 @@ void CUIHudStatesWnd::SetAmmoIcon(const shared_str& sect_name)
         }
         if (texture_rect.width() < 1.01f * INV_GRID_WIDTH)
         {
-            m_ui_weapon_icon->SetTextureOffset(UI().is_widescreen() ? posx_16 : posx, 0.0f);
+            m_ui_weapon_icon->SetTextureOffset(posx, 0.0f);
         }
         else
         {
             m_ui_weapon_icon->SetTextureOffset(0.0f, 0.0f);
         }
-        m_ui_weapon_icon->SetWidth(UI().is_widescreen() ? w * 0.833f : w);
+        m_ui_weapon_icon->SetWidth(w);
     }
     else
     {

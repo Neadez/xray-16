@@ -18,6 +18,7 @@ bool CUIMapFilters::Init(CUIXml& xml)
         { QuestNpcs,      "filter_quest_npcs" },
         { SecondaryTasks, "filter_secondary_tasks" },
         { PrimaryObjects, "filter_primary_objects" },
+        { Camps, "filter_camps" },
     };
 
     for (const auto& [filter_id, filter_section] : filters)

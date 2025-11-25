@@ -86,7 +86,7 @@ public:
 
     // Устанавливаем цвет текста в зависимости от того, прочитан ли артикл
     void MarkArticleAsRead(bool value);
-    bool IsArticleReaded() const { return m_bArticleRead; }
+    bool IsArticleReaded() { return m_bArticleRead; }
     // Цвет текста когда артикл не прочитан и не прочитан
     void SetReadedColor(u32 cl) { m_uReadedColor = cl; }
     void SetUnreadedColor(u32 cl) { m_uUnreadedColor = cl; }

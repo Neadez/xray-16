@@ -68,7 +68,7 @@ public:
     void Init_StrInfoItem(CUIXml& xml_doc, LPCSTR item_str, UIItemType type);
     void Init_IconInfoItem(CUIXml& xml_doc, LPCSTR item_str, UIItemType type);
 
-    void InitMonsterCharacter(shared_str monster_tex_name);
+    void InitMonsterCharacter(CBaseMonster* monster);
 
     void InitCharacter(u16 id);
     void ClearInfo();

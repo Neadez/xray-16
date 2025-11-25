@@ -174,8 +174,8 @@ void CBulletManager::FireShotmark(SBullet* bullet, const Fvector& vDir, const Fv
 
         // XXX: review
         // на текущем актере отметок не ставим
-        if (Level().CurrentEntity() && Level().CurrentEntity()->ID() == R.O->ID())
-            return;
+        //if (Level().CurrentEntity() && Level().CurrentEntity()->ID() == R.O->ID())
+        //    return;
 
         if (R.O->renderable_HUD())
             return;

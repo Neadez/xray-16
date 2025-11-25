@@ -204,6 +204,15 @@ bool CUIWindow::OnMouseAction(float x, float y, EUIMessages mouse_action)
     for (; it != m_ChildWndList.rend(); ++it)
     {
         CUIWindow* w = (*it);
+
+		auto sw = smart_cast<CUIWindow*>(w);
+
+		if (sw)	// Dance Maniac: Костыль от вылета при открытии статей в энциклопедии
+		{
+			if (sw->GetAlignment() != waNone && sw->GetAlignment() != waLeft && sw->GetAlignment() != waRight && sw->GetAlignment() != waTop && sw->GetAlignment() != waBottom && sw->GetAlignment() != waCenter)
+				return false;
+		}
+
         const Frect& wndRect = w->GetWndRect();
         if (wndRect.in(cursor_pos))
         {
@@ -392,11 +401,16 @@ void CUIWindow::SetKeyboardCapture(CUIWindow* pChildWindow, bool capture_status)
 void CUIWindow::SendMessage(CUIWindow* pWnd, s16 msg, void* pData)
 {
     //оповестить дочерние окна
-    for (auto it = m_ChildWndList.begin(); m_ChildWndList.end() != it; ++it)
-    {
-        if ((*it)->IsEnabled())
-            (*it)->SendMessage(pWnd, msg, pData);
-    }
+    //for (auto it = m_ChildWndList.begin(); m_ChildWndList.end() != it; ++it)
+    //{
+    //    if ((*it)->IsEnabled())
+    //        (*it)->SendMessage(pWnd, msg, pData);
+    //}
+	for(int i = 0; i < m_ChildWndList.size(); ++i)
+	{
+		if(m_ChildWndList[i]->IsEnabled())
+			m_ChildWndList[i]->SendMessage(pWnd,msg,pData);
+	}
 }
 
 CUIWindow* CUIWindow::GetCurrentMouseHandler() { return GetTop()->GetChildMouseHandler(); }

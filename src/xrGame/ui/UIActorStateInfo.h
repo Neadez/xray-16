@@ -94,8 +94,9 @@ protected:
     UI_Arrow* m_arrow{};
     UI_Arrow* m_arrow_shadow{};
     float m_magnitude;
-    shared_str m_unit_str;
+    CUIStatic* m_unit_str;
     bool m_sign_inverse;
+    CUIStatic* m_caption{};
 
 public:
     ui_actor_state_item();

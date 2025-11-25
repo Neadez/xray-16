@@ -183,6 +183,19 @@ public:
     virtual void on_renderable_Render(u32 context_id, IRenderable* root) = 0;
 
     virtual CHudItem* cast_hud_item() { return this; }
+
+    virtual BOOL ParentIsActor();
+
+	float GetHudFov();
+
+	bool  m_nearwall_enabled;
+	float m_hud_fov_add_mod;
+	float m_nearwall_last_hud_fov;
+	float m_nearwall_dist_max = 0.f;
+	float m_nearwall_dist_min = 0.f;
+	float m_nearwall_target_hud_fov = 0.f;
+	float m_nearwall_speed_mod = 0.f;
+
     void PlayAnimIdleMovingCrouch(); //AVO: new crouch idle animation
     bool isHUDAnimationExist(pcstr anim_name, bool silent = false) const;
     pcstr WhichHUDAnimationExist(pcstr anim_name, pcstr anim_name2, bool silent = false) const;

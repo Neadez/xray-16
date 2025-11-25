@@ -25,6 +25,7 @@
 #include "xrUICore/ProgressBar/UIProgressBar.h"
 #include "xrUICore/Cursor/UICursor.h"
 #include "UICellItem.h"
+#include "UICellItemFactory.h"
 #include "UICharacterInfo.h"
 #include "UIItemInfo.h"
 #include "UIDragDropListEx.h"
@@ -74,14 +75,7 @@ void CUIActorMenu::InitPartnerInfo()
         CBaseMonster* monster = smart_cast<CBaseMonster*>(m_pPartnerInvOwner);
         if (monster)
         {
-            GetModeSpecificPartnerInfo(m_currMenuMode)->ClearInfo();
-            if (monster)
-            {
-                shared_str monster_tex_name = pSettings->r_string(monster->cNameSect(), "icon");
-//                GetModeSpecificPartnerInfo(m_currMenuMode)->UIIcon().InitTexture(monster_tex_name.c_str());
-//                GetModeSpecificPartnerInfo(m_currMenuMode)->UIIcon().SetStretchTexture(true);
-                  GetModeSpecificPartnerInfo(m_currMenuMode)->InitMonsterCharacter(monster_tex_name);
-            }
+            GetModeSpecificPartnerInfo(m_currMenuMode)->InitMonsterCharacter(monster);
         }
         else
         {
@@ -757,7 +751,7 @@ void CUIActorMenu::highlight_ammo_for_weapon(PIItem weapon_item, CUIDragDropList
         {
             if (ammo_name._get() == (*itb)._get())
             {
-                ci->m_select_armament = true;
+                ci->m_select_armament = CUICellItem::eLightBlue;
                 break; // itb
             }
         }
@@ -797,7 +791,7 @@ void CUIActorMenu::highlight_weapons_for_ammo(PIItem ammo_item, CUIDragDropListE
         {
             if (ammo_name._get() == (*itb)._get())
             {
-                ci->m_select_armament = true;
+                ci->m_select_armament = CUICellItem::eLightBlue;
                 break; // for itb
             }
         }
@@ -813,7 +807,7 @@ void CUIActorMenu::highlight_weapons_for_ammo(PIItem ammo_item, CUIDragDropListE
         {
             if (ammo_name._get() == (*itb)._get())
             {
-                ci->m_select_armament = true;
+                ci->m_select_armament = CUICellItem::eLightBlue;
                 break; // for itb
             }
         }
@@ -831,21 +825,21 @@ bool CUIActorMenu::highlight_addons_for_weapon(PIItem weapon_item, CUICellItem* 
     CScope* pScope = smart_cast<CScope*>(item);
     if (pScope && weapon_item->CanAttach(pScope))
     {
-        ci->m_select_armament = true;
+        ci->m_select_armament = CUICellItem::eLime;
         return true;
     }
 
     CSilencer* pSilencer = smart_cast<CSilencer*>(item);
     if (pSilencer && weapon_item->CanAttach(pSilencer))
     {
-        ci->m_select_armament = true;
+        ci->m_select_armament = CUICellItem::eLime;
         return true;
     }
 
     CGrenadeLauncher* pGrenadeLauncher = smart_cast<CGrenadeLauncher*>(item);
     if (pGrenadeLauncher && weapon_item->CanAttach(pGrenadeLauncher))
     {
-        ci->m_select_armament = true;
+        ci->m_select_armament = CUICellItem::eLime;
         return true;
     }
     return false;
@@ -882,17 +876,17 @@ void CUIActorMenu::highlight_weapons_for_addon(PIItem addon_item, CUIDragDropLis
 
         if (pScope && weapon->CanAttach(pScope))
         {
-            ci->m_select_armament = true;
+            ci->m_select_armament = CUICellItem::eLime;
             continue;
         }
         if (pSilencer && weapon->CanAttach(pSilencer))
         {
-            ci->m_select_armament = true;
+            ci->m_select_armament = CUICellItem::eLime;
             continue;
         }
         if (pGrenadeLauncher && weapon->CanAttach(pGrenadeLauncher))
         {
-            ci->m_select_armament = true;
+            ci->m_select_armament = CUICellItem::eLime;
             continue;
         }
 
@@ -1050,7 +1044,7 @@ void CUIActorMenu::HighlightSectionInSlot(pcstr section, EDDListType type, u16 s
         if (strcmp(section, item->m_section_id.c_str()) != 0)
             continue;
 
-        ci->m_select_armament = true;
+        ci->m_select_armament = CUICellItem::eLightBlue;
     }
 
     m_highlight_clear = false;
@@ -1078,7 +1072,7 @@ void CUIActorMenu::HighlightForEachInSlot(const luabind::functor<bool>& functor,
         if (functor(item->object().cast_game_object()->lua_game_object()) == false)
             continue;
 
-        ci->m_select_armament = true;
+        ci->m_select_armament = CUICellItem::eLightBlue;
     }
 
     m_highlight_clear = false;

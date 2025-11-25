@@ -68,20 +68,18 @@ void CUIMapLocationHint::SetInfoStr(pcstr info)
     SetInfoMode(1);
 
     CUIStatic* text = m_info["simple_text"];
+    
     text->SetTextST(info);
-    text->AdjustHeightToText();
-
-    const float new_w = text->GetWndPos().x + text->GetWndSize().x + 20.0f;
-    const float new_h = _max(64.0f, text->GetWndPos().y + text->GetWndSize().y + 20.0f);
-
-    if (!m_border)
-        SetWndSize(Fvector2().set(new_w, new_h));
+    text->AdjustWidthToText();
+    if (text->GetWndSize().x > 180.0f)
+        text->SetWidth(180.0f);
     else
-    {
-        SetWndSize(Fvector2().set(GetWndSize().x, new_h));
-        m_border->SetWidth(GetWndSize().x);
-        m_border->SetHeight(GetWndSize().y);
-    }
+        text->SetWidth(text->GetWndSize().x + 10.0f);
+    text->AdjustHeightToText();
+    Fvector2 new_size;
+    new_size.x = text->GetWndSize().x + 10.0f;
+    new_size.y = text->GetWndSize().y + 20.0f;
+    SetWndSize(new_size);
 }
 
 void CUIMapLocationHint::SetInfoMSpot(CMapSpot* spot)

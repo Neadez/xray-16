@@ -35,6 +35,10 @@ protected:
     CUIMotionIcon* UIMotionIcon{};
     CUIZoneMap* UIZoneMap{};
 
+    CUIStatic* UIStaticTaskName{};
+    CUIStatic* UIStaticTaskDescr{};
+    void UpdateTask();
+
     CUIHudStatesWnd* m_ui_hud_states{};
 
     CUIStatic* m_ind_bleeding{};

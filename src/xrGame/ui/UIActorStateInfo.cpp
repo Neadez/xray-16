@@ -30,8 +30,9 @@
 #include "Inventory.h"
 #include "Artefact.h"
 
-u32 const red_clr = color_argb(255, 210, 50, 50);
-u32 const green_clr = color_argb(255, 170, 170, 170);
+u32 const red_clr = color_argb(255, 238, 28, 36);
+u32 const green_clr = color_argb(255, 75, 185, 50);
+u32 const white_clr = color_argb(255, 255, 255, 255);
 
 ui_actor_state_wnd::~ui_actor_state_wnd() { delete_data(m_hint_wnd); }
 
@@ -170,6 +171,8 @@ void ui_actor_state_wnd::UpdateActorInfo(CInventoryOwner* owner)
         else
             m_state[stt_radiation]->show_static(true, 3);
     }
+    m_state[stt_radiation]->set_progress(value);
+
     value = actor->GetRestoreSpeed(ALife::eRadiationRestoreSpeed);
     m_state[stt_rada]->set_text(value);
 
@@ -276,7 +279,6 @@ void ui_actor_state_wnd::UpdateActorInfo(CInventoryOwner* owner)
         VERIFY(ikv);
         const auto head_bone = ikv->LL_BoneID("bip01_head");
         fwou2_value += helmet->GetBoneArmor(head_bone) * helmet->GetCondition();
-        fwou_value += 0.0f;
     }
 
     const auto getProtection = [&](float& valueRef, ALife::EHitType hitType) -> float
@@ -358,12 +360,12 @@ void ui_actor_state_wnd::UpdateActorInfo(CInventoryOwner* owner)
         value = actor->GetRestoreSpeed(ALife::eHydrationRestoreSpeed) / conditions.GetMaxHydrationRestoreSpeed();
         update_round_states(stt_hydr, value, -1.f);
     }
-    // strike strike protection progress bar
+    // strike protection progress bar
     {
         const float max_power = getProtection(stri_value, ALife::eHitTypeStrike);
         update_round_states(stt_strike, stri_value, max_power);
     }
-    // explosion wound protection progress bar
+    // explosion protection progress bar
     {
         const float max_power = getProtection(expl_value, ALife::eHitTypeExplosion);
         update_round_states(stt_expl, expl_value, max_power);
@@ -387,7 +389,7 @@ void ui_actor_state_wnd::update_round_states(EStateType stt_type, float initial,
     if (!state->set_progress(progress))
     {
         //state->set_progress_shape(arrow);
-        state->set_arrow(arrow); // 0..1
+        //state->set_arrow(arrow); // 0..1
         state->set_text(arrow); // 0..1
     }
 }
@@ -426,7 +428,7 @@ void ui_actor_state_wnd::Show(bool status)
 }
 
 /// =============================================================================================
-ui_actor_state_item::ui_actor_state_item() : m_magnitude(1.0f), m_sign_inverse(false), m_unit_str("") {}
+ui_actor_state_item::ui_actor_state_item() : m_magnitude(1.0f), m_sign_inverse(false) {}
 
 void ui_actor_state_item::init_from_xml(CUIXml& xml, LPCSTR path, bool critical /*= true*/)
 {
@@ -467,8 +469,6 @@ void ui_actor_state_item::init_from_xml(CUIXml& xml, LPCSTR path, bool critical 
     {
         m_static = UIHelper::CreateStatic(xml, "icon", this);
         m_magnitude = xml.ReadAttribFlt("icon", 0, "magnitude", 1.0f);
-        LPCSTR unit_str = xml.ReadAttrib("icon", 0, "unit_str", "");
-        m_unit_str._set(StringTable().translate(unit_str));
         m_sign_inverse = (xml.ReadAttribInt("icon", 0, "sign_inverse", 0) == 1);
         m_static->TextItemControl()->SetText("");
     }
@@ -484,6 +484,14 @@ void ui_actor_state_item::init_from_xml(CUIXml& xml, LPCSTR path, bool critical 
         m_magnitude = xml.ReadAttribFlt("icon3", 0, "magnitude", 1.0f);
         m_static3->TextItemControl()->SetText("");
     }
+    if (xml.NavigateToNode("caption", 0))
+    {
+        m_caption = UIHelper::CreateStatic(xml, "caption", this);
+    }
+    if (xml.NavigateToNode("unit_str", 0))
+    {
+        m_unit_str = UIHelper::CreateStatic(xml, "unit_str", this);
+    }
     set_arrow(0.0f);
     xml.SetLocalRoot(stored_root);
 }
@@ -498,16 +506,26 @@ bool ui_actor_state_item::set_text(float value)
     if (!m_static)
         return false;
 
-    int v = (int)(value * m_magnitude + 0.49f); // m_magnitude=100
+    int v = (int)(value * m_magnitude/* + 0.49f*/); // m_magnitude=100
     clamp(v, -999, 999);
     string32 text_res;
-    xr_sprintf(text_res, sizeof(text_res), "%+d %s", v, m_unit_str.c_str());
-    m_static->TextItemControl()->SetText(text_res);
-
     bool negative = (value < 0.0f);
     negative = (m_sign_inverse && value != 0.0f) ? !negative : negative;
-    u32 color = (negative) ? red_clr : green_clr;
+    u32 color;
+    if (value != 0.0f) 
+    {
+        color = (negative) ? red_clr : green_clr;
+        xr_sprintf(text_res, sizeof(text_res), "%+d", v);
+    }
+    else 
+    {
+        color = white_clr;
+        xr_sprintf(text_res, sizeof(text_res), "%d", v);
+    }
+    m_static->TextItemControl()->SetText(text_res);
     m_static->SetTextColor(color);
+    if (m_unit_str)
+        m_unit_str->SetTextColor(color);
 
     return true;
 }

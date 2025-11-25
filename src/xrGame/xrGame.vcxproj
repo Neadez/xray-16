@@ -1268,6 +1268,7 @@
     <ClInclude Include="ui\ChangeWeatherDialog.hpp" />
     <ClInclude Include="ui\UICharacterInfo.h" />
     <ClInclude Include="ui\UIChatWnd.h" />
+    <ClInclude Include="ui\UIContactsWnd.h" />
     <ClInclude Include="ui\UIDebugFonts.h" />
     <ClInclude Include="ui\UIDemoPlayControl.h" />
     <ClInclude Include="ui\UIDialogWnd.h" />
@@ -3099,6 +3100,7 @@
     <ClCompile Include="ui\ChangeWeatherDialog.cpp" />
     <ClCompile Include="ui\UICharacterInfo.cpp" />
     <ClCompile Include="ui\UIChatWnd.cpp" />
+    <ClCompile Include="ui\UIContactsWnd.cpp" />
     <ClCompile Include="ui\UIDebugFonts.cpp">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>

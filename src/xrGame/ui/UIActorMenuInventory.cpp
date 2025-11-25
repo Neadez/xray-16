@@ -354,6 +354,7 @@ void CUIActorMenu::OnInventoryAction(PIItem pItem, u16 action_type)
 }
 void CUIActorMenu::AttachAddon(PIItem item_to_upgrade)
 {
+    clear_highlight_lists(); // Обновляем подсветку --#SM+#--
     PlaySnd(eAttachAddon);
     R_ASSERT(item_to_upgrade);
     if (OnClient())
@@ -385,7 +386,10 @@ void CUIActorMenu::DetachAddon(LPCSTR addon_name, PIItem itm)
         return;
     }
     if (itm == NULL)
+    {
         CurrentIItem()->Detach(addon_name, true);
+        clear_highlight_lists();
+    }
     else
         itm->Detach(addon_name, true);
 }
@@ -598,10 +602,10 @@ bool CUIActorMenu::ToSlot(CUICellItem* itm, bool force_place, u16 slot_id)
         SendEvent_ActivateSlot(slot_id, m_pActorInvOwner->object_id());
 
         // ColorizeItem						( itm, false );
-        //if (slot_id == OUTFIT_SLOT)
-        //{
-        //    MoveArtefactsToBag();
-        //}
+        if (slot_id == OUTFIT_SLOT)
+        {
+            MoveArtefactsToBag();
+        }
         return true;
     }
     else
@@ -774,7 +778,7 @@ bool CUIActorMenu::ToBelt(CUICellItem* itm, bool b_use_cursor_pos)
     }
     else
     { // in case belt slot is busy
-        if (!iitem->Belt() || m_pActorInvOwner->inventory().BeltMaxWidth() == 0)
+        if (!iitem->Belt() || m_pActorInvOwner->inventory().BeltWidth() == 0)
             return false;
 
         CUIDragDropListEx* belt_list = NULL;
@@ -1552,7 +1556,6 @@ void CUIActorMenu::UpdateOutfit()
     const u32 maxCount = m_pActorInvOwner->inventory().BeltMaxWidth();
     const Ivector2 maxCap = m_pLists[eInventoryBeltList]->CalculateCapacity(maxCount);
     m_pLists[eInventoryBeltList]->SetMaxCellsCapacity(maxCap);
-    m_pLists[eInventoryBeltList]->SetCellsCapacity(maxCap);
 
     CCustomOutfit* outfit = m_pActorInvOwner->GetOutfit();
     if (m_pLists[eInventoryHelmetList])
@@ -1575,9 +1578,9 @@ void CUIActorMenu::UpdateOutfit()
         return;
     }
 
-    //const u32 af_count = m_pActorInvOwner->inventory().BeltWidth();
-    //const Ivector2 cap = m_pLists[eInventoryBeltList]->CalculateCapacity(af_count);
-    //m_pLists[eInventoryBeltList]->SetCellsCapacity(cap);
+    const u32 af_count = m_pActorInvOwner->inventory().BeltWidth();
+    const Ivector2 cap = m_pLists[eInventoryBeltList]->CalculateCapacity(af_count);
+    m_pLists[eInventoryBeltList]->SetCellsCapacity(cap);
 }
 
 void CUIActorMenu::MoveArtefactsToBag()

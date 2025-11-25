@@ -91,7 +91,7 @@ bool CUIRankingWnd::Init()
     if (!UIHelper::CreateFrameWindow(xml, "background", this, false))
         std::ignore = UIHelper::CreateFrameLine(xml, "background", this, false);
 
-    std::ignore = UIHelper::CreateStatic(xml, "center_background", this, false);
+    std::ignore = UIHelper::CreateFrameWindow(xml, "center_background", this, false);
     std::ignore = UIHelper::CreateFrameWindow(xml, "down_background", this, false);
 
     if (xml.NavigateToNode("actor_ch_info"))

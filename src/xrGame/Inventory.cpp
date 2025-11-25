@@ -1206,10 +1206,10 @@ bool CInventory::CanPutInBelt(PIItem pIItem)
         return false;
     if (!pIItem || !pIItem->Belt())
         return false;
-    if (m_belt.size() >= BeltMaxWidth())
+    if (m_belt.size() >= BeltWidth())
         return false;
 
-    return FreeRoom_inBelt(m_belt, pIItem, BeltMaxWidth(), 1);
+    return FreeRoom_inBelt(m_belt, pIItem, BeltWidth(), 1);
 }
 //проверяет можем ли поместить вещь в рюкзак,
 //при этом реально ничего не меняется

@@ -7,6 +7,7 @@
 #include "Level.h"
 #include "xrServerEntities/character_info.h"
 #include "relation_registry.h"
+#include "ai/monsters/basemonster/base_monster.h"
 
 #include "xrUICore/XML/xrUIXmlParser.h"
 #include "UIXmlInit.h"
@@ -399,13 +400,20 @@ bool CUICharacterInfo::ignore_community(shared_str const& check_community)
 }
 
 // call from using dead monster
-void CUICharacterInfo::InitMonsterCharacter(shared_str monster_tex_name)
+void CUICharacterInfo::InitMonsterCharacter(CBaseMonster* monster)
 {
+    LPCSTR monster_icon = READ_IF_EXISTS(pSettings, r_string, monster->cNameSect(), "icon", " ");
+    LPCSTR monster_name = READ_IF_EXISTS(pSettings, r_string, monster->cNameSect(), "name", " ");
+
+    if (m_icons[eName])
+    {
+        m_icons[eName]->TextItemControl()->SetTextST(monster_name);
+        m_icons[eName]->Show(true);
+    }
     if (m_icons[eIcon])
     {
-        m_icons[eIcon]->InitTexture(monster_tex_name.c_str());
+        m_icons[eIcon]->InitTexture(monster_icon);
         m_icons[eIcon]->SetStretchTexture(true);
-        //m_icons[eIcon]->SetColor(m_deadbody_color); // (color_argb(255, 255, 160, 160));
         m_icons[eIcon]->Show(true);
     }
     if (m_icons[eIconOver])

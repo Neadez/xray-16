@@ -852,15 +852,18 @@ bool CUICellContainer::IsRoomFree(const Ivector2& pos, const Ivector2& _size)
     return true;
 }
 
-void CUICellContainer::GetTexUVLT(Fvector2& uv, u32 col, u32 row, u8 select_mode)
+void CUICellContainer::GetTexUVLT(Fvector2& uv, u32 col, u32 row, CUICellItem::EUISelectArmament armament)
 {
-    switch (select_mode)
+    switch (armament)
     {
-    case 0: uv.set(0.00f, 0.0f); break;
-    case 1: uv.set(0.25f, 0.0f); break;
-    case 2: uv.set(0.50f, 0.0f); break;
-    case 3: uv.set(0.75f, 0.0f); break;
-    default: uv.set(0.00f, 0.0f); break;
+    case CUICellItem::eTransparent: uv.set(0.00f, 0.0f); break;
+    case CUICellItem::eDarkGreen: uv.set(0.25f, 0.0f); break;
+    case CUICellItem::eYellow: uv.set(0.50f, 0.0f); break;
+    case CUICellItem::eLightBlue: uv.set(0.75f, 0.0f); break;
+    case CUICellItem::eGreen: uv.set(0.00f, 0.50f); break;
+    case CUICellItem::eRed: uv.set(0.25f, 0.50f); break;
+    case CUICellItem::eBlue: uv.set(0.50f, 0.50f); break;
+    case CUICellItem::eLime: uv.set(0.75f, 0.50f); break;
     }
 }
 
@@ -1022,7 +1025,7 @@ void CUICellContainer::Draw()
     UI().ClientToScreenScaled(drawLT, drawLT.x, drawLT.y);
 
     const Fvector2 pts[6] = {{0.0f, 0.0f}, {1.0f, 0.0f}, {1.0f, 1.0f}, {0.0f, 0.0f}, {1.0f, 1.0f}, {0.0f, 1.0f}};
-    constexpr auto ty = 1.0f;
+    constexpr auto ty = 0.50f;
     constexpr auto tx = 0.25f;
     const Fvector2 uvs[6] = {{0.0f, 0.0f}, {tx, 0.0f}, {tx, ty}, {0.0f, 0.0f}, {tx, ty}, {0.0f, ty}};
 
@@ -1075,21 +1078,21 @@ void CUICellContainer::Draw()
             cpos.add(TopVisibleCell());
             CUICell& ui_cell = GetCellAt(cpos);
 
-            u8 select_mode = 0;
+            CUICellItem::EUISelectArmament armament = CUICellItem::eTransparent;
             if (!ui_cell.Empty())
             {
                 if (ui_cell.m_item->m_cur_mark)
-                    select_mode = 2;
+                    armament = CUICellItem::eYellow;
                 else if (ui_cell.m_item->m_selected)
-                    select_mode = 1;
+                    armament = CUICellItem::eGreen;
                 else if (ui_cell.m_item->m_select_armament)
-                    select_mode = 3;
+                    armament = ui_cell.m_item->m_select_armament;
                 else if (ui_cell.m_item->m_select_equipped && g_inv_highlight_equipped)
-                    select_mode = 2;
+                    armament = CUICellItem::eYellow;
             }
 
             Fvector2 tp;
-            GetTexUVLT(tp, tgt_cells.x1 + x, tgt_cells.y1 + y, select_mode);
+            GetTexUVLT(tp, tgt_cells.x1 + x, tgt_cells.y1 + y, armament);
 
             // for (u32 k=0; k<6; ++k,++pv)
             for (u32 k = 0; k < 6; ++k)
@@ -1196,7 +1199,7 @@ void CUICellContainer::clear_select_armament()
         CUICell& cell = (*itb);
         if (cell.m_item)
         {
-            cell.m_item->m_select_armament = false;
+            cell.m_item->m_select_armament = CUICellItem::eTransparent;
         }
     }
 }

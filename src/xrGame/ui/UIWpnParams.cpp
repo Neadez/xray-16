@@ -184,9 +184,19 @@ void CUIWpnParams::SetInfo(CInventoryItem* slot_wpn, CInventoryItem& cur_wpn)
 
         if (m_textAmmoUsedType)
         {
-            string128 str;
-            xr_sprintf(str, sizeof(str), "%s", pSettings->r_string(ammo_types[0].c_str(), "inv_name_short"));
-            m_textAmmoUsedType->SetTextST(str);
+            xr_string str;
+            str = CStringTable().translate(pSettings->r_string(ammo_types[0].c_str(), "inv_name_short")).c_str();
+            if (ammo_types.size() > 1)
+            {
+                str += ", ";
+                str += CStringTable().translate(pSettings->r_string(ammo_types[1].c_str(), "inv_name_short")).c_str();
+                if (ammo_types.size() > 2)
+                {
+                    str += ", ";
+                    str += CStringTable().translate(pSettings->r_string(ammo_types[2].c_str(), "inv_name_short")).c_str();
+                }
+            }
+            m_textAmmoUsedType->SetTextST(str.c_str());
         }
 
         Frect tex_rect;
@@ -230,7 +240,7 @@ void CUIWpnParams::SetInfo(CInventoryItem* slot_wpn, CInventoryItem& cur_wpn)
         if (m_stAmmoType3)
         {
             m_stAmmoType3->SetShader(InventoryUtilities::GetEquipmentIconsShader());
-            if (ammo_types.size() == 2 && m_stAmmoType2)
+            if (ammo_types.size() != 3 && m_stAmmoType1 && m_stAmmoType2)
             {
                 tex_rect.set(0, 0, 1, 1);
             }

@@ -67,8 +67,7 @@ void CCustomOutfit::Load(LPCSTR section)
     m_HitTypeProtection[ALife::eHitTypeChemicalBurn] = pSettings->r_float(section, "chemical_burn_protection");
     m_HitTypeProtection[ALife::eHitTypeExplosion] = pSettings->r_float(section, "explosion_protection");
     m_HitTypeProtection[ALife::eHitTypeFireWound] = pSettings->read_if_exists<float>(section, "fire_wound_protection", 0.0f);
-    m_HitTypeProtection[ALife::eHitTypePhysicStrike] = pSettings->read_if_exists<float>(
-        section, "physic_strike_protection", m_HitTypeProtection[ALife::eHitTypeStrike]);
+    m_HitTypeProtection[ALife::eHitTypePhysicStrike] = pSettings->read_if_exists<float>(section, "physic_strike_protection", m_HitTypeProtection[ALife::eHitTypeStrike]);
     m_HitTypeProtection[ALife::eHitTypeLightBurn] = m_HitTypeProtection[ALife::eHitTypeBurn];
 
     if (pSettings->line_exist(section, "hit_fraction_actor"))
@@ -111,7 +110,7 @@ void CCustomOutfit::Load(LPCSTR section)
 
     m_full_icon_name = pSettings->r_string(section, "full_icon_name");
     m_artefact_count = READ_IF_EXISTS(pSettings, r_u32, section, "artefact_count", 0);
-    clamp(m_artefact_count, (u32)0, (u32)12);
+    clamp(m_artefact_count, (u32)0, (u32)10);
 
     m_BonesProtectionSect = READ_IF_EXISTS(pSettings, r_string, section, "bones_koeff_protection", "");
     bIsHelmetAvaliable = !!READ_IF_EXISTS(pSettings, r_bool, section, "helmet_avaliable", true);
@@ -223,52 +222,67 @@ float CCustomOutfit::HitThroughArmor(float hit_power, s16 element, float ap, boo
     }
     case SBoneProtections::HitFractionActorCS:
     {
+        //if (hit_type == ALife::eHitTypeFireWound)
+        //{
+        //    const float BoneArmor = m_boneProtection->getBoneArmor(element) * GetCondition();
+
+        //    if (ap > EPS && ap > BoneArmor)
+        //    {
+        //        //пуля пробила бронь
+        //        const float d_ap = ap - BoneArmor;
+        //        NewHitPower *= (d_ap / ap);
+
+        //        if (NewHitPower < m_boneProtection->m_fHitFrac)
+        //            NewHitPower = m_boneProtection->m_fHitFrac;
+
+        //        if (!IsGameTypeSingle())
+        //        {
+        //            NewHitPower *= m_boneProtection->getBoneProtection(element);
+        //        }
+
+        //        if (NewHitPower < 0.0f)
+        //            NewHitPower = 0.0f;
+        //    }
+        //    else
+        //    {
+        //        //пуля НЕ пробила бронь
+        //        NewHitPower *= m_boneProtection->m_fHitFrac;
+        //        add_wound = false; //раны нет
+        //    }
+        //}
+        //else
+        //{
+        //    float one = 0.1f;
+        //    if (hit_type == ALife::eHitTypeWound ||
+        //        hit_type == ALife::eHitTypeWound_2 ||
+        //        hit_type == ALife::eHitTypeExplosion)
+        //    {
+        //        one = 1.0f;
+        //    }
+
+        //    const float protect = GetHitTypeProtection(hit_type, element);
+        //    NewHitPower -= protect * one;
+        //    if (NewHitPower < 0.0f)
+        //        NewHitPower = 0.0f;
+        //}
+
+        ////увеличить изношенность костюма
+        //Hit(NewHitPower, hit_type);
+        //break;
         if (hit_type == ALife::eHitTypeFireWound)
         {
-            const float BoneArmor = m_boneProtection->getBoneArmor(element) * GetCondition();
-
-            if (ap > EPS && ap > BoneArmor)
-            {
-                //пуля пробила бронь
-                const float d_ap = ap - BoneArmor;
-                NewHitPower *= (d_ap / ap);
-
-                if (NewHitPower < m_boneProtection->m_fHitFrac)
-                    NewHitPower = m_boneProtection->m_fHitFrac;
-
-                if (!IsGameTypeSingle())
-                {
-                    NewHitPower *= m_boneProtection->getBoneProtection(element);
-                }
-
-                if (NewHitPower < 0.0f)
-                    NewHitPower = 0.0f;
-            }
-            else
-            {
-                //пуля НЕ пробила бронь
-                NewHitPower *= m_boneProtection->m_fHitFrac;
-                add_wound = false; //раны нет
-            }
+            const float BoneArmor = m_boneProtection->getBoneArmor(element) * GetCondition() * (1 - ap);
+            NewHitPower -= BoneArmor;
+            if (NewHitPower < hit_power * m_boneProtection->m_fHitFrac)
+                NewHitPower = hit_power * m_boneProtection->m_fHitFrac;
         }
         else
         {
-            float one = 0.1f;
-            if (hit_type == ALife::eHitTypeWound ||
-                hit_type == ALife::eHitTypeWound_2 ||
-                hit_type == ALife::eHitTypeExplosion)
-            {
-                one = 1.0f;
-            }
-
-            const float protect = GetHitTypeProtection(hit_type, element);
-            NewHitPower -= protect * one;
-            if (NewHitPower < 0.0f)
-                NewHitPower = 0.0f;
+            NewHitPower *= GetHitTypeProtection(hit_type, element);
         }
 
         //увеличить изношенность костюма
-        Hit(NewHitPower, hit_type);
+        Hit(hit_power, hit_type);
         break;
     }
     case SBoneProtections::HitFraction:
@@ -376,9 +390,9 @@ void CCustomOutfit::OnMoveToRuck(const SInvItemPlace& prev)
         if (pActor)
         {
             ApplySkinModel(pActor, false, false);
-            CTorch* pTorch = smart_cast<CTorch*>(pActor->inventory().ItemFromSlot(TORCH_SLOT));
-            if (pTorch && !bIsHelmetAvaliable)
-                pTorch->SwitchNightVision(false);
+            //CTorch* pTorch = smart_cast<CTorch*>(pActor->inventory().ItemFromSlot(TORCH_SLOT));
+            //if (pTorch && !bIsHelmetAvaliable)
+            //    pTorch->SwitchNightVision(false);
         }
     }
 };
@@ -467,7 +481,7 @@ bool CCustomOutfit::install_upgrade_impl(LPCSTR section, bool test)
     clamp(m_fPowerLoss, 0.0f, 1.0f);
 
     result |= process_if_exists(section, "artefact_count", &CInifile::r_u32, m_artefact_count, test);
-    clamp(m_artefact_count, (u32)0, (u32)12);
+    clamp(m_artefact_count, (u32)0, (u32)10);
 
     return result;
 }

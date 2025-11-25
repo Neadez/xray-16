@@ -2209,6 +2209,8 @@ float CActor::GetRestoreSpeed(ALife::EConditionRestoreType const& type)
     }
     case ALife::eRadiationRestoreSpeed:
     {
+        res = 0.f;
+        res -= conditions().change_v().m_fV_Radiation;
         for (auto& it : inventory().m_belt)
         {
             const auto artefact = smart_cast<CArtefact*>(it);

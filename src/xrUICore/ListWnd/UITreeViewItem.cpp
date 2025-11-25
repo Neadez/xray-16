@@ -462,7 +462,7 @@ void CUITreeBranch::CreateTreeBranch(shared_str nesting, shared_str leafName, CU
 
             for (GroupTree_it it2 = it; it2 != cont.end(); ++it2)
             {
-                pNewItem = new CUITreeViewItem();
+                pNewItem = xr_new<CUITreeViewItem>();
                 pItemToIns->AddItem(pNewItem);
                 pNewItem->SetFont(pRootFnt);
                 pNewItem->SetText(*(*it2));
@@ -473,7 +473,7 @@ void CUITreeBranch::CreateTreeBranch(shared_str nesting, shared_str leafName, CU
 
             return pNewItem;
         }
-    }AddTreeTail(pRootFont, rootColor);
+    } AddTreeTail(pRootFont, rootColor);
 
     //-----------------------------------------------------------------------------
     //  Function body
@@ -543,8 +543,6 @@ void CUITreeBranch::CreateTreeBranch(shared_str nesting, shared_str leafName, CU
                 pTVItemChilds = pTVItem;
             }
         }
-        pTVItem->Open();
-        pTVItem->Close();
         if (status)
             break;
     }
@@ -552,7 +550,7 @@ void CUITreeBranch::CreateTreeBranch(shared_str nesting, shared_str leafName, CU
     // Прошли все существующее дерево, и не нашли? Тогда добавляем новую иерархию
     if (!pTVItemChilds)
     {
-        pTVItemChilds = new CUITreeViewItem();
+        pTVItemChilds = xr_new<CUITreeViewItem>();
         pTVItemChilds->SetFont(pRootFont);
         pTVItemChilds->SetText(*groupTree.front());
         pTVItemChilds->SetReadedColor(rootColor);
@@ -570,7 +568,7 @@ void CUITreeBranch::CreateTreeBranch(shared_str nesting, shared_str leafName, CU
     // Cначала проверяем нет ли записи с таким названием, и добавляем если нет
     //	if (!pTVItemChilds->Find(*name))
     //	{
-    pTVItem = new CUITreeViewItem();
+    pTVItem = xr_new<CUITreeViewItem>();
     pTVItem->SetFont(pLeafFont);
     pTVItem->SetReadedColor(leafColor);
     pTVItem->SetText(*CStringTable().translate(*leafName));

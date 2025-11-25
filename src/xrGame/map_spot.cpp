@@ -310,9 +310,17 @@ void CComplexMapSpot::Update()
         {
             if (!m_infinity_time)
             {
-                ALife::_TIME_ID dt = m_timer_finish - Level().GetGameTime();
-                m_timer->TextItemControl()->SetText(
-                    GetTimeAsString(dt, InventoryUtilities::etpTimeToMinutes, ':', false).c_str());
+                if ((m_timer_finish - Level().GetGameTime()) > 86400000)
+                {
+                    string512 buff;
+                    InventoryUtilities::GetTimePeriodAsString(buff, sizeof(buff), Level().GetGameTime(), m_timer_finish);
+                    m_timer->TextItemControl()->SetText(buff);
+                }
+                else
+                {
+                    ALife::_TIME_ID dt = m_timer_finish - Level().GetGameTime();
+                    m_timer->TextItemControl()->SetText(GetTimeAsString(dt, InventoryUtilities::etpTimeToMinutes, ':', false).c_str());
+                }
             }
         }
     }

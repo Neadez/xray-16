@@ -49,7 +49,7 @@ public:
 
 protected:
     void OnBtnClose(CUIWindow* w, void* d);
-    //			void	UpdateCounter		();
+    void UpdateCounter();
 
 public:
     UIHint* hint_wnd{};
@@ -59,7 +59,7 @@ private: // m_
     CUIScrollView* m_list{};
 
     CUIStatic* m_caption{};
-    //	CUIStatic*			m_counter{};
+    CUIStatic* m_counter{};
     CUI3tButton* m_bt_close{};
 
     float m_orig_h{};
@@ -101,6 +101,7 @@ private:
     CGameTask* m_task{};
     CUI3tButton* m_name{};
     CUIStatic* m_time{};
+    CUIStatic* m_time_rem{};
     CUICheckButton* m_bt_view{};
     CUIStatic* m_st_story{};
     CUI3tButton* m_bt_focus{};

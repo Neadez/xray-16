@@ -25,6 +25,8 @@
 #include "xrUICore/ProgressBar/UIProgressBar.h"
 #include "xrUICore/ui_base.h"
 #include "UIOutfitSlot.h"
+#include "ActorEffector.h"
+#include "EffectorFall.h"
 
 namespace detail::actor_menu
 {

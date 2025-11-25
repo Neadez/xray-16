@@ -35,16 +35,18 @@ bool CUIEncyclopediaWnd::Init()
     if (!uiXml.Load(CONFIG_PATH, UI_PATH, UI_PATH_DEFAULT, PDA_ENCYCLOPEDIA_XML, false))
         return false;
 
-    CUIXmlInit::InitWindow(uiXml, "main_wnd", 0, this);
+    CUIXmlInit xml_init;
+
+    xml_init.InitWindow(uiXml, "main_wnd", 0, this);
 
     // Load xml data
     UIEncyclopediaIdxBkg = UIHelper::CreateFrameWindow(uiXml, "left_frame_window", this, false);
 
     UIEncyclopediaInfoBkg = UIHelper::CreateFrameWindow(uiXml, "right_frame_window", this, false);
 
-    CUIXmlInit::InitFont(uiXml, "tree_item_font", 0, m_uTreeItemColor, m_pTreeItemFont);
+    xml_init.InitFont(uiXml, "tree_item_font", 0, m_uTreeItemColor, m_pTreeItemFont);
     R_ASSERT(m_pTreeItemFont);
-    CUIXmlInit::InitFont(uiXml, "tree_root_font", 0, m_uTreeRootColor, m_pTreeRootFont);
+    xml_init.InitFont(uiXml, "tree_root_font", 0, m_uTreeRootColor, m_pTreeRootFont);
     R_ASSERT(m_pTreeRootFont);
 
     std::ignore = UIHelper::CreateFrameLine(uiXml, "left_frame_line", UIEncyclopediaIdxBkg, false);
@@ -63,7 +65,7 @@ bool CUIEncyclopediaWnd::Init()
     UIIdxList = xr_new<CUIListWnd>();
     UIIdxList->SetAutoDelete(true);
     UIEncyclopediaIdxBkg->AttachChild(UIIdxList);
-    CUIXmlInit::InitListWnd(uiXml, "idx_list", 0, UIIdxList);
+    xml_init.InitListWnd(uiXml, "idx_list", 0, UIIdxList);
     UIIdxList->SetMessageTarget(this);
     UIIdxList->EnableScrollBar(true);
 
@@ -120,13 +122,13 @@ void CUIEncyclopediaWnd::Draw()
                 if (ARTICLE_DATA::eEncyclopediaArticle == it->article_type)
                 {
                     AddArticle(it->article_id, it->readed);
-                }
+}
             }
             prevArticlesCount = Actor()->encyclopedia_registry->registry().objects_ptr()->size();
         }
 
         m_flags.set(eNeedReload, FALSE);
-    }
+}
 
     inherited::Draw();
 }
@@ -197,10 +199,10 @@ void CUIEncyclopediaWnd::SetCurrentArtice(CUITreeViewItem* pTVItem)
 void CUIEncyclopediaWnd::AddArticle(shared_str article_id, bool bReaded)
 {
     for (std::size_t i = 0; i < m_ArticlesDB.size(); i++)
-    {
+{
         if (m_ArticlesDB[i]->Id() == article_id)
             return;
-    }
+}
 
     // Добавляем элемент
     m_ArticlesDB.resize(m_ArticlesDB.size() + 1);
@@ -208,15 +210,15 @@ void CUIEncyclopediaWnd::AddArticle(shared_str article_id, bool bReaded)
     a = xr_new<CEncyclopediaArticle>();
     a->Load(article_id);
 
-    // Теперь создаем иерархию вещи по заданному пути
+                        // Теперь создаем иерархию вещи по заданному пути
 
     auto b = xr_new<CUITreeBranch>();
     b->CreateTreeBranch(a->data()->group, a->data()->name, UIIdxList, m_ArticlesDB.size() - 1, m_pTreeRootFont,
         m_uTreeRootColor, m_pTreeItemFont, m_uTreeItemColor, bReaded);
-}
+                    }
 
 void CUIEncyclopediaWnd::Reset()
-{
+                {
     inherited::Reset();
     ReloadArticles();
 }

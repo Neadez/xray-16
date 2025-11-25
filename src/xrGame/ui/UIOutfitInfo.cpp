@@ -84,8 +84,40 @@ void CUIOutfitImmunity::SetProgressValue(float cur, float comp)
     {
         m_value.SetTextColor(color_rgba(0, 255, 0, 255));
     }
-    xr_sprintf(buf, sizeof(buf), "%.0f%%", cur);
+    int v = (int)(cur);
+    xr_sprintf(buf, sizeof(buf), "%d%%", v);
     m_value.SetText(buf);
+}
+
+void CUIOutfitImmunity::Set2ProgressValue(float cur, float cur2, float comp, float comp2)
+{
+    cur *= m_magnitude;
+    comp *= m_magnitude;
+    cur2 *= m_magnitude;
+    comp2 *= m_magnitude;
+    string32 buf, buf2;
+    if (cur == comp || cur2 == comp2)
+    {
+        m_value.SetTextColor(color_rgba(170, 170, 170, 255));
+    }
+    else if (cur < comp || cur2 < comp2)
+    {
+        m_value.SetTextColor(color_rgba(255, 0, 0, 255));
+    }
+    else
+    {
+        m_value.SetTextColor(color_rgba(0, 255, 0, 255));
+    }
+    xr_sprintf(buf, sizeof(buf), "%.0f%%", cur);
+    xr_sprintf(buf2, sizeof(buf2), "%.0f%%", cur2);
+    xr_string value;
+    value += buf;
+    value += "/";
+    value += buf2;
+    m_value.SetText(value.c_str());
+    float curr = (cur + cur2) / 2;
+    float compp = (comp + comp2) / 2;
+    m_progress.SetTwoPos(curr, compp);
 }
 
 // ===========================================================================================
@@ -164,28 +196,34 @@ void CUIOutfitInfo::UpdateInfo(CCustomOutfit* cur_outfit, CCustomOutfit* slot_ou
         IKinematics* ikv = smart_cast<IKinematics*>(actor->Visual());
         VERIFY(ikv);
         u16 spine_bone = ikv->LL_BoneID("bip01_spine");
+        u16 head_bone = ikv->LL_BoneID("bip01_head");
 
         float cur = cur_outfit->GetBoneArmor(spine_bone) * cur_outfit->GetCondition();
-        // if(!cur_outfit->bIsHelmetAvaliable)
-        //{
-        //	spine_bone = ikv->LL_BoneID("bip01_head");
-        //	cur += cur_outfit->GetBoneArmor(spine_bone);
-        //}
+        float cur2;
+
+        if(!cur_outfit->bIsHelmetAvaliable)
+            cur2 = cur_outfit->GetBoneArmor(head_bone) * cur_outfit->GetCondition();
+        else
+            cur2 = 0.f;
+
         float slot = cur;
+        float slot2 = cur;
+
         if (slot_outfit)
         {
-            spine_bone = ikv->LL_BoneID("bip01_spine");
             slot = slot_outfit->GetBoneArmor(spine_bone) * slot_outfit->GetCondition();
-            // if(!slot_outfit->bIsHelmetAvaliable)
-            //{
-            //	spine_bone = ikv->LL_BoneID("bip01_head");
-            //	slot += slot_outfit->GetBoneArmor(spine_bone);
-            //}
+            if(!slot_outfit->bIsHelmetAvaliable)
+                slot2 = slot_outfit->GetBoneArmor(head_bone) * slot_outfit->GetCondition();
+            else
+                slot2 = 0.f;
         }
+
         const float max_power = actor->conditions().GetMaxFireWoundProtection();
         cur /= max_power;
         slot /= max_power;
-        fireWoundItem->SetProgressValue(cur, slot);
+        cur2 /= max_power;
+        slot2 /= max_power;
+        fireWoundItem->Set2ProgressValue(cur, cur2, slot, slot2);
     }
 }
 

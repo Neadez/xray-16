@@ -30,8 +30,10 @@
 #include "UILogsWnd.h"
 #include "UIEncyclopediaWnd.h"
 #include "UIScriptWnd.h"
+#include "ActorEffector.h"
+#include "EffectorFall.h"
 
-#define PDA_XML "pda.xml"
+constexpr pcstr PDA_XML = "pda.xml";
 
 u32 g_pda_info_state = 0;
 
@@ -86,6 +88,10 @@ void CUIPdaWnd::Init()
     CUIXmlInit::InitWindow(uiXml, "main", 0, this);
 
     UIMainPdaFrame = UIHelper::CreateStatic(uiXml, "background_static", this);
+    std::ignore = UIHelper::CreateFrameWindow(uiXml, "top_background", this, false);
+    std::ignore = UIHelper::CreateFrameWindow(uiXml, "bottom_left_background", this, false);
+    std::ignore = UIHelper::CreateFrameWindow(uiXml, "bottom_right_background", this, false);
+
     m_caption = UIHelper::CreateStatic(uiXml, "caption_static", this);
     m_caption_const = (m_caption->GetText());
     m_clock = UIHelper::CreateStatic(uiXml, "clock_wnd", this, false);
@@ -179,8 +185,8 @@ void CUIPdaWnd::Init()
         xr_delete(UINoice);
 
     // XXX: dynamically determine if we need to rearrange the tabs
-    if (ClearSkyMode)
-        RearrangeTabButtons(UITabControl);
+    //if (ClearSkyMode)
+    RearrangeTabButtons(UITabControl);
     InitSounds(uiXml);
 }
 
@@ -483,7 +489,7 @@ void RearrangeTabButtons(CUITabControl* pTab)
     }
 
     pTab->SetWidth(pos.x + 5.0f);
-    pos.x = pTab->GetWndPos().x - pos.x;
+    pos.x = pTab->GetWndPos().x;
     pos.y = pTab->GetWndPos().y;
     pTab->SetWndPos(pos);
 }

@@ -4,6 +4,7 @@
 
 class CInventoryOwner;
 class CUIFrameLineWnd;
+class CUIButton;
 class CUI3tButton;
 class CUITabControl;
 class CUIStatic;
@@ -43,6 +44,18 @@ protected:
     shared_str m_sActiveSection;
 
     UIHint* m_hint_wnd;
+
+    enum eActorPdaSndAction
+    {
+        eSndOpen = 0,
+        eSndClose,
+        eSndButton,
+        eSndMax
+    };
+
+    ref_sound sounds[eSndMax];
+    void PlaySnd(eActorPdaSndAction a);
+    void InitSounds(CUIXml& uiXml);
 
 public:
     // Поддиалоги PDA

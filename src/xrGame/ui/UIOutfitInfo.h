@@ -17,6 +17,7 @@ public:
 
     bool InitFromXml(CUIXml& xml_doc, pcstr base_str, pcstr immunity, pcstr immunity_text);
     void SetProgressValue(float cur, float comp);
+    void Set2ProgressValue(float cur, float cur2, float comp, float comp2);
 
     pcstr GetDebugType() override { return "CUIOutfitImmunity"; }
 
