@@ -63,6 +63,8 @@ public:
 
     CUIArtefactPanel* UIArtefactPanel{};
 
+    [[nodiscard]]
+    bool IsZoneMapShown();
     void ShowZoneMap(bool status);
     void DrawZoneMap();
     void UpdateZoneMap();

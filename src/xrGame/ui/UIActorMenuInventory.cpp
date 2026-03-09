@@ -11,6 +11,7 @@
 #include "UIDragDropReferenceList.h"
 #include "UICellCustomItems.h"
 #include "UIItemInfo.h"
+#include "UIOutfitInfo.h"
 #include "xrUICore/Windows/UIFrameLineWnd.h"
 #include "xrUICore/PropertiesBox/UIPropertiesBox.h"
 #include "xrUICore/ListBox/UIListBoxItem.h"
@@ -429,7 +430,12 @@ void CUIActorMenu::InitInventoryContents(CUIDragDropListEx* pBagList, bool onlyB
 
     CUIDragDropListEx* curr_list = pBagList;
 
-    TIItemContainer ruck_list = m_pActorInvOwner->inventory().m_ruck;
+    TIItemContainer ruck_list;
+    if (onlyBagList)
+        m_pActorInvOwner->inventory().AddAvailableItems(ruck_list, true);
+    else
+        ruck_list = m_pActorInvOwner->inventory().m_ruck;
+
     std::sort(ruck_list.begin(), ruck_list.end(), InventoryUtilities::GreaterRoomInRuck);
 
     for (PIItem item : ruck_list)
@@ -1016,13 +1022,9 @@ void CUIActorMenu::PropertiesBoxForSlots(PIItem item, bool& b_show)
         {
             if (!pHelmet)
             {
-                if (!pBackpack)
-                {
-                    if (m_currMenuMode == mmDeadBodySearch)
-                        m_UIPropertiesBox->AddItem("st_move_to_bag", nullptr, INVENTORY_TO_BAG_ACTION);
-                    else
-                        m_UIPropertiesBox->AddItem("st_unequip", nullptr, INVENTORY_TO_BAG_ACTION);
-                }
+                const bool has_translation = StringTable().has_translation("st_unequip");
+                if (m_currMenuMode == mmDeadBodySearch || !has_translation)
+                    m_UIPropertiesBox->AddItem("st_move_to_bag", nullptr, INVENTORY_TO_BAG_ACTION);
                 else
                     m_UIPropertiesBox->AddItem("st_undress_backpack", NULL, INVENTORY_TO_BAG_ACTION);
             }
@@ -1140,7 +1142,7 @@ void CUIActorMenu::PropertiesBoxForAddon(PIItem item, bool& b_show)
         if (item_in_slot_2 && item_in_slot_2->CanAttach(pScope))
         {
             shared_str str = StringTable().translate("st_attach_scope_to_pistol");
-            str.printf("%s %s", str.c_str(), item_in_slot_2->m_name.c_str());
+            xr_sprintf(str, "%s %s", str.c_str(), item_in_slot_2->m_name.c_str());
             m_UIPropertiesBox->AddItem(str.c_str(), (void*)item_in_slot_2, INVENTORY_ATTACH_ADDON);
             //			m_UIPropertiesBox->AddItem( "st_attach_scope_to_pistol",  (void*)item_in_slot_2,
             // INVENTORY_ATTACH_ADDON );
@@ -1149,7 +1151,7 @@ void CUIActorMenu::PropertiesBoxForAddon(PIItem item, bool& b_show)
         if (item_in_slot_3 && item_in_slot_3->CanAttach(pScope))
         {
             shared_str str = StringTable().translate("st_attach_scope_to_pistol");
-            str.printf("%s %s", str.c_str(), item_in_slot_3->m_name.c_str());
+            xr_sprintf(str, "%s %s", str.c_str(), item_in_slot_3->m_name.c_str());
             m_UIPropertiesBox->AddItem(str.c_str(), (void*)item_in_slot_3, INVENTORY_ATTACH_ADDON);
             //			m_UIPropertiesBox->AddItem( "st_attach_scope_to_rifle",  (void*)item_in_slot_3,
             // INVENTORY_ATTACH_ADDON );
@@ -1163,7 +1165,7 @@ void CUIActorMenu::PropertiesBoxForAddon(PIItem item, bool& b_show)
         if (item_in_slot_2 && item_in_slot_2->CanAttach(pSilencer))
         {
             shared_str str = StringTable().translate("st_attach_silencer_to_pistol");
-            str.printf("%s %s", str.c_str(), item_in_slot_2->m_name.c_str());
+            xr_sprintf(str, "%s %s", str.c_str(), item_in_slot_2->m_name.c_str());
             m_UIPropertiesBox->AddItem(str.c_str(), (void*)item_in_slot_2, INVENTORY_ATTACH_ADDON);
             //			m_UIPropertiesBox->AddItem( "st_attach_silencer_to_pistol",  (void*)item_in_slot_2,
             // INVENTORY_ATTACH_ADDON );
@@ -1172,7 +1174,7 @@ void CUIActorMenu::PropertiesBoxForAddon(PIItem item, bool& b_show)
         if (item_in_slot_3 && item_in_slot_3->CanAttach(pSilencer))
         {
             shared_str str = StringTable().translate("st_attach_silencer_to_pistol");
-            str.printf("%s %s", str.c_str(), item_in_slot_3->m_name.c_str());
+            xr_sprintf(str, "%s %s", str.c_str(), item_in_slot_3->m_name.c_str());
             m_UIPropertiesBox->AddItem(str.c_str(), (void*)item_in_slot_3, INVENTORY_ATTACH_ADDON);
             //			m_UIPropertiesBox->AddItem( "st_attach_silencer_to_rifle",  (void*)item_in_slot_3,
             // INVENTORY_ATTACH_ADDON );
@@ -1186,7 +1188,7 @@ void CUIActorMenu::PropertiesBoxForAddon(PIItem item, bool& b_show)
         if (item_in_slot_2 && item_in_slot_2->CanAttach(pGrenadeLauncher))
         {
             shared_str str = StringTable().translate("st_attach_gl_to_rifle");
-            str.printf("%s %s", str.c_str(), item_in_slot_2->m_name.c_str());
+            xr_sprintf(str, "%s %s", str.c_str(), item_in_slot_2->m_name.c_str());
             m_UIPropertiesBox->AddItem(str.c_str(), (void*)item_in_slot_2, INVENTORY_ATTACH_ADDON);
             //			m_UIPropertiesBox->AddItem( "st_attach_gl_to_pistol",  (void*)item_in_slot_2,
             //INVENTORY_ATTACH_ADDON
@@ -1196,7 +1198,7 @@ void CUIActorMenu::PropertiesBoxForAddon(PIItem item, bool& b_show)
         if (item_in_slot_3 && item_in_slot_3->CanAttach(pGrenadeLauncher))
         {
             shared_str str = StringTable().translate("st_attach_gl_to_rifle");
-            str.printf("%s %s", str.c_str(), item_in_slot_3->m_name.c_str());
+            xr_sprintf(str, "%s %s", str.c_str(), item_in_slot_3->m_name.c_str());
             m_UIPropertiesBox->AddItem(str.c_str(), (void*)item_in_slot_3, INVENTORY_ATTACH_ADDON);
             //			m_UIPropertiesBox->AddItem( "st_attach_gl_to_rifle",  (void*)item_in_slot_3,
             //INVENTORY_ATTACH_ADDON
@@ -1564,6 +1566,11 @@ void CUIActorMenu::UpdateOutfit()
             m_pLists[eInventoryHelmetList]->SetCellsCapacity({ 0, 0 });
         else
             m_pLists[eInventoryHelmetList]->SetCellsCapacity(m_pLists[eInventoryHelmetList]->MaxCellsCapacity());
+    }
+
+    if (m_OutfitInfo)
+    {
+        m_OutfitInfo->UpdateInfo(outfit, nullptr, true, true);
     }
 
     if (ShadowOfChernobylMode)

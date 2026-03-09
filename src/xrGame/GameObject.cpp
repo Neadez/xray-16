@@ -120,15 +120,15 @@ void CGameObject::cNameSect_set(shared_str N) { NameSection = N; }
 void CGameObject::cNameVisual_set(shared_str N)
 {
     // check if equal
-    if (*N && *NameVisual)
+    if (N.c_str() && NameVisual.c_str())
         if (N == NameVisual)
             return;
     // replace model
-    if (*N && N[0])
+    if (N.c_str() && N[0])
     {
         IRenderVisual* old_v = renderable.visual;
         NameVisual = N;
-        renderable.visual = GEnv.Render->model_Create(*N);
+        renderable.visual = GEnv.Render->model_Create(N.c_str());
         IKinematics* old_k = old_v ? old_v->dcast_PKinematics() : NULL;
         IKinematics* new_k = renderable.visual->dcast_PKinematics();
         /*
@@ -155,7 +155,7 @@ void CGameObject::cNameVisual_set(shared_str N)
 // flagging
 void CGameObject::processing_activate()
 {
-    VERIFY3(255 != Props.bActiveCounter, "Invalid sequence of processing enable/disable calls: overflow", *cName());
+    VERIFY3(255 != Props.bActiveCounter, "Invalid sequence of processing enable/disable calls: overflow", cName().c_str());
     Props.bActiveCounter++;
     if (!(Props.bActiveCounter - 1))
         g_pGameLevel->Objects.o_activate(this);
@@ -163,7 +163,7 @@ void CGameObject::processing_activate()
 
 void CGameObject::processing_deactivate()
 {
-    VERIFY3(Props.bActiveCounter, "Invalid sequence of processing enable/disable calls: underflow", *cName());
+    VERIFY3(Props.bActiveCounter, "Invalid sequence of processing enable/disable calls: underflow", cName().c_str());
     Props.bActiveCounter--;
     if (!Props.bActiveCounter)
         g_pGameLevel->Objects.o_sleep(this);
@@ -202,19 +202,19 @@ void CGameObject::setVisible(bool _visible)
 
 void CGameObject::Center(Fvector& C) const
 {
-    VERIFY2(renderable.visual, *cName());
+    VERIFY2(renderable.visual, cName().c_str());
     renderable.xform.transform_tiny(C, renderable.visual->getVisData().sphere.P);
 }
 
 float CGameObject::Radius() const
 {
-    VERIFY2(renderable.visual, *cName());
+    VERIFY2(renderable.visual, cName().c_str());
     return renderable.visual->getVisData().sphere.R;
 }
 
 const Fbox& CGameObject::BoundingBox() const
 {
-    VERIFY2(renderable.visual, *cName());
+    VERIFY2(renderable.visual, cName().c_str());
     return renderable.visual->getVisData().box;
 }
 
@@ -275,7 +275,7 @@ void CGameObject::net_Destroy()
 {
 #ifdef DEBUG
     if (psAI_Flags.test(aiDestroy))
-        Msg("Destroying client object [%d][%s][%x]", ID(), *cName(), this);
+        Msg("Destroying client object [%d][%s][%x]", ID(), cName().c_str(), this);
 #endif
 
     VERIFY(m_spawned);
@@ -472,7 +472,7 @@ bool CGameObject::net_Spawn(CSE_Abstract* DC)
     XFORM().setXYZ(E->o_Angle);
     Position().set(E->o_Position);
 #ifdef DEBUG
-    if (ph_dbg_draw_mask1.test(ph_m1_DbgTrackObject) && xr_stricmp(PH_DBG_ObjectTrackName(), *cName()) == 0)
+    if (ph_dbg_draw_mask1.test(ph_m1_DbgTrackObject) && xr_stricmp(PH_DBG_ObjectTrackName(), cName().c_str()) == 0)
     {
         Msg("CGameObject::net_Spawn obj %s Position set from CSE_Abstract %f,%f,%f", PH_DBG_ObjectTrackName(),
             Position().x, Position().y, Position().z);
@@ -485,7 +485,7 @@ bool CGameObject::net_Spawn(CSE_Abstract* DC)
     {
 #pragma warning(push)
 #pragma warning(disable : 4238)
-        IReader reader((void*)(*(O->m_ini_string)), O->m_ini_string.size());
+        IReader reader((void*)((O->m_ini_string).c_str()), O->m_ini_string.size());
         m_ini_file = xr_new<CInifile>(&reader, FS.get_path("$game_config$")->m_Path);
 #pragma warning(pop)
     }
@@ -518,15 +518,15 @@ bool CGameObject::net_Spawn(CSE_Abstract* DC)
             spatial.type = (spatial.type | STYPE_VISIBLEFORAI) ^ STYPE_VISIBLEFORAI;
     }
 
-    reload(*cNameSect());
+    reload(cNameSect().c_str());
     if (!GEnv.isDedicatedServer)
-        scriptBinder.reload(*cNameSect());
+        scriptBinder.reload(cNameSect().c_str());
 
     reinit();
     if (!GEnv.isDedicatedServer)
         scriptBinder.reinit();
 #ifdef DEBUG
-    if (ph_dbg_draw_mask1.test(ph_m1_DbgTrackObject) && xr_stricmp(PH_DBG_ObjectTrackName(), *cName()) == 0)
+    if (ph_dbg_draw_mask1.test(ph_m1_DbgTrackObject) && xr_stricmp(PH_DBG_ObjectTrackName(), cName().c_str()) == 0)
     {
         Msg("CGameObject::net_Spawn obj %s After Script Binder reinit %f,%f,%f", PH_DBG_ObjectTrackName(), Position().x,
             Position().y, Position().z);
@@ -589,7 +589,7 @@ bool CGameObject::net_Spawn(CSE_Abstract* DC)
     {
         if (pSettings->line_exist(cNameSect(), "cform"))
         {
-            VERIFY3(*NameVisual, "Model isn't assigned for object, but cform requisted", *cName());
+            VERIFY3(NameVisual.c_str(), "Model isn't assigned for object, but cform requisted", cName().c_str());
             CForm = xr_new<CCF_Skeleton>(this);
         }
     }
@@ -605,7 +605,7 @@ bool CGameObject::net_Spawn(CSE_Abstract* DC)
     m_bObjectRemoved = false;
     spawn_supplies();
 #ifdef DEBUG
-    if (ph_dbg_draw_mask1.test(ph_m1_DbgTrackObject) && xr_stricmp(PH_DBG_ObjectTrackName(), *cName()) == 0)
+    if (ph_dbg_draw_mask1.test(ph_m1_DbgTrackObject) && xr_stricmp(PH_DBG_ObjectTrackName(), cName().c_str()) == 0)
     {
         Msg("CGameObject::net_Spawn obj %s Before CScriptBinder::net_Spawn %f,%f,%f", PH_DBG_ObjectTrackName(),
             Position().x, Position().y, Position().z);
@@ -616,7 +616,7 @@ bool CGameObject::net_Spawn(CSE_Abstract* DC)
 #endif
 
 #ifdef DEBUG
-    if (ph_dbg_draw_mask1.test(ph_m1_DbgTrackObject) && xr_stricmp(PH_DBG_ObjectTrackName(), *cName()) == 0)
+    if (ph_dbg_draw_mask1.test(ph_m1_DbgTrackObject) && xr_stricmp(PH_DBG_ObjectTrackName(), cName().c_str()) == 0)
     {
         Msg("CGameObject::net_Spawn obj %s Before CScriptBinder::net_Spawn %f,%f,%f", PH_DBG_ObjectTrackName(),
             Position().x, Position().y, Position().z);
@@ -635,7 +635,7 @@ void CGameObject::net_Save(NET_Packet& net_packet)
 #ifdef DEBUG
     if (psAI_Flags.test(aiSerialize))
     {
-        Msg(">> **** Save script object [%s] *****", *cName());
+        Msg(">> **** Save script object [%s] *****", cName().c_str());
         Msg(">> Before save :: packet position = [%u]", net_packet.w_tell());
     }
 
@@ -664,7 +664,7 @@ void CGameObject::net_Load(IReader& ireader)
 #ifdef DEBUG
     if (psAI_Flags.test(aiSerialize))
     {
-        Msg(">> **** Load script object [%s] *****", *cName());
+        Msg(">> **** Load script object [%s] *****", cName().c_str());
         Msg(">> Before load :: reader position = [%i]", ireader.tell());
     }
 
@@ -681,7 +681,7 @@ void CGameObject::net_Load(IReader& ireader)
 #endif
 // ----------------------------------------------------------
 #ifdef DEBUG
-    if (ph_dbg_draw_mask1.test(ph_m1_DbgTrackObject) && xr_stricmp(PH_DBG_ObjectTrackName(), *cName()) == 0)
+    if (ph_dbg_draw_mask1.test(ph_m1_DbgTrackObject) && xr_stricmp(PH_DBG_ObjectTrackName(), cName().c_str()) == 0)
     {
         Msg("CGameObject::net_Load obj %s (loaded) %f,%f,%f", PH_DBG_ObjectTrackName(), Position().x, Position().y,
             Position().z);
@@ -1202,7 +1202,7 @@ void CGameObject::shedule_Update(u32 dt)
 
 bool CGameObject::net_SaveRelevant() { return scriptBinder.net_SaveRelevant(); }
 //игровое имя объекта
-LPCSTR CGameObject::Name() const { return (*cName()); }
+LPCSTR CGameObject::Name() const { return (cName().c_str()); }
 u32 CGameObject::ef_creature_type() const
 {
     string16 temp;
@@ -1359,14 +1359,14 @@ void CGameObject::UpdateCL()
 // IGameObject::UpdateCL();
 // consistency check
 #ifdef DEBUG
-    VERIFY2(_valid(renderable.xform), *cName());
+    VERIFY2(_valid(renderable.xform), cName().c_str());
     if (Device.dwFrame == dbg_update_cl)
-        xrDebug::Fatal(DEBUG_INFO, "'UpdateCL' called twice per frame for %s", *cName());
+        xrDebug::Fatal(DEBUG_INFO, "'UpdateCL' called twice per frame for %s", cName().c_str());
     dbg_update_cl = Device.dwFrame;
     if (Parent && spatial.node_ptr)
-        xrDebug::Fatal(DEBUG_INFO, "Object %s has parent but is still registered inside spatial DB", *cName());
+        xrDebug::Fatal(DEBUG_INFO, "Object %s has parent but is still registered inside spatial DB", cName().c_str());
     if (!CForm && (spatial.type & STYPE_COLLIDEABLE))
-        xrDebug::Fatal(DEBUG_INFO, "Object %s registered as 'collidable' but has no collidable model", *cName());
+        xrDebug::Fatal(DEBUG_INFO, "Object %s registered as 'collidable' but has no collidable model", cName().c_str());
 #endif
     spatial_update(base_spu_epsP * 5, base_spu_epsR * 5);
     // crow
@@ -1523,7 +1523,7 @@ bool CGameObject::use(IGameObject* obj)
     return true;
 }
 
-LPCSTR CGameObject::tip_text() { return *m_sTipText; }
+LPCSTR CGameObject::tip_text() { return m_sTipText.c_str(); }
 void CGameObject::set_tip_text(LPCSTR new_text) { m_sTipText = new_text; }
 void CGameObject::set_tip_text_default() { m_sTipText = nullptr; }
 LPCSTR CGameObject::tip_icon() { return *m_sTipIcon; }
