@@ -465,7 +465,7 @@ void CUITreeBranch::CreateTreeBranch(shared_str nesting, shared_str leafName, CU
                 pNewItem = xr_new<CUITreeViewItem>();
                 pItemToIns->AddItem(pNewItem);
                 pNewItem->SetFont(pRootFnt);
-                pNewItem->SetText(*(*it2));
+                pNewItem->SetText((*it2).c_str());
                 pNewItem->SetReadedColor(rootItemColor);
                 pNewItem->SetRoot(true);
                 pItemToIns = pNewItem;
@@ -480,11 +480,11 @@ void CUITreeBranch::CreateTreeBranch(shared_str nesting, shared_str leafName, CU
     //-----------------------------------------------------------------------------
 
     // Начинаем алгоритм определения группы вещи в иерархии энциклопедии
-    R_ASSERT(*nesting);
+    R_ASSERT(nesting);
     R_ASSERT(pListToAdd);
     R_ASSERT(pLeafFont);
     R_ASSERT(pRootFont);
-    xr_string group = *nesting;
+    xr_string group = nesting.c_str();
 
     // Парсим строку группы для определения вложенности
     GroupTree groupTree;
@@ -526,13 +526,13 @@ void CUITreeBranch::CreateTreeBranch(shared_str nesting, shared_str leafName, CU
         caption.erase(0, 1);
 
         // Ищем не содержит ли он данной иерархии и добавляем новые элементы если не найдено
-        if (0 == xr_strcmp(caption.c_str(), *groupTree.front()))
+        if (0 == xr_strcmp(caption.c_str(), groupTree.front().c_str()))
         {
             // Уже содержит. Надо искать глубже
             pTVItemChilds = pTVItem;
             for (GroupTree_it it = groupTree.begin() + 1; it != groupTree.end(); ++it)
             {
-                pTVItem = pTVItemChilds->Find(*(*it));
+                pTVItem = pTVItemChilds->Find((*it).c_str());
                 // Не нашли, надо вставлять хвост списка вложенности
                 if (!pTVItem)
                 {
@@ -552,7 +552,7 @@ void CUITreeBranch::CreateTreeBranch(shared_str nesting, shared_str leafName, CU
     {
         pTVItemChilds = xr_new<CUITreeViewItem>();
         pTVItemChilds->SetFont(pRootFont);
-        pTVItemChilds->SetText(*groupTree.front());
+        pTVItemChilds->SetText(groupTree.front().c_str());
         pTVItemChilds->SetReadedColor(rootColor);
         pTVItemChilds->SetRoot(true);
         pListToAdd->AddItem<CUITreeViewItem>(pTVItemChilds);
@@ -571,7 +571,7 @@ void CUITreeBranch::CreateTreeBranch(shared_str nesting, shared_str leafName, CU
     pTVItem = xr_new<CUITreeViewItem>();
     pTVItem->SetFont(pLeafFont);
     pTVItem->SetReadedColor(leafColor);
-    pTVItem->SetText(*CStringTable().translate(*leafName));
+    pTVItem->SetText(CStringTable().translate(leafName).c_str());
     pTVItem->SetValue(leafProperty);
     pTVItemChilds->AddItem(pTVItem);
     pTVItem->MarkArticleAsRead(markRead);
