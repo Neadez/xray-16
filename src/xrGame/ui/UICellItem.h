@@ -42,6 +42,8 @@ protected:
     CUIStatic* m_text;
     CUIStatic* m_upgrade;
     Fvector2 m_upgrade_pos;
+    CUIStatic* m_unique;
+    Fvector2 m_unique_pos;
 
     virtual void UpdateItemText();
     void init();
@@ -85,7 +87,19 @@ public:
     u32 m_drawn_frame;
     bool m_b_destroy_childs;
     bool m_selected;
-    bool m_select_armament;
+
+    enum EUISelectArmament
+    {
+        eTransparent = 0,
+        eDarkGreen,
+        eYellow,
+        eLightBlue,
+        eGreen,
+        eRed,
+        eBlue,
+        eLime,
+    } m_select_armament;
+
     bool m_select_equipped{};
     bool m_cur_mark;
     bool m_has_upgrade;

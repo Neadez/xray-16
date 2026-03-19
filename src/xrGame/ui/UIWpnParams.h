@@ -40,6 +40,7 @@ protected:
     CUIStatic* m_textAmmoCount2;
     CUIStatic* m_stAmmoType1;
     CUIStatic* m_stAmmoType2;
+    CUIStatic* m_stAmmoType3;
     CUIStatic* m_Prop_line;
 };
 
@@ -58,4 +59,5 @@ public:
 protected:
     CUIDoubleProgressBar m_progress; // red or green
     CUIStatic m_text;
+    CUIStatic m_value;
 };

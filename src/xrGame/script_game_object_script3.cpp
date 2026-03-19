@@ -311,12 +311,14 @@ luabind::class_<CScriptGameObject>& script_register_game_object2(luabind::class_
         .def("get_artefact_health", &CScriptGameObject::GetArtefactHealthRestoreSpeed)
         .def("get_artefact_radiation", &CScriptGameObject::GetArtefactRadiationRestoreSpeed)
         .def("get_artefact_satiety", &CScriptGameObject::GetArtefactSatietyRestoreSpeed)
+        .def("get_artefact_hydration", &CScriptGameObject::GetArtefactHydrationRestoreSpeed)
         .def("get_artefact_power", &CScriptGameObject::GetArtefactPowerRestoreSpeed)
         .def("get_artefact_bleeding", &CScriptGameObject::GetArtefactBleedingRestoreSpeed)
 
         .def("set_artefact_health", &CScriptGameObject::SetArtefactHealthRestoreSpeed)
         .def("set_artefact_radiation", &CScriptGameObject::SetArtefactRadiationRestoreSpeed)
         .def("set_artefact_satiety", &CScriptGameObject::SetArtefactSatietyRestoreSpeed)
+        .def("set_artefact_hydration", &CScriptGameObject::SetArtefactHydrationRestoreSpeed)
         .def("set_artefact_power", &CScriptGameObject::SetArtefactPowerRestoreSpeed)
         .def("set_artefact_bleeding", &CScriptGameObject::SetArtefactBleedingRestoreSpeed)
 
@@ -331,6 +333,8 @@ luabind::class_<CScriptGameObject>& script_register_game_object2(luabind::class_
         // usable object
         .def("set_tip_text", &CScriptGameObject::SetTipText)
         .def("set_tip_text_default", &CScriptGameObject::SetTipTextDefault)
+        .def("set_tip_icon", &CScriptGameObject::SetTipIcon)
+        .def("set_tip_icon_default", &CScriptGameObject::SetTipIconDefault)
         .def("set_nonscript_usable", &CScriptGameObject::SetNonscriptUsable)
 
         // Script Zone

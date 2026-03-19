@@ -118,6 +118,7 @@ enum EConditionRestoreType
 {
     eHealthRestoreSpeed = u32(0),
     eSatietyRestoreSpeed,
+    eHydrationRestoreSpeed,
     ePowerRestoreSpeed,
     eBleedingRestoreSpeed,
     eRadiationRestoreSpeed,

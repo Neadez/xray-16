@@ -65,6 +65,7 @@ CGameObject::CGameObject() : SpatialBase(g_pGamePersistent->SpatialSpace), scrip
     // CUsableScriptObject init
     m_bNonscriptUsable = true;
     set_tip_text_default();
+    set_tip_icon_default();
     //
     m_ai_obstacle = 0;
 
@@ -1525,5 +1526,8 @@ bool CGameObject::use(IGameObject* obj)
 LPCSTR CGameObject::tip_text() { return m_sTipText.c_str(); }
 void CGameObject::set_tip_text(LPCSTR new_text) { m_sTipText = new_text; }
 void CGameObject::set_tip_text_default() { m_sTipText = nullptr; }
+LPCSTR CGameObject::tip_icon() { return *m_sTipIcon; }
+void CGameObject::set_tip_icon(LPCSTR new_icon) { m_sTipIcon = new_icon; }
+void CGameObject::set_tip_icon_default() { m_sTipIcon = nullptr; }
 bool CGameObject::nonscript_usable() { return m_bNonscriptUsable; }
 void CGameObject::set_nonscript_usable(bool usable) { m_bNonscriptUsable = usable; }

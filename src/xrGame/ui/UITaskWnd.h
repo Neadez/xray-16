@@ -75,10 +75,14 @@ public:
     [[nodiscard]]
     bool IsPrimaryObjectsEnabled() const;
 
+    [[nodiscard]]
+    bool IsCampsEnabled() const;
+
     void TreasuresEnabled(bool enable);
     void QuestNpcsEnabled(bool enable);
     void SecondaryTasksEnabled(bool enable);
     void PrimaryObjectsEnabled(bool enable);
+    void CampsEnabled(bool enable);
 
     bool IsUsingCursorRightNow() const override;
 

@@ -66,8 +66,7 @@ void CCustomOutfit::Load(LPCSTR section)
     // fire_wound_protection isn't used in hit calculations code, bone protections are used instead.
     // This is used as a virtual value in the UI, and possibly in Lua scripts (which can do some real calculations).
     m_HitTypeProtection[ALife::eHitTypeFireWound] = pSettings->read_if_exists<float>(section, "fire_wound_protection", 0.0f);
-    m_HitTypeProtection[ALife::eHitTypePhysicStrike] = pSettings->read_if_exists<float>(
-        section, "physic_strike_protection", m_HitTypeProtection[ALife::eHitTypeStrike]);
+    m_HitTypeProtection[ALife::eHitTypePhysicStrike] = pSettings->read_if_exists<float>(section, "physic_strike_protection", m_HitTypeProtection[ALife::eHitTypeStrike]);
     m_HitTypeProtection[ALife::eHitTypeLightBurn] = m_HitTypeProtection[ALife::eHitTypeBurn];
 
     if (pSettings->line_exist(section, "hit_fraction_actor"))
@@ -104,12 +103,13 @@ void CCustomOutfit::Load(LPCSTR section)
     m_fHealthRestoreSpeed = READ_IF_EXISTS(pSettings, r_float, section, "health_restore_speed", 0.0f);
     m_fRadiationRestoreSpeed = READ_IF_EXISTS(pSettings, r_float, section, "radiation_restore_speed", 0.0f);
     m_fSatietyRestoreSpeed = READ_IF_EXISTS(pSettings, r_float, section, "satiety_restore_speed", 0.0f);
+    m_fHydrationRestoreSpeed = READ_IF_EXISTS(pSettings, r_float, section, "hydration_restore_speed", 0.0f);
     m_fPowerRestoreSpeed = READ_IF_EXISTS(pSettings, r_float, section, "power_restore_speed", 0.0f);
     m_fBleedingRestoreSpeed = READ_IF_EXISTS(pSettings, r_float, section, "bleeding_restore_speed", 0.0f);
 
     m_full_icon_name = pSettings->r_string(section, "full_icon_name");
     m_artefact_count = READ_IF_EXISTS(pSettings, r_u32, section, "artefact_count", 0);
-    clamp(m_artefact_count, (u32)0, (u32)5);
+    clamp(m_artefact_count, (u32)0, (u32)10);
 
     m_BonesProtectionSect = READ_IF_EXISTS(pSettings, r_string, section, "bones_koeff_protection", "");
     bIsHelmetAvaliable = !!READ_IF_EXISTS(pSettings, r_bool, section, "helmet_avaliable", true);
@@ -212,6 +212,53 @@ float CCustomOutfit::HitThroughArmor(float hit_power, s16 element, float ap, boo
     }
     case SBoneProtections::HitFractionActorCS:
     {
+        //if (hit_type == ALife::eHitTypeFireWound)
+        //{
+        //    const float BoneArmor = m_boneProtection->getBoneArmor(element) * GetCondition();
+
+        //    if (ap > EPS && ap > BoneArmor)
+        //    {
+        //        //пуля пробила бронь
+        //        const float d_ap = ap - BoneArmor;
+        //        NewHitPower *= (d_ap / ap);
+
+        //        if (NewHitPower < m_boneProtection->m_fHitFrac)
+        //            NewHitPower = m_boneProtection->m_fHitFrac;
+
+        //        if (!IsGameTypeSingle())
+        //        {
+        //            NewHitPower *= m_boneProtection->getBoneProtection(element);
+        //        }
+
+        //        if (NewHitPower < 0.0f)
+        //            NewHitPower = 0.0f;
+        //    }
+        //    else
+        //    {
+        //        //пуля НЕ пробила бронь
+        //        NewHitPower *= m_boneProtection->m_fHitFrac;
+        //        add_wound = false; //раны нет
+        //    }
+        //}
+        //else
+        //{
+        //    float one = 0.1f;
+        //    if (hit_type == ALife::eHitTypeWound ||
+        //        hit_type == ALife::eHitTypeWound_2 ||
+        //        hit_type == ALife::eHitTypeExplosion)
+        //    {
+        //        one = 1.0f;
+        //    }
+
+        //    const float protect = GetHitTypeProtection(hit_type, element);
+        //    NewHitPower -= protect * one;
+        //    if (NewHitPower < 0.0f)
+        //        NewHitPower = 0.0f;
+        //}
+
+        ////увеличить изношенность костюма
+        //Hit(NewHitPower, hit_type);
+        //break;
         if (hit_type == ALife::eHitTypeFireWound)
         {
             const float BoneArmor = GetBoneArmor(element) * GetCondition();
@@ -242,22 +289,11 @@ float CCustomOutfit::HitThroughArmor(float hit_power, s16 element, float ap, boo
         }
         else
         {
-            float one = 0.1f;
-            if (hit_type == ALife::eHitTypeWound ||
-                hit_type == ALife::eHitTypeWound_2 ||
-                hit_type == ALife::eHitTypeExplosion)
-            {
-                one = 1.0f;
-            }
-
-            const float protect = GetHitTypeProtection(hit_type, element);
-            NewHitPower -= protect * one;
-            if (NewHitPower < 0.0f)
-                NewHitPower = 0.0f;
+            NewHitPower *= GetHitTypeProtection(hit_type, element);
         }
 
         //увеличить изношенность костюма
-        Hit(NewHitPower, hit_type);
+        Hit(hit_power, hit_type);
         break;
     }
     case SBoneProtections::HitFraction:
@@ -293,12 +329,12 @@ void CCustomOutfit::OnMoveToSlot(const SInvItemPlace& prev)
         if (pActor)
         {
             ApplySkinModel(pActor, true, false);
-            if (prev.type == eItemPlaceSlot && !bIsHelmetAvaliable)
-            {
-                CTorch* pTorch = smart_cast<CTorch*>(pActor->inventory().ItemFromSlot(TORCH_SLOT));
-                if (pTorch && pTorch->GetNightVisionStatus())
-                    pTorch->SwitchNightVision(true, false);
-            }
+            //if (prev.type == eItemPlaceSlot && !bIsHelmetAvaliable)
+            //{
+            //    CTorch* pTorch = smart_cast<CTorch*>(pActor->inventory().ItemFromSlot(TORCH_SLOT));
+            //    if (pTorch && pTorch->GetNightVisionStatus())
+            //        pTorch->SwitchNightVision(true, false);
+            //}
             PIItem pHelmet = pActor->inventory().ItemFromSlot(HELMET_SLOT);
             if (pHelmet && !bIsHelmetAvaliable)
                 pActor->inventory().Ruck(pHelmet, false);
@@ -365,9 +401,9 @@ void CCustomOutfit::OnMoveToRuck(const SInvItemPlace& prev)
         if (pActor)
         {
             ApplySkinModel(pActor, false, false);
-            CTorch* pTorch = smart_cast<CTorch*>(pActor->inventory().ItemFromSlot(TORCH_SLOT));
-            if (pTorch && !bIsHelmetAvaliable)
-                pTorch->SwitchNightVision(false);
+            //CTorch* pTorch = smart_cast<CTorch*>(pActor->inventory().ItemFromSlot(TORCH_SLOT));
+            //if (pTorch && !bIsHelmetAvaliable)
+            //    pTorch->SwitchNightVision(false);
         }
     }
 };
@@ -449,6 +485,7 @@ bool CCustomOutfit::install_upgrade_impl(LPCSTR section, bool test)
     result |= process_if_exists(section, "health_restore_speed", &CInifile::r_float, m_fHealthRestoreSpeed, test);
     result |= process_if_exists(section, "radiation_restore_speed", &CInifile::r_float, m_fRadiationRestoreSpeed, test);
     result |= process_if_exists(section, "satiety_restore_speed", &CInifile::r_float, m_fSatietyRestoreSpeed, test);
+    result |= process_if_exists(section, "hydration_restore_speed", &CInifile::r_float, m_fHydrationRestoreSpeed, test);
     result |= process_if_exists(section, "power_restore_speed", &CInifile::r_float, m_fPowerRestoreSpeed, test);
     result |= process_if_exists(section, "bleeding_restore_speed", &CInifile::r_float, m_fBleedingRestoreSpeed, test);
 
@@ -456,7 +493,7 @@ bool CCustomOutfit::install_upgrade_impl(LPCSTR section, bool test)
     clamp(m_fPowerLoss, 0.0f, 1.0f);
 
     result |= process_if_exists(section, "artefact_count", &CInifile::r_u32, m_artefact_count, test);
-    clamp(m_artefact_count, (u32)0, (u32)5);
+    clamp(m_artefact_count, (u32)0, (u32)10);
 
     return result;
 }

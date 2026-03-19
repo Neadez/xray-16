@@ -272,6 +272,13 @@ Fmatrix hud_item_measures::load(const shared_str& sect_name, IKinematics* K)
     strconcat(val_name, "gl_hud_offset_rot", _prefix);
     m_hands_offset[1][2] = pSettings->r_fvector3(sect_name, val_name);
 
+	//strconcat(sizeof(val_name), val_name, "hud_collision_offset_pos", _prefix);
+	//m_collision_offset[0] = pSettings->r_fvector3(sect_name, val_name);
+	//strconcat(sizeof(val_name), val_name, "hud_collision_offset_rot", _prefix);
+	//m_collision_offset[1] = pSettings->r_fvector3(sect_name, val_name);
+    m_collision_offset[0] = Fvector().set(0.f, -0.5f, 0.f);
+	m_collision_offset[1] = Fvector().set(-0.8f, 0.f, 0.f);
+
     R_ASSERT2(pSettings->line_exist(sect_name, "fire_point") == pSettings->line_exist(sect_name, "fire_bone"),
         sect_name.c_str());
     R_ASSERT2(pSettings->line_exist(sect_name, "fire_point2") == pSettings->line_exist(sect_name, "fire_bone2"),

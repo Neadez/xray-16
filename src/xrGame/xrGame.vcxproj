@@ -1268,12 +1268,15 @@
     <ClInclude Include="ui\ChangeWeatherDialog.hpp" />
     <ClInclude Include="ui\UICharacterInfo.h" />
     <ClInclude Include="ui\UIChatWnd.h" />
+    <ClInclude Include="ui\UIContactsWnd.h" />
     <ClInclude Include="ui\UIDebugFonts.h" />
     <ClInclude Include="ui\UIDemoPlayControl.h" />
     <ClInclude Include="ui\UIDialogWnd.h" />
     <ClInclude Include="ui\UIDragDropListEx.h" />
     <ClInclude Include="ui\UIDragDropReferenceList.h" />
     <ClInclude Include="ui\UIEditKeyBind.h" />
+    <ClInclude Include="ui\UIEncyclopediaArticleWnd.h" />
+    <ClInclude Include="ui\UIEncyclopediaWnd.h" />
     <ClInclude Include="ui\UIFactionWarWnd.h" />
     <ClInclude Include="ui\UIGameLog.h" />
     <ClInclude Include="ui\UIGameTutorial.h" />
@@ -3096,6 +3099,7 @@
     <ClCompile Include="ui\ChangeWeatherDialog.cpp" />
     <ClCompile Include="ui\UICharacterInfo.cpp" />
     <ClCompile Include="ui\UIChatWnd.cpp" />
+    <ClCompile Include="ui\UIContactsWnd.cpp" />
     <ClCompile Include="ui\UIDebugFonts.cpp">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
@@ -3105,6 +3109,8 @@
     <ClCompile Include="ui\UIDragDropListEx.cpp" />
     <ClCompile Include="ui\UIDragDropReferenceList.cpp" />
     <ClCompile Include="ui\UIEditKeyBind.cpp" />
+    <ClCompile Include="ui\UIEncyclopediaArticleWnd.cpp" />
+    <ClCompile Include="ui\UIEncyclopediaWnd.cpp" />
     <ClCompile Include="ui\UIFactionWarWnd.cpp" />
     <ClCompile Include="ui\UIGameLog.cpp" />
     <ClCompile Include="ui\UIGameTutorial.cpp">
@@ -3198,6 +3204,7 @@
       <PrecompiledHeaderFile>pch_script.h</PrecompiledHeaderFile>
       <PrecompiledHeaderOutputFile>$(IntDir)$(ProjectName)_script.pch</PrecompiledHeaderOutputFile>
     </ClCompile>
+    <ClCompile Include="ui\UIRelationsWnd.cpp" />
     <ClCompile Include="ui\UIScriptWnd.cpp">
       <PrecompiledHeaderFile>pch_script.h</PrecompiledHeaderFile>
       <PrecompiledHeaderOutputFile>$(IntDir)$(ProjectName)_script.pch</PrecompiledHeaderOutputFile>

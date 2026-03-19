@@ -82,6 +82,10 @@ void CTorch::Load(LPCSTR section)
         m_sounds.LoadSound(section, "snd_turn_on", "sndTurnOn", false, SOUND_TYPE_ITEM_USING);
     if (pSettings->line_exist(section, "snd_turn_off"))
         m_sounds.LoadSound(section, "snd_turn_off", "sndTurnOff", false, SOUND_TYPE_ITEM_USING);
+    if (pSettings->line_exist(section, "nightvision_sect"))
+        m_NightVisionSect = pSettings->r_string(section, "nightvision_sect");
+    else
+        m_NightVisionSect = "";
 }
 
 void CTorch::SwitchNightVision()
@@ -121,19 +125,20 @@ void CTorch::SwitchNightVision(bool vision_on, bool use_sounds)
         }
     }
 
-    CHelmet* pHelmet = smart_cast<CHelmet*>(pA->inventory().ItemFromSlot(HELMET_SLOT));
-    CCustomOutfit* pOutfit = smart_cast<CCustomOutfit*>(pA->inventory().ItemFromSlot(OUTFIT_SLOT));
+    //CHelmet* pHelmet = smart_cast<CHelmet*>(pA->inventory().ItemFromSlot(HELMET_SLOT));
+    //CCustomOutfit* pOutfit = smart_cast<CCustomOutfit*>(pA->inventory().ItemFromSlot(OUTFIT_SLOT));
+    CTorch* pTorch = smart_cast<CTorch*>(pA->inventory().ItemFromSlot(TORCH_SLOT));
 
-    if (pHelmet && pHelmet->m_NightVisionSect.size() && !b_allow)
+    if (pTorch && pTorch->m_NightVisionSect.size() && !b_allow)
     {
         m_night_vision->OnDisabled(pA, use_sounds);
         return;
     }
-    else if (pOutfit && pOutfit->m_NightVisionSect.size() && !b_allow)
-    {
-        m_night_vision->OnDisabled(pA, use_sounds);
-        return;
-    }
+    //else if (pOutfit && pOutfit->m_NightVisionSect.size() && !b_allow)
+    //{
+    //    m_night_vision->OnDisabled(pA, use_sounds);
+    //    return;
+    //}
 
     bool bIsActiveNow = m_night_vision->IsActive();
 
@@ -141,16 +146,16 @@ void CTorch::SwitchNightVision(bool vision_on, bool use_sounds)
     {
         if (!bIsActiveNow)
         {
-            if (pHelmet && pHelmet->m_NightVisionSect.size())
+            if (pTorch && pTorch->m_NightVisionSect.size())
             {
-                m_night_vision->Start(pHelmet->m_NightVisionSect, pA, use_sounds);
+                m_night_vision->Start(pTorch->m_NightVisionSect, pA, use_sounds);
                 return;
             }
-            else if (pOutfit && pOutfit->m_NightVisionSect.size())
-            {
-                m_night_vision->Start(pOutfit->m_NightVisionSect, pA, use_sounds);
-                return;
-            }
+            //else if (pOutfit && pOutfit->m_NightVisionSect.size())
+            //{
+            //    m_night_vision->Start(pOutfit->m_NightVisionSect, pA, use_sounds);
+            //    return;
+            //}
             m_bNightVisionOn = false; // in case if there is no nightvision in helmet and outfit
         }
     }
@@ -482,9 +487,13 @@ bool CTorch::can_be_attached() const
 {
     const CActor* pA = smart_cast<const CActor*>(H_Parent());
     if (pA)
-        return pA->inventory().InSlot(this);
-    else
-        return true;
+    {
+        if ((const CTorch*)smart_cast<CTorch*>(pA->inventory().ItemFromSlot(TORCH_SLOT)) == this)
+            return true;
+        else
+            return false;
+    }
+    return true;
 }
 
 void CTorch::afterDetach()
@@ -499,6 +508,59 @@ void CTorch::enable(bool value)
 
     if (!enabled() && m_switched_on)
         Switch(false);
+}
+
+
+bool CTorch::install_upgrade_impl(LPCSTR section, bool test)
+{
+    bool result = inherited::install_upgrade_impl(section, test);
+
+    LPCSTR str{};
+    bool result2 = process_if_exists_set(section, "nightvision_sect", &CInifile::r_string, str, test);
+    if (result2 && !test)
+    {
+        m_NightVisionSect._set(str);
+    }
+    result |= result2;
+
+    return result;
+}
+
+void CTorch::OnMoveToSlot(const SInvItemPlace& previous_place)
+{
+    inherited::OnMoveToSlot(previous_place);
+    if (m_pInventory && (previous_place.type == eItemPlaceSlot))
+    {
+        CActor* pActor = smart_cast<CActor*>(H_Parent());
+        if (pActor)
+        {
+            CTorch* pTorch = smart_cast<CTorch*>(pActor->inventory().ItemFromSlot(TORCH_SLOT));
+            if (pTorch) 
+            {                   
+                if (pTorch->GetNightVisionStatus())
+                    pTorch->SwitchNightVision(true, false);
+                pTorch->Switch(torch_active());
+            }
+        }
+    }
+}
+
+void CTorch::OnMoveToRuck(const SInvItemPlace& previous_place)
+{
+    inherited::OnMoveToRuck(previous_place);
+    if (m_pInventory && (previous_place.type == eItemPlaceSlot))
+    {
+        CActor* pActor = smart_cast<CActor*>(H_Parent());
+        if (pActor)
+        {
+            CTorch* pTorch = smart_cast<CTorch*>(pActor->inventory().ItemFromSlot(TORCH_SLOT));
+            if (pTorch) 
+            {                   
+                pTorch->SwitchNightVision(false);
+                pTorch->Switch(torch_active());
+            }
+        }
+    }
 }
 
 CNightVisionEffector::CNightVisionEffector(const shared_str& section) : m_pActor(NULL)

@@ -4,6 +4,7 @@
 
 class CInventoryOwner;
 class CUIFrameLineWnd;
+class CUIButton;
 class CUI3tButton;
 class CUITabControl;
 class CUIStatic;
@@ -19,6 +20,9 @@ class CUIRankingWnd;
 class CUILogsWnd;
 class CUIAnimatedStatic;
 class UIHint;
+
+class CUIEncyclopediaWnd;
+class CUIRelationsWnd;
 
 class CUIPdaWnd final : public CUIDialogWnd
 {
@@ -41,6 +45,18 @@ protected:
 
     UIHint* m_hint_wnd;
 
+    enum eActorPdaSndAction
+    {
+        eSndOpen = 0,
+        eSndClose,
+        eSndButton,
+        eSndMax
+    };
+
+    ref_sound sounds[eSndMax];
+    void PlaySnd(eActorPdaSndAction a);
+    void InitSounds(CUIXml& uiXml);
+
 public:
     // Поддиалоги PDA
     CUIMapWnd* pUIMapWnd;
@@ -49,6 +65,9 @@ public:
     CUIActorInfoWnd* pUIActorInfo;
     CUIRankingWnd* pUIRankingWnd;
     CUILogsWnd* pUILogsWnd;
+    CUIRelationsWnd* pUIRelationsWnd;
+
+    CUIEncyclopediaWnd* pUIEncyclopediaWnd;
 
     virtual void Reset();
 
@@ -90,6 +109,7 @@ public:
     bool NeedCursor() const override;
     void UpdatePda();
     void UpdateRankingWnd();
+    void UpdateRelationsWnd();
 
     pcstr GetDebugType() override { return "CUIPdaWnd"; }
 };

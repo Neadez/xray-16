@@ -186,8 +186,7 @@ void CHUDTarget::Render()
                         if (fuzzyShowInfo > 0.5f)
                         {
                             F->SetColor(subst_alpha(C, u8(iFloor(255.f * (fuzzyShowInfo - 0.5f) * 2.f))));
-                            F->OutNext("%s", StringTable().translate(others_inv_owner->Name()).c_str());
-                            F->OutNext("%s", StringTable().translate(others_inv_owner->CharacterInfo().Community().id()).c_str());
+                            F->OutNext("%s, %s", StringTable().translate(others_inv_owner->Name()).c_str(), StringTable().translate(others_inv_owner->CharacterInfo().Community().id()).c_str());
                         }
                     }
 

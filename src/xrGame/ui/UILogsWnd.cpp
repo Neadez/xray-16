@@ -119,11 +119,12 @@ bool CUILogsWnd::Init()
     xr_strcat(buf, StringTable().translate("ui_logs_center_caption").c_str());
     center_caption->SetText(buf);
 
-    CUIFixedScrollBar* tmp_scroll = xr_new<CUIFixedScrollBar>();
-    m_list = xr_new<CUIScrollView>(tmp_scroll);
-    m_list->SetAutoDelete(true);
-    AttachChild(m_list);
-    CUIXmlInit::InitScrollView(m_uiXml, "logs_list", 0, m_list);
+    m_list = UIHelper::CreateScrollView(m_uiXml, "logs_list", this, false);
+    //CUIFixedScrollBar* tmp_scroll = xr_new<CUIFixedScrollBar>();
+    //m_list = xr_new<CUIScrollView>(tmp_scroll);
+    //m_list->SetAutoDelete(true);
+    //AttachChild(m_list);
+    //CUIXmlInit::InitScrollView(m_uiXml, "logs_list", 0, m_list);
     //	m_list->SetWindowName("---logs_list");
     //	m_logs_list->m_sort_function = fastdelegate::MakeDelegate( this, &CUIRankingWnd::SortingLessFunction );
 

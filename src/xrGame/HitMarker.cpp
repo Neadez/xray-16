@@ -157,6 +157,8 @@ SHitMark::SHitMark(const ui_shader& sh, const Fvector& dir)
 {
     constexpr Fvector2 SIZE = { UI_BASE_WIDTH / 2.0f, UI_BASE_WIDTH / 2.0f };
     constexpr float POS_X   = { (UI_BASE_WIDTH  - SIZE.x) / 2.0f };
+    constexpr Fvector2 SIZE_W = { UI_BASE_WIDTH_W / 2.0f, UI_BASE_WIDTH_W / 2.0f };
+    constexpr float POS_X_W   = { (UI_BASE_WIDTH_W  - SIZE_W.x) / 2.0f };
     constexpr float POS_Y   = { (UI_BASE_HEIGHT - SIZE.y) / 2.0f };
 
     m_StartTime = Device.fTimeGlobal;
@@ -164,8 +166,17 @@ SHitMark::SHitMark(const ui_shader& sh, const Fvector& dir)
     m_HitDirection = dir.getH();
     m_UIStaticItem = xr_new<CUIStaticItem>();
     m_UIStaticItem->SetShader(sh);
-    m_UIStaticItem->SetPos(POS_X, POS_Y);
-    m_UIStaticItem->SetSize(SIZE);
+    if (UI().is_widescreen() && UI().new_widescreen())
+    {
+        m_UIStaticItem->SetPos(POS_X_W, POS_Y);
+        m_UIStaticItem->SetSize(SIZE_W);    
+    }
+    else
+    {
+        m_UIStaticItem->SetPos(POS_X, POS_Y);
+        m_UIStaticItem->SetSize(SIZE);    
+    }
+
 }
 
 SHitMark::~SHitMark() { xr_delete(m_UIStaticItem); }
@@ -193,7 +204,10 @@ SGrenadeMark::SGrenadeMark(const ui_shader& sh, CGrenade* grn)
     m_UIStaticItem->SetShader(sh);
     float xs = 640.0f;
     float ys = 640.0f;
-    m_UIStaticItem->SetPos((UI_BASE_WIDTH - xs) * 0.5f, (UI_BASE_HEIGHT - ys) * 0.5f);
+    if (UI().is_widescreen() && UI().new_widescreen())
+        m_UIStaticItem->SetPos((UI_BASE_WIDTH_W - xs) * 0.5f, (UI_BASE_HEIGHT - ys) * 0.5f);
+    else
+        m_UIStaticItem->SetPos((UI_BASE_WIDTH - xs) * 0.5f, (UI_BASE_HEIGHT - ys) * 0.5f);
     m_UIStaticItem->SetSize(Fvector2().set(xs, ys));
 }
 

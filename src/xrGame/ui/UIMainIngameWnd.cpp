@@ -44,6 +44,9 @@
 #include "xrUICore/ProgressBar/UIProgressShape.h"
 #include "UIArtefactPanel.h"
 
+#include "GametaskManager.h"
+#include "GameTask.h"
+
 #include "Include/xrRender/Kinematics.h"
 
 using namespace InventoryUtilities;
@@ -96,16 +99,17 @@ void CUIMainIngameWnd::Init()
 	UIWeaponIcon.SetShader		(GetEquipmentIconsShader());
 	UIWeaponIcon_rect			= UIWeaponIcon.GetWndRect();
 */ //---------------------------------------------------------
-    UIPickUpItemIcon = UIHelper::CreateStatic(uiXml, "pick_up_item", this);
-    UIPickUpItemIcon->SetShader(GetEquipmentIconsShader());
+    //UIPickUpItemIcon = UIHelper::CreateStatic(uiXml, "pick_up_item", this);
+    //UIPickUpItemIcon->SetShader(GetEquipmentIconsShader());
 
-    m_iPickUpItemIconWidth = UIPickUpItemIcon->GetWidth();
-    m_iPickUpItemIconHeight = UIPickUpItemIcon->GetHeight();
-    m_iPickUpItemIconX = UIPickUpItemIcon->GetWndRect().left;
-    m_iPickUpItemIconY = UIPickUpItemIcon->GetWndRect().top;
+    //m_iPickUpItemIconWidth = UIPickUpItemIcon->GetWidth();
+    //m_iPickUpItemIconHeight = UIPickUpItemIcon->GetHeight();
+    //m_iPickUpItemIconX = UIPickUpItemIcon->GetWndRect().left;
+    //m_iPickUpItemIconY = UIPickUpItemIcon->GetWndRect().top;
     //---------------------------------------------------------
 
     // Подсказки, которые возникают при наведении прицела на объект
+    UIStaticInteractIcon = UIHelper::CreateStatic(uiXml, "interact_icon", this);
     UIStaticQuickHelp = UIHelper::CreateStatic(uiXml, "quick_info", this);
 
     uiXml.SetLocalRoot(uiXml.GetRoot());
@@ -115,34 +119,52 @@ void CUIMainIngameWnd::Init()
     m_ind_bleeding = UIHelper::CreateStatic(uiXml, "indicator_bleeding", this, false);
     m_ind_radiation = UIHelper::CreateStatic(uiXml, "indicator_radiation", this, false);
     m_ind_starvation = UIHelper::CreateStatic(uiXml, "indicator_starvation", this, false);
+    m_ind_dehydration = UIHelper::CreateStatic(uiXml, "indicator_dehydration", this, false);
+    m_ind_psy_health = UIHelper::CreateStatic(uiXml, "indicator_psy_health", this, false);
     m_ind_weapon_broken = UIHelper::CreateStatic(uiXml, "indicator_weapon_broken", this, false);
     m_ind_helmet_broken = UIHelper::CreateStatic(uiXml, "indicator_helmet_broken", this, false);
     m_ind_outfit_broken = UIHelper::CreateStatic(uiXml, "indicator_outfit_broken", this, false);
     m_ind_overweight = UIHelper::CreateStatic(uiXml, "indicator_overweight", this, false);
 
     if ((m_ind_boost_psy = UIHelper::CreateStatic(uiXml, "indicator_booster_psy", this, false)))
+    {
         m_ind_boost_psy->Show(false);
+    }
 
     if ((m_ind_boost_radia = UIHelper::CreateStatic(uiXml, "indicator_booster_radia", this, false)))
+    {
         m_ind_boost_radia->Show(false);
+    }
 
     if ((m_ind_boost_chem = UIHelper::CreateStatic(uiXml, "indicator_booster_chem", this, false)))
+    {
         m_ind_boost_chem->Show(false);
+    }
 
     if ((m_ind_boost_wound = UIHelper::CreateStatic(uiXml, "indicator_booster_wound", this, false)))
+    {
         m_ind_boost_wound->Show(false);
+    }
 
     if ((m_ind_boost_weight = UIHelper::CreateStatic(uiXml, "indicator_booster_weight", this, false)))
+    {
         m_ind_boost_weight->Show(false);
+    }
 
     if ((m_ind_boost_health = UIHelper::CreateStatic(uiXml, "indicator_booster_health", this, false)))
+    {
         m_ind_boost_health->Show(false);
+    }
 
     if ((m_ind_boost_power = UIHelper::CreateStatic(uiXml, "indicator_booster_power", this, false)))
+    {
         m_ind_boost_power->Show(false);
+    }
 
     if ((m_ind_boost_rad = UIHelper::CreateStatic(uiXml, "indicator_booster_rad", this, false)))
+    {
         m_ind_boost_rad->Show(false);
+    }
 
     // Загружаем иконки
     /*	if ( IsGameTypeSingle() )
@@ -172,7 +194,7 @@ void CUIMainIngameWnd::Init()
         UIArtefactIcon->Show(false);
     }
 
-    const static shared_str warningStrings[7] = {"jammed", "radiation", "wounds", "starvation", "fatigue",
+    const static shared_str warningStrings[8] = {"jammed", "radiation", "wounds", "starvation", "dehydration", "fatigue",
         "invincible", "artefact"};
 
     // Загружаем пороговые значения для индикаторов
@@ -256,6 +278,26 @@ void CUIMainIngameWnd::Init()
     }
 
     HUD_SOUND_ITEM::LoadSound("maingame_ui", "snd_new_contact", m_contactSnd, SOUND_TYPE_IDLE);
+
+    UIStaticTaskName = UIHelper::CreateStatic(uiXml, "task_name", this);
+}
+
+void CUIMainIngameWnd::UpdateTask()
+{
+    CGameTask* t1 = Level().GameTaskManager().ActiveTask(eTaskTypeStoryline);
+    CGameTask* t2 = Level().GameTaskManager().ActiveTask(eTaskTypeAdditional);
+    CGameTask* t = (t1) ? t1 : t2;
+
+    if (t1 || t2)
+    {
+        UIStaticTaskName->SetTextST(t->m_Title.c_str());
+        UIStaticTaskName->Show(true);
+    }
+    else
+    {
+        //UIStaticTaskName->SetTextST("st_no_active_task");
+        UIStaticTaskName->Show(false);
+    }
 }
 
 float UIStaticDiskIO_start_time = 0.0f;
@@ -318,6 +360,8 @@ void CUIMainIngameWnd::Update()
 {
     ZoneScoped;
 
+    UpdateTask();
+
     CUIWindow::Update();
     CActor* pActor = smart_cast<CActor*>(Level().CurrentViewEntity());
 
@@ -335,7 +379,7 @@ void CUIMainIngameWnd::Update()
     //	UIHealthBar.SetProgressPos	(m_pActor->GetfHealth()*100.0f);
     UIMotionIcon->SetPower(pActor->conditions().GetPower() * 100.0f);
 
-    UpdatePickUpItem();
+    //UpdatePickUpItem();
 
     if (Device.dwFrame % 10)
         return;
@@ -405,17 +449,23 @@ void CUIMainIngameWnd::RenderQuickInfos()
 
     static CGameObject* pObject = NULL;
     LPCSTR actor_action = pActor->GetDefaultActionForObject();
+    LPCSTR action_icon = pActor->GetDefaultActionIcon();
     UIStaticQuickHelp->Show(NULL != actor_action);
+    UIStaticInteractIcon->Show(NULL != action_icon);
 
     if (NULL != actor_action)
     {
         if (xr_stricmp(actor_action, UIStaticQuickHelp->GetText()))
+        {
             UIStaticQuickHelp->SetTextST(actor_action);
+            UIStaticInteractIcon->InitTexture(action_icon);
+        }
     }
 
     if (pObject != pActor->ObjectWeLookingAt())
     {
         UIStaticQuickHelp->SetTextST(actor_action ? actor_action : " ");
+        UIStaticInteractIcon->InitTexture(action_icon ? action_icon : "");
         UIStaticQuickHelp->ResetColorAnimation();
         pObject = pActor->ObjectWeLookingAt();
     }
@@ -729,6 +779,48 @@ void CUIMainIngameWnd::UpdateMainIndicators()
         }
     }
 
+    // Hydration icon
+    if (m_ind_dehydration)
+    {
+        const float hydration = pActor->conditions().GetHydration();
+        const float hydration_critical = pActor->conditions().HydrationCritical();
+        const float hydration_koef =
+            (hydration - hydration_critical) / (hydration >= hydration_critical ? 1 - hydration_critical : hydration_critical);
+        if (hydration_koef > 0.5)
+            m_ind_dehydration->Show(false);
+        else
+        {
+            m_ind_dehydration->Show(true);
+            if (hydration_koef > 0.0f)
+                m_ind_dehydration->InitTexture("ui_inGame2_circle_dehydration_green");
+            else if (hydration_koef > -0.5f)
+                m_ind_dehydration->InitTexture("ui_inGame2_circle_dehydration_yellow");
+            else
+                m_ind_dehydration->InitTexture("ui_inGame2_circle_dehydration_red");
+        }
+    }
+
+    // Psy health icon
+    if (m_ind_psy_health)
+    {
+        const float psy_health = pActor->conditions().GetPsyHealth();
+        const float psy_health_critical = pActor->conditions().PsyHealthCritical();
+        const float psy_health_koef = (psy_health - psy_health_critical) /
+            (psy_health >= psy_health_critical ? 1 - psy_health_critical : psy_health_critical);
+        if (psy_health_koef > 0.5)
+            m_ind_psy_health->Show(false);
+        else
+        {
+            m_ind_psy_health->Show(true);
+            if (psy_health_koef > 0.0f)
+                m_ind_psy_health->InitTexture("ui_inGame2_circle_psy_health_green");
+            else if (psy_health_koef > -0.5f)
+                m_ind_psy_health->InitTexture("ui_inGame2_circle_psy_health_yellow");
+            else
+                m_ind_psy_health->InitTexture("ui_inGame2_circle_psy_health_red");
+        }
+    }
+
     // Armor broken icon
     if (m_ind_outfit_broken)
     {
@@ -985,6 +1077,9 @@ void CUIMainIngameWnd::UpdateBoosterIndicators(const CEntityCondition::BOOSTER_M
             if (m_ind_boost_health)
             {
                 m_ind_boost_health->Show(true);
+                string32 buff;
+                xr_sprintf(buff, sizeof(buff), "%.0f", booster.fBoostTime);
+                m_ind_boost_health->TextItemControl()->SetTextST(buff);
                 if (booster.fBoostTime <= 3.0f)
                     m_ind_boost_health->SetColorAnimation(str_flag, flags);
                 else
@@ -997,6 +1092,9 @@ void CUIMainIngameWnd::UpdateBoosterIndicators(const CEntityCondition::BOOSTER_M
             if (m_ind_boost_power)
             {
                 m_ind_boost_power->Show(true);
+                string32 buff;
+                xr_sprintf(buff, sizeof(buff), "%.0f", booster.fBoostTime);
+                m_ind_boost_power->TextItemControl()->SetTextST(buff);
                 if (booster.fBoostTime <= 3.0f)
                     m_ind_boost_power->SetColorAnimation(str_flag, flags);
                 else
@@ -1009,6 +1107,9 @@ void CUIMainIngameWnd::UpdateBoosterIndicators(const CEntityCondition::BOOSTER_M
             if (m_ind_boost_rad)
             {
                 m_ind_boost_rad->Show(true);
+                string32 buff;
+                xr_sprintf(buff, sizeof(buff), "%.0f", booster.fBoostTime);
+                m_ind_boost_rad->TextItemControl()->SetTextST(buff);
                 if (booster.fBoostTime <= 3.0f)
                     m_ind_boost_rad->SetColorAnimation(str_flag, flags);
                 else
@@ -1021,6 +1122,9 @@ void CUIMainIngameWnd::UpdateBoosterIndicators(const CEntityCondition::BOOSTER_M
             if (m_ind_boost_wound)
             {
                 m_ind_boost_wound->Show(true);
+                string32 buff;
+                xr_sprintf(buff, sizeof(buff), "%.0f", booster.fBoostTime);
+                m_ind_boost_wound->TextItemControl()->SetTextST(buff);
                 if (booster.fBoostTime <= 3.0f)
                     m_ind_boost_wound->SetColorAnimation(str_flag, flags);
                 else
@@ -1033,6 +1137,9 @@ void CUIMainIngameWnd::UpdateBoosterIndicators(const CEntityCondition::BOOSTER_M
             if (m_ind_boost_weight)
             {
                 m_ind_boost_weight->Show(true);
+                string32 buff;
+                xr_sprintf(buff, sizeof(buff), "%.0f", booster.fBoostTime);
+                m_ind_boost_weight->TextItemControl()->SetTextST(buff);
                 if (booster.fBoostTime <= 3.0f)
                     m_ind_boost_weight->SetColorAnimation(str_flag, flags);
                 else
@@ -1046,6 +1153,9 @@ void CUIMainIngameWnd::UpdateBoosterIndicators(const CEntityCondition::BOOSTER_M
             if (m_ind_boost_radia)
             {
                 m_ind_boost_radia->Show(true);
+                string32 buff;
+                xr_sprintf(buff, sizeof(buff), "%.0f", booster.fBoostTime);
+                m_ind_boost_radia->TextItemControl()->SetTextST(buff);
                 if (booster.fBoostTime <= 3.0f)
                     m_ind_boost_radia->SetColorAnimation(str_flag, flags);
                 else
@@ -1059,6 +1169,9 @@ void CUIMainIngameWnd::UpdateBoosterIndicators(const CEntityCondition::BOOSTER_M
             if (m_ind_boost_psy)
             {
                 m_ind_boost_psy->Show(true);
+                string32 buff;
+                xr_sprintf(buff, sizeof(buff), "%.0f", booster.fBoostTime);
+                m_ind_boost_psy->TextItemControl()->SetTextST(buff);
                 if (booster.fBoostTime <= 3.0f)
                     m_ind_boost_psy->SetColorAnimation(str_flag, flags);
                 else
@@ -1072,6 +1185,9 @@ void CUIMainIngameWnd::UpdateBoosterIndicators(const CEntityCondition::BOOSTER_M
             if (m_ind_boost_chem)
             {
                 m_ind_boost_chem->Show(true);
+                string32 buff;
+                xr_sprintf(buff, sizeof(buff), "%.0f", booster.fBoostTime);
+                m_ind_boost_chem->TextItemControl()->SetTextST(buff);
                 if (booster.fBoostTime <= 3.0f)
                     m_ind_boost_chem->SetColorAnimation(str_flag, flags);
                 else

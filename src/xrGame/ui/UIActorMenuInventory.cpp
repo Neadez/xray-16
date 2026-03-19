@@ -55,6 +55,8 @@ void CUIActorMenu::InitInventoryMode()
     ShowIfExist(m_pLists[eTrashList], true);
     ShowIfExist(m_clock_value, true);
 
+    ShowIfExist(m_pLists[eInventoryTorchList], true);
+
     InitInventoryContents(m_pLists[eInventoryBagList]);
 
     VERIFY(CurrentGameUI());
@@ -103,7 +105,7 @@ void CUIActorMenu::SendEvent_Item2Belt(PIItem pItem, u16 recipient)
     P.w_u16(pItem->object().ID());
     CGameObject::u_EventSend(P);
 
-    PlaySnd(eItemToBelt);
+    //PlaySnd(eItemToBelt);
     clear_highlight_lists();
 };
 
@@ -248,7 +250,7 @@ void CUIActorMenu::OnInventoryAction(PIItem pItem, u16 action_type)
     {
         m_pLists[eInventoryBeltList], m_pLists[eInventoryKnifeList], m_pLists[eInventoryPistolList], m_pLists[eInventoryAutomaticList],
         m_pLists[eInventoryBackpackList], m_pLists[eInventoryOutfitList], m_pLists[eInventoryHelmetList], m_pLists[eInventoryDetectorList],
-        m_pLists[eInventoryBagList], m_pLists[eTradeActorBagList], m_pLists[eTradeActorList]
+        m_pLists[eInventoryBagList], m_pLists[eTradeActorBagList], m_pLists[eTradeActorList], m_pLists[eInventoryTorchList]
     };
 
     switch (action_type)
@@ -353,6 +355,7 @@ void CUIActorMenu::OnInventoryAction(PIItem pItem, u16 action_type)
 }
 void CUIActorMenu::AttachAddon(PIItem item_to_upgrade)
 {
+    clear_highlight_lists(); // Обновляем подсветку --#SM+#--
     PlaySnd(eAttachAddon);
     R_ASSERT(item_to_upgrade);
     if (OnClient())
@@ -384,7 +387,10 @@ void CUIActorMenu::DetachAddon(LPCSTR addon_name, PIItem itm)
         return;
     }
     if (itm == NULL)
+    {
         CurrentIItem()->Detach(addon_name, true);
+        clear_highlight_lists();
+    }
     else
         itm->Detach(addon_name, true);
 }
@@ -473,8 +479,8 @@ void CUIActorMenu::InitInventoryContents(CUIDragDropListEx* pBagList, bool onlyB
         InitCellForSlot(ARTEFACT_SLOT);
     if (!m_pActorInvOwner->inventory().SlotIsPersistent(PDA_SLOT))
         InitCellForSlot(PDA_SLOT);
-    //if (!m_pActorInvOwner->inventory().SlotIsPersistent(TORCH_SLOT))
-    //    InitCellForSlot(TORCH_SLOT); // Alundaio: TODO find out why this crash when you unequip
+    if (!m_pActorInvOwner->inventory().SlotIsPersistent(TORCH_SLOT))
+        InitCellForSlot(TORCH_SLOT); // Alundaio: TODO find out why this crash when you unequip
 
     //for custom slots that exist past LAST_SLOT
     for (u16 i = SLOTS_COUNT; i <= m_pActorInvOwner->inventory().LastSlot(); ++i)
@@ -773,6 +779,7 @@ bool CUIActorMenu::ToBelt(CUICellItem* itm, bool b_use_cursor_pos)
             SendEvent_Item2Belt(iitem, m_pActorInvOwner->object_id());
 
         // ColorizeItem						(itm, false);
+        PlaySnd(eItemToBelt);
         return true;
     }
     else
@@ -825,7 +832,7 @@ CUIDragDropListEx* CUIActorMenu::GetSlotList(u16 slot_idx)
     case DETECTOR_SLOT: return m_pLists[eInventoryDetectorList]; break;
 
     case PDA_SLOT:
-    case TORCH_SLOT:
+    case TORCH_SLOT: return m_pLists[eInventoryTorchList]; break;
     case ARTEFACT_SLOT:
     case BINOCULAR_SLOT:
 
@@ -990,13 +997,14 @@ void CUIActorMenu::PropertiesBoxForSlots(PIItem item, bool& b_show)
 {
     CCustomOutfit* pOutfit = smart_cast<CCustomOutfit*>(item);
     CHelmet* pHelmet = smart_cast<CHelmet*>(item);
+    CBackpack* pBackpack = smart_cast<CBackpack*>(item);
     CInventory& inv = m_pActorInvOwner->inventory();
 
     // Флаг-признак для невлючения пункта контекстного меню: Dreess Outfit, если костюм уже надет
     bool bAlreadyDressed = false;
     u16 cur_slot = item->BaseSlot();
 
-    if (!pOutfit && !pHelmet && cur_slot != NO_ACTIVE_SLOT && !inv.SlotIsPersistent(cur_slot) &&
+    if (!pOutfit && !pHelmet && !pBackpack && cur_slot != NO_ACTIVE_SLOT && !inv.SlotIsPersistent(cur_slot) &&
         inv.ItemFromSlot(cur_slot) != item /*&& inv.CanPutInSlot(item, cur_slot)*/)
     {
         m_UIPropertiesBox->AddItem("st_move_to_slot", NULL, INVENTORY_TO_SLOT_ACTION);
@@ -1018,7 +1026,7 @@ void CUIActorMenu::PropertiesBoxForSlots(PIItem item, bool& b_show)
                 if (m_currMenuMode == mmDeadBodySearch || !has_translation)
                     m_UIPropertiesBox->AddItem("st_move_to_bag", nullptr, INVENTORY_TO_BAG_ACTION);
                 else
-                    m_UIPropertiesBox->AddItem("st_unequip", nullptr, INVENTORY_TO_BAG_ACTION);
+                    m_UIPropertiesBox->AddItem("st_undress_backpack", NULL, INVENTORY_TO_BAG_ACTION);
             }
             else
                 m_UIPropertiesBox->AddItem("st_undress_helmet", NULL, INVENTORY_TO_BAG_ACTION);
@@ -1039,6 +1047,12 @@ void CUIActorMenu::PropertiesBoxForSlots(PIItem item, bool& b_show)
     if (pHelmet && !bAlreadyDressed && (!outfit_in_slot || outfit_in_slot->bIsHelmetAvaliable))
     {
         m_UIPropertiesBox->AddItem("st_dress_helmet", NULL, INVENTORY_TO_SLOT_ACTION);
+        b_show = true;
+    }
+
+    if (pBackpack && !bAlreadyDressed)
+    {
+        m_UIPropertiesBox->AddItem("st_dress_backpack", NULL, INVENTORY_TO_SLOT_ACTION);
         b_show = true;
     }
 }
@@ -1501,6 +1515,7 @@ void CUIActorMenu::ProcessPropertiesBoxClicked(CUIWindow* w, void* d)
         break;
     case INVENTORY_UNLOAD_MAGAZINE:
     {
+        PlaySnd(eUnload);
         CWeaponMagazined* weap_mag = smart_cast<CWeaponMagazined*>((CWeapon*)cell_item->m_pData);
         if (!weap_mag)
         {

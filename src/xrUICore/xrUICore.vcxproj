@@ -83,6 +83,7 @@
     <ClInclude Include="ListWnd\UIListItemEx.h" />
     <ClInclude Include="ListWnd\UIListWnd.h" />
     <ClInclude Include="ListWnd\UIListWnd_inline.h" />
+    <ClInclude Include="ListWnd\UITreeViewItem.h" />
     <ClInclude Include="MessageBox\UIMessageBox.h" />
     <ClInclude Include="Options\UIOptionsItem.h" />
     <ClInclude Include="Options\UIOptionsManager.h" />
@@ -144,6 +145,7 @@
     <ClCompile Include="ListWnd\UIListItem.cpp" />
     <ClCompile Include="ListWnd\UIListItemEx.cpp" />
     <ClCompile Include="ListWnd\UIListWnd.cpp" />
+    <ClCompile Include="ListWnd\UITreeViewItem.cpp" />
     <ClCompile Include="MessageBox\UIMessageBox.cpp" />
     <ClCompile Include="Options\UIOptionsItem.cpp" />
     <ClCompile Include="Options\UIOptionsManager.cpp" />

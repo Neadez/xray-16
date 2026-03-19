@@ -470,6 +470,10 @@ void CActor::Load(LPCSTR section)
     m_sCarCharacterUseAction = "car_character_use";
     m_sInventoryItemUseAction = "inventory_item_use";
     m_sInventoryBoxUseAction = "inventory_box_use";
+
+    m_sCharacterUseActionIcon = "ui_hud_icon_talk";
+    m_sInventoryItemUseActionIcon = "ui_hud_icon_pickup";
+    m_sDefaultIcon = "ui_hud_icon_interact";
     //---------------------------------------------------------------------
     m_sHeadShotParticle = READ_IF_EXISTS(pSettings, r_string, section, "HeadShotParticle", 0);
 }
@@ -1276,6 +1280,7 @@ void CActor::shedule_Update(u32 DT)
     if (m_holder || !getEnabled() || !Ready())
     {
         m_sDefaultObjAction = nullptr;
+        m_sDefaultActionIcon = nullptr;
         inherited::shedule_Update(DT);
         return;
     }
@@ -1472,18 +1477,24 @@ void CActor::shedule_Update(u32 DT)
             if (m_pUsableObject && m_pUsableObject->tip_text())
             {
                 m_sDefaultObjAction = StringTable().translate(m_pUsableObject->tip_text());
+                if (m_pUsableObject->tip_icon())
+                {
+                    m_sDefaultActionIcon = m_pUsableObject->tip_icon();
+                }
             }
             else
             {
                 if (m_pPersonWeLookingAt && pEntityAlive->g_Alive() && m_pPersonWeLookingAt->IsTalkEnabled())
                 {
                     m_sDefaultObjAction = m_sCharacterUseAction;
+                    m_sDefaultActionIcon = m_sCharacterUseActionIcon;
                 }
                 else if (pEntityAlive && !pEntityAlive->g_Alive())
                 {
                     if (m_pPersonWeLookingAt && m_pPersonWeLookingAt->deadbody_closed_status())
                     {
                         m_sDefaultObjAction = m_sDeadCharacterDontUseAction;
+                        m_sDefaultActionIcon = m_sDefaultIcon;
                     }
                     else
                     {
@@ -1491,25 +1502,30 @@ void CActor::shedule_Update(u32 DT)
                         if (b_allow_drag)
                         {
                             m_sDefaultObjAction = m_sDeadCharacterUseOrDragAction;
+                            m_sDefaultActionIcon = m_sDefaultIcon;
                         }
                         else if (pEntityAlive->cast_inventory_owner())
                         {
                             m_sDefaultObjAction = m_sDeadCharacterUseAction;
+                            m_sDefaultActionIcon = m_sDefaultIcon;
                         }
                     } // m_pPersonWeLookingAt
                 }
                 else if (m_pVehicleWeLookingAt)
                 {
                     m_sDefaultObjAction = m_pVehicleWeLookingAt->m_sUseAction ? m_pVehicleWeLookingAt->m_sUseAction : m_sCarCharacterUseAction;
+                    m_sDefaultActionIcon = m_sDefaultIcon;
                 }
                 else if (m_pObjectWeLookingAt && m_pObjectWeLookingAt->cast_inventory_item() &&
                     m_pObjectWeLookingAt->cast_inventory_item()->CanTake())
                 {
                     m_sDefaultObjAction = m_sInventoryItemUseAction;
+                    m_sDefaultActionIcon = m_sInventoryItemUseActionIcon;
                 }
                 else
                 {
                     m_sDefaultObjAction = nullptr;
+                    m_sDefaultActionIcon = nullptr;
                 }
             }
         }
@@ -1518,6 +1534,7 @@ void CActor::shedule_Update(u32 DT)
     {
         m_pPersonWeLookingAt = nullptr;
         m_sDefaultObjAction = nullptr;
+        m_sDefaultActionIcon = nullptr;
         m_pUsableObject = nullptr;
         m_pObjectWeLookingAt = nullptr;
         m_pVehicleWeLookingAt = nullptr;
@@ -1892,6 +1909,7 @@ void CActor::UpdateArtefactsOnBeltAndOutfit()
             conditions().ChangeHealth((artefact->m_fHealthRestoreSpeed * art_cond) * f_update_time);
             conditions().ChangePower((artefact->m_fPowerRestoreSpeed * art_cond) * f_update_time);
             conditions().ChangeSatiety((artefact->m_fSatietyRestoreSpeed * art_cond) * f_update_time);
+            conditions().ChangeHydration((artefact->m_fHydrationRestoreSpeed * art_cond) * f_update_time);
             if (artefact->m_fRadiationRestoreSpeed * art_cond > 0.0f)
             {
                 float val = (artefact->m_fRadiationRestoreSpeed * art_cond) - conditions().GetBoostRadiationImmunity();
@@ -1910,20 +1928,21 @@ void CActor::UpdateArtefactsOnBeltAndOutfit()
         conditions().ChangeHealth(outfit->m_fHealthRestoreSpeed * f_update_time);
         conditions().ChangePower(outfit->m_fPowerRestoreSpeed * f_update_time);
         conditions().ChangeSatiety(outfit->m_fSatietyRestoreSpeed * f_update_time);
+        conditions().ChangeHydration(outfit->m_fHydrationRestoreSpeed * f_update_time);
         conditions().ChangeRadiation(outfit->m_fRadiationRestoreSpeed * f_update_time);
     }
-    else
-    {
-        CHelmet* pHelmet = smart_cast<CHelmet*>(inventory().ItemFromSlot(HELMET_SLOT));
-        if (!pHelmet)
-        {
-            CTorch* pTorch = smart_cast<CTorch*>(inventory().ItemFromSlot(TORCH_SLOT));
-            if (pTorch && pTorch->GetNightVisionStatus())
-            {
-                pTorch->SwitchNightVision(false);
-            }
-        }
-    }
+    //else
+    //{
+    //    CHelmet* pHelmet = smart_cast<CHelmet*>(inventory().ItemFromSlot(HELMET_SLOT));
+    //    if (!pHelmet)
+    //    {
+    //        CTorch* pTorch = smart_cast<CTorch*>(inventory().ItemFromSlot(TORCH_SLOT));
+    //        if (pTorch && pTorch->GetNightVisionStatus())
+    //        {
+    //            pTorch->SwitchNightVision(false);
+    //        }
+    //    }
+    //}
 }
 
 float CActor::HitArtefactsOnBelt(float hit_power, ALife::EHitType hit_type)
@@ -2096,6 +2115,7 @@ float CActor::GetRestoreSpeed(ALife::EConditionRestoreType const& type)
     {
         res = conditions().change_v().m_fV_HealthRestore;
         res += conditions().V_SatietyHealth() * (conditions().GetSatiety() > 0.0f ? 1.0f : -1.0f);
+        res += conditions().V_HydrationHealth() * (conditions().GetHydration() > 0.0f ? 1.0f : -1.0f);
 
         for (auto& it : inventory().m_belt)
         {
@@ -2112,6 +2132,8 @@ float CActor::GetRestoreSpeed(ALife::EConditionRestoreType const& type)
     }
     case ALife::eRadiationRestoreSpeed:
     {
+        res = 0.f;
+        res -= conditions().change_v().m_fV_Radiation;
         for (auto& it : inventory().m_belt)
         {
             const auto artefact = smart_cast<CArtefact*>(it);
@@ -2142,9 +2164,27 @@ float CActor::GetRestoreSpeed(ALife::EConditionRestoreType const& type)
 
         break;
     }
+    case ALife::eHydrationRestoreSpeed:
+    {
+        res = conditions().V_Hydration();
+
+        for (auto& it : inventory().m_belt)
+        {
+            const auto artefact = smart_cast<CArtefact*>(it);
+            if (artefact)
+                res += artefact->m_fHydrationRestoreSpeed * artefact->GetCondition();
+        }
+
+        const auto outfit = GetOutfit();
+        if (outfit)
+            res += outfit->m_fHydrationRestoreSpeed;
+
+        break;
+    }
     case ALife::ePowerRestoreSpeed:
     {
         res = conditions().GetSatietyPower();
+        res += conditions().GetHydrationPower();
 
         for (auto& it : inventory().m_belt)
         {

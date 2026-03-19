@@ -17,6 +17,7 @@ void CCustomOutfit::script_register(lua_State* luaState)
             .def_readwrite("m_fHealthRestoreSpeed", &CCustomOutfit::m_fHealthRestoreSpeed)
             .def_readwrite("m_fRadiationRestoreSpeed", &CCustomOutfit::m_fRadiationRestoreSpeed)
             .def_readwrite("m_fSatietyRestoreSpeed", &CCustomOutfit::m_fSatietyRestoreSpeed)
+            .def_readwrite("m_fHydrationRestoreSpeed", &CCustomOutfit::m_fHydrationRestoreSpeed)
             .def_readwrite("m_fPowerRestoreSpeed", &CCustomOutfit::m_fPowerRestoreSpeed)
             .def_readwrite("m_fBleedingRestoreSpeed", &CCustomOutfit::m_fBleedingRestoreSpeed)
             .def_readonly("bIsHelmetAvaliable", &CCustomOutfit::bIsHelmetAvaliable)
@@ -47,6 +48,7 @@ void CHelmet::script_register(lua_State* luaState)
             .def_readwrite("m_fHealthRestoreSpeed", &CHelmet::m_fHealthRestoreSpeed)
             .def_readwrite("m_fRadiationRestoreSpeed", &CHelmet::m_fRadiationRestoreSpeed)
             .def_readwrite("m_fSatietyRestoreSpeed", &CHelmet::m_fSatietyRestoreSpeed)
+            .def_readwrite("m_fHydrationRestoreSpeed", &CHelmet::m_fHydrationRestoreSpeed)
             .def_readwrite("m_fPowerRestoreSpeed", &CHelmet::m_fPowerRestoreSpeed)
             .def_readwrite("m_fBleedingRestoreSpeed", &CHelmet::m_fBleedingRestoreSpeed)
             .def("GetDefHitTypeProtection", +[](CHelmet* self, int hit_type)
@@ -60,4 +62,20 @@ void CHelmet::script_register(lua_State* luaState)
             })
             .def("GetBoneArmor", &CHelmet::GetBoneArmor)
     ];
+}
+
+void CBackpack::script_register(lua_State* luaState)
+{
+    using namespace luabind;
+
+    module(luaState)
+    [
+        class_<CBackpack, CGameObject>("CBackpack")
+            .def(constructor<>())
+            .def_readwrite("m_fPowerLoss", &CBackpack::m_fPowerLoss)
+            .def_readwrite("m_fPowerRestoreSpeed", &CBackpack::m_fPowerRestoreSpeed)
+            .def_readwrite("m_additional_weight", &CBackpack::m_additional_weight)
+            .def_readwrite("m_additional_weight2", &CBackpack::m_additional_weight2)
+    ];
+
 }

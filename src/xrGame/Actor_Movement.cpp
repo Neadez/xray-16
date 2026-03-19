@@ -671,9 +671,9 @@ float CActor::get_additional_weight() const
         res += outfit->m_additional_weight;
     }
 
-    CBackpack* pBackpack = GetBackpack();
-    if (pBackpack)
-        res += pBackpack->m_additional_weight;
+    CBackpack* backpack = GetBackpack();
+    if (backpack) 
+        res += backpack->m_additional_weight;
 
     for (TIItemContainer::const_iterator it = inventory().m_belt.begin(); inventory().m_belt.end() != it; ++it)
     {

@@ -2224,6 +2224,9 @@
     <Filter Include="AI\AMonsters\common\monster states\Move">
       <UniqueIdentifier>{8ca91267-ead8-4233-af9a-9771664b4be5}</UniqueIdentifier>
     </Filter>
+    <Filter Include="UI\Common\PDA\Encyclopedia">
+      <UniqueIdentifier>{414d2d0f-3047-494d-bc37-7646dac7f64c}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="mt_config.h">
@@ -6302,6 +6305,15 @@
     <ClInclude Include="..\xrServerEntities\object_factory_spawner.h">
       <Filter>Core\Common\ObjectFactory</Filter>
     </ClInclude>
+    <ClInclude Include="ui\UIEncyclopediaWnd.h">
+      <Filter>UI\Common\PDA\Encyclopedia</Filter>
+    </ClInclude>
+    <ClInclude Include="ui\UIEncyclopediaArticleWnd.h">
+      <Filter>UI\Common\PDA\Encyclopedia</Filter>
+    </ClInclude>
+    <ClInclude Include="ui\UITreeBranch.h">
+      <Filter>UI\Common\PDA\Encyclopedia</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="damage_manager.cpp">
@@ -9485,6 +9497,18 @@
     </ClCompile>
     <ClCompile Include="..\xrServerEntities\object_factory_spawner.cpp">
       <Filter>Core\Common\ObjectFactory</Filter>
+    </ClCompile>
+    <ClCompile Include="ui\UIRelationsWnd.cpp">
+      <Filter>UI\Common\PDA\Statistics &amp; Rankings</Filter>
+    </ClCompile>
+    <ClCompile Include="ui\UIEncyclopediaWnd.cpp">
+      <Filter>UI\Common\PDA\Encyclopedia</Filter>
+    </ClCompile>
+    <ClCompile Include="ui\UIEncyclopediaArticleWnd.cpp">
+      <Filter>UI\Common\PDA\Encyclopedia</Filter>
+    </ClCompile>
+    <ClCompile Include="ui\UITreeBranch.cpp">
+      <Filter>UI\Common\PDA\Encyclopedia</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

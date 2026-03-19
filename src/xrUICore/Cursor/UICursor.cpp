@@ -25,9 +25,16 @@ void CUICursor::InitInternal()
 
 void CUICursor::OnDeviceReset()
 {
-    correction.x = UI_BASE_WIDTH  / (float)Device.m_rcWindowClient.w;
-    correction.y = UI_BASE_HEIGHT / (float)Device.m_rcWindowClient.h;
+    if (UI().is_widescreen() && UI().new_widescreen())
+    {
+        correction.x = UI_BASE_WIDTH_W  / (float)Device.m_rcWindowClient.w;
+    }
+    else
+    {
+        correction.x = UI_BASE_WIDTH  / (float)Device.m_rcWindowClient.w;
+    }
 
+    correction.y = UI_BASE_HEIGHT / (float)Device.m_rcWindowClient.h;
     SDL_Rect display;
     if (0 == SDL_GetDisplayBounds(0, &display))
     {
@@ -112,15 +119,26 @@ void CUICursor::UpdateCursorPosition(Fvector2 pos)
         vPos.x = (float)pti.x * correction.x;
         vPos.y = (float)pti.y * correction.y;
     }
-    clamp(vPos.x, 0.f, UI_BASE_WIDTH);
+    if (UI().is_widescreen() && UI().new_widescreen())
+    {
+        clamp(vPos.x, 0.f, UI_BASE_WIDTH_W);
+    }
+    else 
+    {
+        clamp(vPos.x, 0.f, UI_BASE_WIDTH);
+    }
     clamp(vPos.y, 0.f, UI_BASE_HEIGHT);
+
 }
 
 void CUICursor::WarpToWindow(const CUIWindow* wnd, bool center /*= false*/)
 {
     if (!wnd)
     {
-        SetUICursorPosition({ UI_BASE_WIDTH / 2.0f, UI_BASE_HEIGHT / 2.0f });
+        if (UI().is_widescreen() && UI().new_widescreen())
+            SetUICursorPosition({ UI_BASE_WIDTH_W / 2.0f, UI_BASE_HEIGHT / 2.0f });
+        else
+            SetUICursorPosition({ UI_BASE_WIDTH / 2.0f, UI_BASE_HEIGHT / 2.0f });
         return;
     }
 

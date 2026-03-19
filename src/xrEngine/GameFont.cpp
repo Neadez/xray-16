@@ -10,6 +10,8 @@
 extern ENGINE_API bool g_bRendering;
 ENGINE_API Fvector2 g_current_font_scale = {1.0f, 1.0f};
 
+ENGINE_API float g_fontScale = 1.f;
+
 #include "Include/xrRender/RenderFactory.h"
 #include "Include/xrRender/FontRender.h"
 
@@ -239,10 +241,10 @@ u16 CGameFont::GetCutLengthPos(float fTargetWidth, pcstr pszText)
     u16 i = 1;
     for (; i <= len; i++)
     {
-        fDelta = GetCharTC(wsStr[i]).z - 2;
+        fDelta = (GetCharTC(wsStr[i]).z) * GetScale() - 2;
 
         if (IsNeedSpaceCharacter(wsStr[i]))
-            fDelta += fXStep;
+            fDelta += fXStep * GetScale();
 
         if ((fCurWidth + fDelta) > fTargetWidth)
             break;
@@ -265,10 +267,10 @@ u16 CGameFont::SplitByWidth(u16* puBuffer, u16 uBufferSize, float fTargetWidth, 
 
     for (u16 i = 1; i <= len; i++)
     {
-        fDelta = GetCharTC(wsStr[i]).z - 2;
+        fDelta = (GetCharTC(wsStr[i]).z * GetScale()) * GetScale() - 2;
 
         if (IsNeedSpaceCharacter(wsStr[i]))
-            fDelta += fXStep;
+            fDelta += fXStep * GetScale();
 
         if (((fCurWidth + fDelta) > fTargetWidth) && // overlength
             (!IsBadStartCharacter(wsStr[i])) && // can start with this character
@@ -348,7 +350,7 @@ void CGameFont::OutNextVA(pcstr format, va_list args)
 void CGameFont::OutSkip(float val) { fCurrentY += val * CurrentHeight_(); }
 float CGameFont::SizeOf_(const char cChar)
 {
-    return (GetCharTC((u16)(u8)(((IsMultibyte() && cChar == ' ')) ? 0 : cChar)).z * vInterval.x);
+    return (GetCharTC((u16)(u8)(((IsMultibyte() && cChar == ' ')) ? 0 : cChar)).z * vInterval.x * GetScale());
 }
 
 float CGameFont::SizeOf_(pcstr s)
@@ -390,7 +392,7 @@ float CGameFont::SizeOf_(pcstr s)
             }
         }
     }
-    return (X * vInterval.x);
+    return (X * vInterval.x * GetScale());
 }
 
 float CGameFont::SizeOf_(const xr_wide_char* wsStr)
@@ -433,9 +435,10 @@ float CGameFont::SizeOf_(const xr_wide_char* wsStr)
             }
         }
     }
-    return (X * vInterval.x);
+    return (X * vInterval.x * GetScale());
 }
 
+//float CGameFont::CurrentHeight_() { return fCurrentHeight * vInterval.y * GetScale(); } for some reason text goes upwards instead of aligning to center
 float CGameFont::CurrentHeight_() { return fCurrentHeight * vInterval.y; }
 void CGameFont::SetHeightI(float S)
 {
@@ -448,3 +451,11 @@ void CGameFont::SetHeight(float S)
     VERIFY(uFlags & fsDeviceIndependent);
     fCurrentHeight = S;
 };
+
+float CGameFont::GetScale() const //честно стырил идею и часть кода из OGSR
+{
+    if (uFlags & fsDeviceIndependent)
+        return 1.f;
+
+    return g_fontScale * (!fis_zero(fScale) ? fScale : 1);
+}

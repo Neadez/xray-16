@@ -55,8 +55,8 @@ void CUIArtefactPanel::Draw()
     for (const Frect& r : m_vRects)
     {
         Fvector2 size;
-        size.x = m_fScale*(r.bottom - r.top);
-        size.y = _s*m_fScale*(r.right - r.left);
+        size.x = m_fScale*(r.bottom - r.top) / (INV_GRID_WIDTH/50.0f);
+        size.y = _s*m_fScale*(r.right - r.left) / (INV_GRID_WIDTH/50.0f);
 
         m_StaticItem.SetTextureRect(r);
         m_StaticItem.SetSize(size);

@@ -25,6 +25,8 @@
 
 #define MAX_SATIETY 1.0f
 #define START_SATIETY 0.5f
+#define MAX_HYDRATION 1.0f
+#define START_HYDRATION 0.5f
 
 BOOL GodMode()
 {
@@ -46,6 +48,7 @@ CActorCondition::CActorCondition(CActor* object) : inherited(object)
     m_fSprintK = 0.f;
     m_fAlcohol = 0.f;
     m_fSatiety = 1.0f;
+    m_fHydration = 1.0f;
 
     //	m_vecBoosts.clear();
 
@@ -68,6 +71,13 @@ CActorCondition::CActorCondition(CActor* object) : inherited(object)
     m_f_time_affected = Device.fTimeGlobal;
 
     m_max_power_restore_speed = 0.0f;
+    //
+    m_max_health_restore_speed = 0.0f;
+    m_max_bleeding_restore_speed = 0.0f;
+    m_max_radiation_restore_speed = 0.0f;
+    m_max_satiety_restore_speed = 0.0f;
+    m_max_hydration_restore_speed = 0.0f;
+    //
     m_max_wound_protection = 0.0f;
     m_max_fire_wound_protection = 0.0f;
 }
@@ -116,6 +126,15 @@ void CActorCondition::LoadCondition(LPCSTR entity_section)
     m_fV_SatietyPower = pSettings->r_float(section, "satiety_power_v");
     m_fV_SatietyHealth = pSettings->r_float(section, "satiety_health_v");
 
+    m_fHydrationCritical = pSettings->r_float(section, "hydration_critical");
+    clamp(m_fHydrationCritical, 0.0f, 1.0f);
+    m_fV_Hydration = pSettings->r_float(section, "hydration_v");
+    m_fV_HydrationPower = pSettings->r_float(section, "hydration_power_v");
+    m_fV_HydrationHealth = pSettings->r_float(section, "hydration_health_v");
+
+    m_fPsyHealthCritical = pSettings->r_float(section, "psy_health_critical");
+    clamp(m_fPsyHealthCritical, 0.0f, 1.0f);
+
     m_MaxWalkWeight = pSettings->r_float(section, "max_walk_weight");
 
     m_zone_max_power[ALife::infl_rad] = pSettings->read_if_exists<float>(section, "radio_zone_max_power", 1.0f);
@@ -125,6 +144,13 @@ void CActorCondition::LoadCondition(LPCSTR entity_section)
     m_zone_max_power[ALife::infl_electra] = pSettings->read_if_exists<float>(section, "electra_zone_max_power", 1.0f);
 
     m_max_power_restore_speed = pSettings->read_if_exists<float>(section, "max_power_restore_speed", 1.0f);
+    //
+    m_max_health_restore_speed = pSettings->read_if_exists<float>(section, "max_health_restore_speed", 1.0f);
+    m_max_bleeding_restore_speed = pSettings->read_if_exists<float>(section, "max_bleeding_restore_speed", 1.0f);
+    m_max_radiation_restore_speed = pSettings->read_if_exists<float>(section, "max_radiation_restore_speed", 1.0f);
+    m_max_satiety_restore_speed = pSettings->read_if_exists<float>(section, "max_satiety_restore_speed", 1.0f);
+    m_max_hydration_restore_speed = pSettings->read_if_exists<float>(section, "max_hydration_restore_speed", 1.0f);
+    //
     m_max_wound_protection = pSettings->read_if_exists<float>(section, "max_wound_protection", 1.0f);
     m_max_fire_wound_protection = pSettings->read_if_exists<float>(section, "max_fire_wound_protection", 1.0f);
 
@@ -134,6 +160,12 @@ void CActorCondition::LoadCondition(LPCSTR entity_section)
     VERIFY(!fis_zero(m_zone_max_power[ALife::infl_psi]));
     VERIFY(!fis_zero(m_zone_max_power[ALife::infl_electra]));
     VERIFY(!fis_zero(m_max_power_restore_speed));
+    //
+    VERIFY(!fis_zero(m_max_health_restore_speed));
+    VERIFY(!fis_zero(m_max_bleeding_restore_speed));
+    VERIFY(!fis_zero(m_max_radiation_restore_speed));
+    VERIFY(!fis_zero(m_max_satiety_restore_speed));
+    VERIFY(!fis_zero(m_max_hydration_restore_speed));
 }
 
 float CActorCondition::GetZoneMaxPower(ALife::EInfluenceType type) const
@@ -175,6 +207,7 @@ void CActorCondition::UpdateCondition()
     if (psActorFlags.test(AF_GODMODE_RT))
     {
         UpdateSatiety();
+        UpdateHydration();
         UpdateBoosters();
 
         m_fAlcohol += m_fV_Alcohol * m_fDeltaTime;
@@ -270,6 +303,7 @@ void CActorCondition::UpdateCondition()
     };
 
     UpdateSatiety();
+    UpdateHydration();
     UpdateBoosters();
 
     inherited::UpdateCondition();
@@ -439,6 +473,29 @@ void CActorCondition::UpdateSatiety()
     }
 }
 
+void CActorCondition::UpdateHydration()
+{
+    if (!IsGameTypeSingle())
+    {
+        m_fDeltaPower += m_fV_HydrationPower * m_fDeltaTime;
+        return;
+    }
+
+    if (m_fHydration > 0)
+    {
+        m_fHydration -= m_fV_Hydration * m_fDeltaTime;
+        clamp(m_fHydration, 0.0f, 1.0f);
+    }
+
+    float hydration_health_koef = (m_fHydration - m_fHydrationCritical) /
+        (m_fHydration >= m_fHydrationCritical ? 1 - m_fHydrationCritical : m_fHydrationCritical);
+    if (CanBeHarmed() && !psActorFlags.test(AF_GODMODE_RT))
+    {
+        m_fDeltaHealth += m_fV_HydrationHealth * hydration_health_koef * m_fDeltaTime;
+        m_fDeltaPower += m_fV_HydrationPower * m_fHydration * m_fDeltaTime;
+    }
+}
+
 CWound* CActorCondition::ConditionHit(SHit* pHDS)
 {
     if (GodMode())
@@ -524,10 +581,12 @@ void CActorCondition::save(NET_Packet& output_packet)
     save_data(m_fAlcohol, output_packet);
     save_data(m_condition_flags, output_packet);
     save_data(m_fSatiety, output_packet);
+    save_data(m_fHydration, output_packet);
 
     save_data(m_curr_medicine_influence.fHealth, output_packet);
     save_data(m_curr_medicine_influence.fPower, output_packet);
     save_data(m_curr_medicine_influence.fSatiety, output_packet);
+    save_data(m_curr_medicine_influence.fHydration, output_packet);
     save_data(m_curr_medicine_influence.fRadiation, output_packet);
     save_data(m_curr_medicine_influence.fWoundsHeal, output_packet);
     save_data(m_curr_medicine_influence.fMaxPowerUp, output_packet);
@@ -551,10 +610,12 @@ void CActorCondition::load(IReader& input_packet)
     load_data(m_fAlcohol, input_packet);
     load_data(m_condition_flags, input_packet);
     load_data(m_fSatiety, input_packet);
+    load_data(m_fHydration, input_packet);
 
     load_data(m_curr_medicine_influence.fHealth, input_packet);
     load_data(m_curr_medicine_influence.fPower, input_packet);
     load_data(m_curr_medicine_influence.fSatiety, input_packet);
+    load_data(m_curr_medicine_influence.fHydration, input_packet);
     load_data(m_curr_medicine_influence.fRadiation, input_packet);
     load_data(m_curr_medicine_influence.fWoundsHeal, input_packet);
     load_data(m_curr_medicine_influence.fMaxPowerUp, input_packet);
@@ -579,6 +640,7 @@ void CActorCondition::reinit()
     inherited::reinit();
     m_bLimping = false;
     m_fSatiety = 1.f;
+    m_fHydration = 1.f;
 }
 
 void CActorCondition::ChangeAlcohol(float value) { m_fAlcohol += value; }
@@ -586,6 +648,12 @@ void CActorCondition::ChangeSatiety(float value)
 {
     m_fSatiety += value;
     clamp(m_fSatiety, 0.0f, 1.0f);
+}
+
+void CActorCondition::ChangeHydration(float value)
+{
+    m_fHydration += value;
+    clamp(m_fHydration, 0.0f, 1.0f);
 }
 
 void CActorCondition::BoostParameters(const SBooster& B)
@@ -676,7 +744,11 @@ void CActorCondition::ClearAllBoosters()
     }
 }
 void CActorCondition::BoostHpRestore(const float value) { m_change_v.m_fV_HealthRestore += value; }
-void CActorCondition::BoostPowerRestore(const float value) { m_fV_SatietyPower += value; }
+void CActorCondition::BoostPowerRestore(const float value)
+{
+    m_fV_SatietyPower += value;
+    m_fV_HydrationPower += value;
+}
 void CActorCondition::BoostRadiationRestore(const float value) { m_change_v.m_fV_Radiation += value; }
 void CActorCondition::BoostBleedingRestore(const float value) { m_change_v.m_fV_WoundIncarnation += value; }
 void CActorCondition::BoostMaxWeight(const float value)
@@ -703,6 +775,7 @@ void CActorCondition::UpdateTutorialThresholds()
     static float _cPowerMaxThr = pSettings->r_float("tutorial_conditions_thresholds", "max_power");
     static float _cBleeding = pSettings->r_float("tutorial_conditions_thresholds", "bleeding");
     static float _cSatiety = pSettings->r_float("tutorial_conditions_thresholds", "satiety");
+    static float _cHydration = pSettings->r_float("tutorial_conditions_thresholds", "hydration");
     static float _cRadiation = pSettings->r_float("tutorial_conditions_thresholds", "radiation");
     static float _cWpnCondition = pSettings->r_float("tutorial_conditions_thresholds", "weapon_jammed");
     static float _cPsyHealthThr = pSettings->r_float("tutorial_conditions_thresholds", "psy_health");
@@ -734,6 +807,13 @@ void CActorCondition::UpdateTutorialThresholds()
         m_condition_flags.set(eCriticalSatietyReached, TRUE);
         b = false;
         xr_strcpy(cb_name, "_G.on_actor_satiety");
+    }
+
+    if (b && !m_condition_flags.test(eCriticalHydrationReached) && GetHydration() < _cHydration)
+    {
+        m_condition_flags.set(eCriticalHydrationReached, TRUE);
+        b = false;
+        xr_strcpy(cb_name, "_G.on_actor_hydration");
     }
 
     if (b && !m_condition_flags.test(eCriticalRadiationReached) && GetRadiation() > _cRadiation)

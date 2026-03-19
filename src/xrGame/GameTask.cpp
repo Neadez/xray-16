@@ -436,7 +436,7 @@ void SGameTaskObjective::CreateMapLocation(bool on_load)
 
     if (m_linked_map_location->complex_spot())
     {
-        m_linked_map_location->complex_spot()->SetTimerFinish(m_timer_finish);
+        m_linked_map_location->complex_spot()->SetTimerFinish(m_TimeToComplete);
     }
 }
 

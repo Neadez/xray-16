@@ -61,6 +61,7 @@ public:
     virtual void OnDeviceReset();
     void OnUIReset() override;
     static bool is_widescreen();
+    static bool new_widescreen();
     static float get_current_kx();
     static shared_str get_xml_name(pcstr path, pcstr fn);
 

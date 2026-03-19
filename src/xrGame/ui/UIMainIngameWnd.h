@@ -30,14 +30,22 @@ public:
 protected:
     CUIStatic* UIStaticDiskIO{};
     CUIStatic* UIStaticQuickHelp{};
+    CUIStatic* UIStaticTalkIcon{};
+    CUIStatic* UIStaticInteractIcon{};
     CUIMotionIcon* UIMotionIcon{};
     CUIZoneMap* UIZoneMap{};
+
+    CUIStatic* UIStaticTaskName{};
+    CUIStatic* UIStaticTaskDescr{};
+    void UpdateTask();
 
     CUIHudStatesWnd* m_ui_hud_states{};
 
     CUIStatic* m_ind_bleeding{};
     CUIStatic* m_ind_radiation{};
     CUIStatic* m_ind_starvation{};
+    CUIStatic* m_ind_dehydration{};
+    CUIStatic* m_ind_psy_health{};
     CUIStatic* m_ind_weapon_broken{};
     CUIStatic* m_ind_helmet_broken{};
     CUIStatic* m_ind_outfit_broken{};

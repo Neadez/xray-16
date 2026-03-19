@@ -68,20 +68,18 @@ void CUIMapLocationHint::SetInfoStr(pcstr info)
     SetInfoMode(1);
 
     CUIStatic* text = m_info["simple_text"];
+    
     text->SetTextST(info);
-    text->AdjustHeightToText();
-
-    const float new_w = text->GetWndPos().x + text->GetWndSize().x + 20.0f;
-    const float new_h = _max(64.0f, text->GetWndPos().y + text->GetWndSize().y + 20.0f);
-
-    if (!m_border)
-        SetWndSize(Fvector2().set(new_w, new_h));
+    text->AdjustWidthToText();
+    if (text->GetWndSize().x > 180.0f)
+        text->SetWidth(180.0f);
     else
-    {
-        SetWndSize(Fvector2().set(GetWndSize().x, new_h));
-        m_border->SetWidth(GetWndSize().x);
-        m_border->SetHeight(GetWndSize().y);
-    }
+        text->SetWidth(text->GetWndSize().x + 10.0f);
+    text->AdjustHeightToText();
+    Fvector2 new_size;
+    new_size.x = text->GetWndSize().x + 10.0f;
+    new_size.y = text->GetWndSize().y + 20.0f;
+    SetWndSize(new_size);
 }
 
 void CUIMapLocationHint::SetInfoMSpot(CMapSpot* spot)
@@ -145,7 +143,7 @@ void CUIMapLocationHint::SetInfoTask(CGameTask* task)
     pos.y = S->GetWndPos().y + S->GetWndSize().y + 10;
     m_info["t_hint_text"]->SetWndPos(pos);
 
-    if (task->GetTaskType() == eTaskTypeStoryline)
+    if (task->GetTaskType() == eTaskTypeStoryline || task->GetTaskType() == eTaskTypeAdditional)
     {
         m_info["t_icon"]->Show(true);
         float w = m_info["t_time"]->GetWidth();
@@ -170,24 +168,6 @@ void CUIMapLocationHint::SetInfoTask(CGameTask* task)
         pos = m_info["t_hint_text"]->GetWndPos();
         pos.y = _max(pos.y, m_info["t_icon"]->GetWndPos().y + m_info["t_icon"]->GetWndSize().y + 7);
         m_info["t_hint_text"]->SetWndPos(pos);
-    }
-    else if (task->GetTaskType() == eTaskTypeAdditional)
-    {
-        m_info["t_icon"]->Show(false);
-        float w = m_info["t_hint_text"]->GetWidth();
-
-        Fvector2 pos = m_info["t_caption"]->GetWndPos();
-        pos.x = m_posx_icon;
-        m_info["t_caption"]->SetWndPos(pos);
-        m_info["t_caption"]->SetWidth(w);
-
-        pos = m_info["t_time"]->GetWndPos();
-        pos.x = m_posx_icon;
-        m_info["t_time"]->SetWndPos(pos);
-
-        pos = m_info["t_time_rem"]->GetWndPos();
-        pos.x = m_posx_icon;
-        m_info["t_time_rem"]->SetWndPos(pos);
     }
 
     pos.x = m_info["t_hint_text"]->GetWndPos().x + m_info["t_hint_text"]->GetWndSize().x + 20.0f;

@@ -39,6 +39,13 @@ void CFontManager::InitializeFonts()
     InitializeFont(pFontStat, "stat_font", CGameFont::fsDeviceIndependent);
 }
 
+CGameFont* CFontManager::InitNewFont(LPCSTR section)
+{
+    CGameFont* pFontAdd = NULL;
+    InitializeFont(pFontAdd, section);
+    return pFontAdd;
+}
+
 LPCSTR CFontManager::GetFontTexName(LPCSTR section)
 {
     constexpr pcstr tex_names[] = { "texture800", "texture", "texture1600" };
@@ -88,6 +95,12 @@ void CFontManager::InitializeFont(CGameFont*& F, LPCSTR section, u32 flags)
     }
     if (pSettings->line_exist(section, "interval"))
         F->SetInterval(pSettings->r_fvector2(section, "interval"));
+
+    if (!(flags & CGameFont::fsDeviceIndependent)) //честно стырил идею и часть кода из OGSR
+    {
+        if (pSettings->line_exist(section, "scale"))
+            F->SetScale(pSettings->r_float(section, "scale"));
+    }
 }
 
 CFontManager::~CFontManager()

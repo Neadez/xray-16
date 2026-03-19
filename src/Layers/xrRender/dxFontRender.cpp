@@ -62,14 +62,21 @@ void dxFontRender::OnRender(CGameFont& owner)
             else
                 break;
         }
+        // fill vertices
+        u32 last = i + count;
+        u32 di = i;
+        RenderFragment(owner, di, true, 2, 2, length, last);
+        RenderFragment(owner, i, false, 0, 0, length, last);
+    }
+}
 
+void dxFontRender::RenderFragment(CGameFont& owner, u32& i, bool shadow_mode, float dX, float dY, u32 length, u32 last) //честно стырил идею и часть кода из OGSR
+{
         // lock AGP memory
         u32 vOffset;
         FVF::TL* v = (FVF::TL*)RImplementation.Vertex.Lock(length * 4, pGeom.stride(), vOffset);
         FVF::TL* start = v;
 
-        // fill vertices
-        u32 last = i + count;
         for (; i < last; i++)
         {
             CGameFont::String& PS = owner.strings[i];
@@ -79,8 +86,9 @@ void dxFontRender::OnRender(CGameFont& owner)
 
             if (len)
             {
-                float X = float(iFloor(PS.x));
-                float Y = float(iFloor(PS.y));
+                float X = float(iFloor(PS.x)) + dX;
+                float Y = float(iFloor(PS.y)) + dY;
+                //float S = PS.height * g_current_font_scale.y * owner.GetScale(); for some reason text goes upwards instead of aligning to center
                 float S = PS.height * g_current_font_scale.y;
                 float Y2 = Y + S;
                 float fSize = 0;
@@ -94,7 +102,7 @@ void dxFontRender::OnRender(CGameFont& owner)
                 case CGameFont::alRight: X -= iFloor(fSize); break;
                 }
 
-                const u32 clr = PS.c;
+                u32 clr = PS.c;
                 u32 clr2 = PS.c;
 
                 if (owner.uFlags & CGameFont::fsGradient)
@@ -105,6 +113,24 @@ void dxFontRender::OnRender(CGameFont& owner)
                     const u32 a = color_get_A(clr);
                     clr2 = color_rgba(r, g, b, a);
                 }
+                //code from OGSR
+                if (shadow_mode)
+                {
+                    // color_argb(220, 20, 20, 20)
+
+                    const u32 min_alpha = _min(color_get_A(clr), (u32)220);
+
+                    const u32 _R = color_get_R(clr);
+                    const u32 _G = color_get_G(clr);
+                    const u32 _B = color_get_B(clr);
+
+                    const float Y = 0.299f * _R + 0.587f * _G + 0.114f * _B;
+
+                    const u32 c = Y > 40 ? 20 : 120;
+
+                    clr2 = clr = color_argb(min_alpha, c, c, c);
+                }
+                //code from OGSR
 
 #ifndef USE_DX9 // Vertex shader will cancel a DX9 correction, so make fake offset
                 X -= 0.5f;
@@ -174,12 +200,11 @@ void dxFontRender::OnRender(CGameFont& owner)
             RCache.set_Geometry(pGeom);
             RCache.Render(D3DPT_TRIANGLELIST, vOffset, 0, vCount, 0, vCount / 2);
         }
-    }
 }
 
 inline void dxFontRender::ImprintChar(Fvector l, const CGameFont& owner, FVF::TL*& v, float& X, float Y2, u32 clr2, float Y, u32 clr, xr_wide_char* wsStr, int j)
 {
-    float scw = l.z * g_current_font_scale.x;
+    float scw = l.z * g_current_font_scale.x * owner.GetScale();
 
     float fTCWidth = l.z / owner.vTS.x;
 
@@ -204,7 +229,7 @@ inline void dxFontRender::ImprintChar(Fvector l, const CGameFont& owner, FVF::TL
     {
         X -= 2;
         if (IsNeedSpaceCharacter(wsStr[1 + j]))
-            X += owner.fXStep;
+            X += owner.fXStep * owner.GetScale();
     }
 }
 } // namespace xray::render::RENDER_NAMESPACE

@@ -865,39 +865,27 @@ void CActor::SwitchNightVision()
     if (inventory().ItemFromSlot(INV_SLOT_3))
         wpn2 = smart_cast<CWeapon*>(inventory().ItemFromSlot(INV_SLOT_3));
 
-    xr_vector<CAttachableItem*> const& all = CAttachmentOwner::attached_objects();
-    xr_vector<CAttachableItem*>::const_iterator it = all.begin();
-    xr_vector<CAttachableItem*>::const_iterator it_e = all.end();
-    for (; it != it_e; ++it)
+    CTorch* pTorch = smart_cast<CTorch*>(inventory().ItemFromSlot(TORCH_SLOT));
+    if (pTorch)
     {
-        CTorch* torch = smart_cast<CTorch*>(*it);
-        if (torch)
-        {
-            if (wpn1 && wpn1->IsZoomed())
-                return;
-
-            if (wpn2 && wpn2->IsZoomed())
-                return;
-
-            torch->SwitchNightVision();
+        if (wpn1 && wpn1->IsZoomed())
             return;
-        }
+
+        if (wpn2 && wpn2->IsZoomed())
+            return;
+
+        pTorch->SwitchNightVision();
+        return;
     }
 }
 
 void CActor::SwitchTorch()
 {
-    xr_vector<CAttachableItem*> const& all = CAttachmentOwner::attached_objects();
-    xr_vector<CAttachableItem*>::const_iterator it = all.begin();
-    xr_vector<CAttachableItem*>::const_iterator it_e = all.end();
-    for (; it != it_e; ++it)
+    CTorch* pTorch = smart_cast<CTorch*>(inventory().ItemFromSlot(TORCH_SLOT));
+    if (pTorch)
     {
-        CTorch* torch = smart_cast<CTorch*>(*it);
-        if (torch)
-        {
-            torch->Switch();
-            return;
-        }
+        pTorch->Switch();
+        return;
     }
 }
 

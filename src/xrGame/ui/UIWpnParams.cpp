@@ -88,6 +88,7 @@ bool CUIWpnParams::InitFromXml(CUIXml& xml_doc)
         m_textAmmoUsedType = UIHelper::CreateStatic(xml_doc, "wpn_params:cap_ammo_used_type", this, false);
         m_stAmmoType1 = UIHelper::CreateStatic(xml_doc, "wpn_params:static_ammo_type1", this, false);
         m_stAmmoType2 = UIHelper::CreateStatic(xml_doc, "wpn_params:static_ammo_type2", this, false);
+        m_stAmmoType3 = UIHelper::CreateStatic(xml_doc, "wpn_params:static_ammo_type3", this, false);
     }
     return true;
 }
@@ -183,9 +184,19 @@ void CUIWpnParams::SetInfo(CInventoryItem* slot_wpn, CInventoryItem& cur_wpn)
 
         if (m_textAmmoUsedType)
         {
-            string128 str;
-            xr_sprintf(str, sizeof(str), "%s", pSettings->r_string(ammo_types[0].c_str(), "inv_name_short"));
-            m_textAmmoUsedType->SetTextST(str);
+            xr_string str;
+            str = CStringTable().translate(pSettings->r_string(ammo_types[0].c_str(), "inv_name_short")).c_str();
+            if (ammo_types.size() > 1)
+            {
+                str += ", ";
+                str += CStringTable().translate(pSettings->r_string(ammo_types[1].c_str(), "inv_name_short")).c_str();
+                if (ammo_types.size() > 2)
+                {
+                    str += ", ";
+                    str += CStringTable().translate(pSettings->r_string(ammo_types[2].c_str(), "inv_name_short")).c_str();
+                }
+            }
+            m_textAmmoUsedType->SetTextST(str.c_str());
         }
 
         Frect tex_rect;
@@ -201,7 +212,7 @@ void CUIWpnParams::SetInfo(CInventoryItem* slot_wpn, CInventoryItem& cur_wpn)
             m_stAmmoType1->TextureOn();
             m_stAmmoType1->SetStretchTexture(true);
             m_stAmmoType1->SetWndSize(
-                Fvector2().set((tex_rect.x2 - tex_rect.x1) * UI().get_current_kx(), tex_rect.y2 - tex_rect.y1));
+                Fvector2().set((tex_rect.x2 - tex_rect.x1) * UI().get_current_kx() / (INV_GRID_WIDTH/50.0f), (tex_rect.y2 - tex_rect.y1) / (INV_GRID_HEIGHT/50.0f)));
         }
 
         if (m_stAmmoType2)
@@ -223,7 +234,29 @@ void CUIWpnParams::SetInfo(CInventoryItem* slot_wpn, CInventoryItem& cur_wpn)
             m_stAmmoType2->TextureOn();
             m_stAmmoType2->SetStretchTexture(true);
             m_stAmmoType2->SetWndSize(
-                Fvector2().set((tex_rect.x2 - tex_rect.x1) * UI().get_current_kx(), tex_rect.y2 - tex_rect.y1));
+                Fvector2().set((tex_rect.x2 - tex_rect.x1) * UI().get_current_kx() / (INV_GRID_WIDTH/50.0f), (tex_rect.y2 - tex_rect.y1) / (INV_GRID_HEIGHT/50.0f)));
+        }
+
+        if (m_stAmmoType3)
+        {
+            m_stAmmoType3->SetShader(InventoryUtilities::GetEquipmentIconsShader());
+            if (ammo_types.size() != 3 && m_stAmmoType1 && m_stAmmoType2)
+            {
+                tex_rect.set(0, 0, 1, 1);
+            }
+            else
+            {
+                tex_rect.x1 = float(pSettings->r_u32(ammo_types[2].c_str(), "inv_grid_x") * INV_GRID_WIDTH);
+                tex_rect.y1 = float(pSettings->r_u32(ammo_types[2].c_str(), "inv_grid_y") * INV_GRID_HEIGHT);
+                tex_rect.x2 = float(pSettings->r_u32(ammo_types[2].c_str(), "inv_grid_width") * INV_GRID_WIDTH);
+                tex_rect.y2 = float(pSettings->r_u32(ammo_types[2].c_str(), "inv_grid_height") * INV_GRID_HEIGHT);
+                tex_rect.rb.add(tex_rect.lt);
+            }
+            m_stAmmoType3->SetTextureRect(tex_rect);
+            m_stAmmoType3->TextureOn();
+            m_stAmmoType3->SetStretchTexture(true);
+            m_stAmmoType3->SetWndSize(
+                Fvector2().set((tex_rect.x2 - tex_rect.x1) * UI().get_current_kx() / (INV_GRID_WIDTH/50.0f), (tex_rect.y2 - tex_rect.y1) / (INV_GRID_HEIGHT/50.0f)));
         }
     }
 }
@@ -254,10 +287,11 @@ bool CUIWpnParams::Check(const shared_str& wpn_section)
 // -------------------------------------------------------------------------------------------------
 
 CUIConditionParams::CUIConditionParams()
-    : CUIWindow("Condition Params"), m_text("Text")
+    : CUIWindow("Condition Params"), m_text("Text"), m_value("Value")
 {
     AttachChild(&m_progress);
     AttachChild(&m_text);
+    AttachChild(&m_value);
 }
 
 bool CUIConditionParams::InitFromXml(CUIXml& xml_doc)
@@ -266,6 +300,7 @@ bool CUIConditionParams::InitFromXml(CUIXml& xml_doc)
     {
         CUIXmlInit::InitWindow(xml_doc, "condition_params", 0, this);
         CUIXmlInit::InitStatic(xml_doc, "condition_params:caption", 0, &m_text);
+        CUIXmlInit::InitStatic(xml_doc, "condition_params:static_value", 0, &m_value);
         m_progress.InitFromXml(xml_doc, "condition_params:progress_state");
         return true;
     }
@@ -283,12 +318,31 @@ void CUIConditionParams::SetInfo(CInventoryItem const* slot_item, CInventoryItem
 {
     float cur_value = cur_item.GetConditionToShow() * 100.0f + 1.0f - EPS;
     float slot_value = cur_value;
+    float cur = cur_item.GetConditionToShow() * 100.0f;
+    float slot = cur;
+    string32 buf;
 
     if (slot_item &&
         (slot_item !=
             &cur_item) /*&& (cur_item.object().cNameSect()._get() == slot_item->object().cNameSect()._get())*/)
     {
         slot_value = slot_item->GetConditionToShow() * 100.0f + 1.0f - EPS;
+        slot = slot_item->GetConditionToShow() * 100.0f;
     }
     m_progress.SetTwoPos(cur_value, slot_value);
+
+    if (cur == slot)
+    {
+        m_value.SetTextColor(color_rgba(170, 170, 170, 255));
+    }
+    else if (cur < slot)
+    {
+        m_value.SetTextColor(color_rgba(255, 0, 0, 255));
+    }
+    else
+    {
+        m_value.SetTextColor(color_rgba(0, 255, 0, 255));
+    }
+    xr_sprintf(buf, sizeof(buf), "%.0f%%", cur);
+    m_value.SetText(buf);
 }

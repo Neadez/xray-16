@@ -26,6 +26,7 @@ private:
         ePhyHealthMinReached = (1 << 6),
         eCantWalkWeight = (1 << 7),
         eCantWalkWeightReached = (1 << 8),
+        eCriticalHydrationReached = (1 << 9),
     };
     Flags16 m_condition_flags;
 
@@ -34,6 +35,7 @@ private:
     CActorDeathEffector* m_death_effector;
     void UpdateTutorialThresholds();
     void UpdateSatiety();
+    void UpdateHydration();
     virtual void UpdateRadiation();
 
 public:
@@ -49,6 +51,7 @@ public:
 
     virtual void ChangeAlcohol(const float value);
     virtual void ChangeSatiety(const float value);
+    virtual void ChangeHydration(const float value);
 
     void BoostParameters(const SBooster& B);
     void DisableBoostParameters(const SBooster& B);
@@ -90,6 +93,12 @@ public:
     float GetPsy() { return 1.0f - GetPsyHealth(); }
     float GetSatiety() { return m_fSatiety; }
     IC float GetSatietyPower() const { return m_fV_SatietyPower * m_fSatiety; };
+    float GetHydration() { return m_fHydration; }
+    IC float GetHydrationPower() const { return m_fV_HydrationPower * m_fHydration; };
+
+    float GetSatietyHealth() const { return m_fSatiety; }
+    float GetHydrationHealth() const { return m_fHydration; }
+
     void AffectDamage_InjuriousMaterialAndMonstersInfluence();
     float GetInjuriousMaterialDamage();
 
@@ -109,6 +118,13 @@ public:
     IC float const& V_SatietyPower() { return m_fV_SatietyPower; }
     IC float const& V_SatietyHealth() { return m_fV_SatietyHealth; }
     IC float const& SatietyCritical() { return m_fSatietyCritical; }
+    IC float const& V_Hydration() { return m_fV_Hydration; }
+    IC float const& V_HydrationPower() { return m_fV_HydrationPower; }
+    IC float const& V_HydrationHealth() { return m_fV_HydrationHealth; }
+    IC float const& HydrationCritical() { return m_fHydrationCritical; }
+
+    IC float const& PsyHealthCritical() { return m_fPsyHealthCritical; }
+
     float GetZoneMaxPower(ALife::EInfluenceType type) const;
     float GetZoneMaxPower(ALife::EHitType hit_type) const;
 
@@ -118,6 +134,13 @@ public:
     virtual bool ApplyInfluence(const SMedicineInfluenceValues& V, const shared_str& sect);
     virtual bool ApplyBooster(const SBooster& B, const shared_str& sect);
     float GetMaxPowerRestoreSpeed() const { return m_max_power_restore_speed; };
+    //
+    float GetMaxHealthRestoreSpeed() const { return m_max_health_restore_speed; };
+    float GetMaxBleedingRestoreSpeed() const { return m_max_bleeding_restore_speed; };
+    float GetMaxRadiationRestoreSpeed() const { return m_max_radiation_restore_speed; };
+    float GetMaxSatietyRestoreSpeed() const { return m_max_satiety_restore_speed; };
+    float GetMaxHydrationRestoreSpeed() const { return m_max_hydration_restore_speed; };
+    //
     float GetMaxWoundProtection() const { return m_max_wound_protection; };
     float GetMaxFireWoundProtection() const { return m_max_fire_wound_protection; };
 protected:
@@ -130,6 +153,14 @@ protected:
     float m_fV_SatietyPower;
     float m_fV_SatietyHealth;
     float m_fSatietyCritical;
+    //--
+    float m_fHydration;
+    float m_fV_Hydration;
+    float m_fV_HydrationPower;
+    float m_fV_HydrationHealth;
+    float m_fHydrationCritical;
+
+    float m_fPsyHealthCritical;
     //--
     float m_fPowerLeakSpeed;
 
@@ -151,6 +182,13 @@ protected:
     float m_zone_danger[ALife::infl_max_count];
     float m_f_time_affected;
     float m_max_power_restore_speed;
+    //
+    float m_max_health_restore_speed;
+    float m_max_bleeding_restore_speed;
+    float m_max_radiation_restore_speed;
+    float m_max_satiety_restore_speed;
+    float m_max_hydration_restore_speed;
+    //
     float m_max_wound_protection;
     float m_max_fire_wound_protection;
 

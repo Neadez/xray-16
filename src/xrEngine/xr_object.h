@@ -360,6 +360,10 @@ public:
     virtual pcstr tip_text() = 0;
     virtual void set_tip_text(pcstr text) = 0;
     virtual void set_tip_text_default() = 0;
+    // ikonka появляющаяся при наведении на объект (если NULL, то нет)
+    virtual pcstr tip_icon() = 0;
+    virtual void set_tip_icon(pcstr icon) = 0;
+    virtual void set_tip_icon_default() = 0;
     // можно ли использовать объект стандартным (не скриптовым) образом
     virtual bool nonscript_usable() = 0;
     virtual void set_nonscript_usable(bool usable) = 0;

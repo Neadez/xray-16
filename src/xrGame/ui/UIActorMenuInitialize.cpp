@@ -26,6 +26,8 @@
 #include "xrUICore/ProgressBar/UIProgressBar.h"
 #include "xrUICore/ui_base.h"
 #include "UIOutfitSlot.h"
+#include "ActorEffector.h"
+#include "EffectorFall.h"
 
 namespace detail::actor_menu
 {
@@ -223,6 +225,8 @@ void CUIActorMenu::InitializeUniversal(CUIXml& uiXml)
         { eTrashList,              "dragdrop_trash",           nullptr,               nullptr,                   nullptr,            false },
 
         { eInventoryBackpackList,  "dragdrop_backpack",        nullptr,               "backpack_slot_highlight", nullptr,            false },
+
+        { eInventoryTorchList,     "dragdrop_torch",           nullptr,               "torch_slot_highlight",    nullptr,            false },
     };
     static_assert(std::size(inventory_lists) == eListCount,
         "All lists should be listed in the tuple above.");
@@ -480,6 +484,7 @@ void CUIActorMenu::InitSounds(CUIXml& uiXml)
     sounds[eAttachAddon].create(uiXml.Read("snd_attach_addon", 0, NULL), st_Effect, sg_SourceType);
     sounds[eDetachAddon].create(uiXml.Read("snd_detach_addon", 0, NULL), st_Effect, sg_SourceType);
     sounds[eItemUse].create(uiXml.Read("snd_item_use", 0, NULL), st_Effect, sg_SourceType);
+    sounds[eUnload].create(uiXml.Read("snd_unload", 0, NULL), st_Effect, sg_SourceType);
     uiXml.SetLocalRoot(stored_root);
 }
 
@@ -540,6 +545,8 @@ void CUIActorMenu::InitCallbacks()
     BindDragDropListEvents(m_pLists[eInventoryDetectorList]);
 
     BindDragDropListEvents(m_pLists[eInventoryBagList]);
+    
+    BindDragDropListEvents(m_pLists[eInventoryTorchList]);
 
     BindDragDropListEvents(m_pLists[eTradeActorBagList]);
     BindDragDropListEvents(m_pLists[eTradeActorList]);

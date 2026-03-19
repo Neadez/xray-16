@@ -21,7 +21,10 @@ constexpr cpcstr CHAT_LOG_LIST_PENDING = "chat_log_list_pending";
 
 CUIMessagesWindow::CUIMessagesWindow() : CUIWindow("CUIMessagesWindow")
 {
-    Init(0, 0, UI_BASE_WIDTH, UI_BASE_HEIGHT);
+    if (UI().is_widescreen() && UI().new_widescreen())
+        Init(0, 0, UI_BASE_WIDTH_W, UI_BASE_HEIGHT);
+    else
+        Init(0, 0, UI_BASE_WIDTH, UI_BASE_HEIGHT);
 }
 
 void CUIMessagesWindow::AddLogMessage(KillMessageStruct& msg) const { m_pGameLog->AddLogMessage(msg); }

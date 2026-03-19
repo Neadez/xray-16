@@ -28,9 +28,12 @@
 #include "UIActorInfo.h"
 #include "UIRankingWnd.h"
 #include "UILogsWnd.h"
+#include "UIEncyclopediaWnd.h"
 #include "UIScriptWnd.h"
+#include "ActorEffector.h"
+#include "EffectorFall.h"
 
-#define PDA_XML "pda.xml"
+constexpr pcstr PDA_XML = "pda.xml";
 
 u32 g_pda_info_state = 0;
 
@@ -45,6 +48,8 @@ CUIPdaWnd::CUIPdaWnd() : CUIDialogWnd(CUIPdaWnd::GetDebugType())
     pUIActorInfo = nullptr;
     pUIRankingWnd = nullptr;
     pUILogsWnd = nullptr;
+    pUIEncyclopediaWnd = nullptr;
+    pUIRelationsWnd = nullptr;
     m_hint_wnd = nullptr;
     Init();
 }
@@ -63,6 +68,10 @@ CUIPdaWnd::~CUIPdaWnd()
         delete_data(pUIRankingWnd);
     if (pUILogsWnd)
         delete_data(pUILogsWnd);
+    if (pUIEncyclopediaWnd)
+        delete_data(pUIEncyclopediaWnd);
+    if (pUIRelationsWnd)
+        delete_data(pUIRelationsWnd);
     delete_data(m_hint_wnd);
     if (UINoice)
         delete_data(UINoice);
@@ -79,12 +88,14 @@ void CUIPdaWnd::Init()
     CUIXmlInit::InitWindow(uiXml, "main", 0, this);
 
     UIMainPdaFrame = UIHelper::CreateStatic(uiXml, "background_static", this);
+    std::ignore = UIHelper::CreateFrameWindow(uiXml, "top_background", this, false);
+    std::ignore = UIHelper::CreateFrameWindow(uiXml, "bottom_left_background", this, false);
+    std::ignore = UIHelper::CreateFrameWindow(uiXml, "bottom_right_background", this, false);
 
     CUIXmlInit::InitAutoStaticGroup(uiXml, "", 0, this);
 
     m_caption = UIHelper::CreateStatic(uiXml, "caption_static", this, false);
     m_caption_const = m_caption ? m_caption->GetText() : "";
-
     // Main buttons background
     CUIWindow* buttons_background = this;
     if (UIHelper::CreateFrameLine(uiXml, "mbbackground_frame_line", UIMainPdaFrame, false))
@@ -141,6 +152,14 @@ void CUIPdaWnd::Init()
         pUILogsWnd = xr_new<CUILogsWnd>();
         if (!pUILogsWnd->Init())
             xr_delete(pUILogsWnd);
+
+        pUIEncyclopediaWnd = xr_new<CUIEncyclopediaWnd>();
+        if (!pUIEncyclopediaWnd->Init())
+            xr_delete(pUIEncyclopediaWnd);
+
+        pUIRelationsWnd = xr_new<CUIRelationsWnd>();
+        if (!pUIRelationsWnd->Init())
+            xr_delete(pUIRelationsWnd);
     }
 
     UITabControl = xr_new<CUITabControl>();
@@ -183,8 +202,9 @@ void CUIPdaWnd::Init()
         xr_delete(UINoice);
 
     // XXX: dynamically determine if we need to rearrange the tabs
-    if (ClearSkyMode)
-        RearrangeTabButtons(UITabControl);
+    //if (ClearSkyMode)
+    RearrangeTabButtons(UITabControl);
+    InitSounds(uiXml);
 }
 
 void CUIPdaWnd::SendMessage(CUIWindow* pWnd, s16 msg, void* pData)
@@ -198,6 +218,7 @@ void CUIPdaWnd::SendMessage(CUIWindow* pWnd, s16 msg, void* pData)
             const auto& id = UITabControl->GetActiveId();
             SetActiveSubdialog(id);
         }
+        PlaySnd(eSndButton);
         break;
     }
     case BUTTON_CLICKED:
@@ -206,6 +227,7 @@ void CUIPdaWnd::SendMessage(CUIWindow* pWnd, s16 msg, void* pData)
         {
             HideDialog();
         }
+        PlaySnd(eSndButton);
         break;
     }
     default:
@@ -214,6 +236,22 @@ void CUIPdaWnd::SendMessage(CUIWindow* pWnd, s16 msg, void* pData)
             m_pActiveDialog->SendMessage(pWnd, msg, pData);
     }
     };
+}
+
+void CUIPdaWnd::PlaySnd(eActorPdaSndAction a)
+{
+    if (sounds[a]._handle())
+        sounds[a].play(NULL, sm_2D | sm_IgnoreTimeFactor);
+}
+
+void CUIPdaWnd::InitSounds(CUIXml& uiXml)
+{
+    XML_NODE stored_root = uiXml.GetLocalRoot();
+    uiXml.SetLocalRoot(uiXml.NavigateToNode("action_sounds", 0));
+    sounds[eSndOpen].create(uiXml.Read("snd_open", 0, NULL), st_Effect, sg_SourceType);
+    sounds[eSndClose].create(uiXml.Read("snd_close", 0, NULL), st_Effect, sg_SourceType);
+    sounds[eSndButton].create(uiXml.Read("snd_button", 0, NULL), st_Effect, sg_SourceType);
+    uiXml.SetLocalRoot(stored_root);
 }
 
 void CUIPdaWnd::Show(bool status)
@@ -231,6 +269,7 @@ void CUIPdaWnd::Show(bool status)
             SetActiveSubdialog(subdialog);
             UITabControl->SetActiveTab(subdialog);
         }
+        PlaySnd(eSndOpen);
     }
     else
     {
@@ -243,6 +282,7 @@ void CUIPdaWnd::Show(bool status)
         }
         g_btnHint->Discard();
         g_statHint->Discard();
+        PlaySnd(eSndClose);
     }
 }
 
@@ -288,6 +328,8 @@ void CUIPdaWnd::SetActiveSubdialog(const shared_str& section)
         { "eptStatistics",  "ui_pda_actor_info", pUIActorInfo },
         { "eptRanking",     nullptr, pUIRankingWnd },
         { "eptLogs",        nullptr, pUILogsWnd },
+        { "eptNotes",       nullptr, pUIEncyclopediaWnd },
+        { "eptRelations",   nullptr, pUIRelationsWnd },
     };
 
     pcstr soc_infoportion{};
@@ -420,12 +462,20 @@ void CUIPdaWnd::UpdatePda()
     {
         pUITaskWnd->ReloadTaskInfo();
     }
+    if (pUIEncyclopediaWnd)
+        pUIEncyclopediaWnd->ReloadArticles();
 }
 
 void CUIPdaWnd::UpdateRankingWnd()
 {
     if (pUIRankingWnd)
         pUIRankingWnd->Update();
+}
+
+void CUIPdaWnd::UpdateRelationsWnd()
+{
+    if (pUIRelationsWnd)
+        pUIRelationsWnd->Update();
 }
 
 void CUIPdaWnd::Reset()
@@ -444,6 +494,10 @@ void CUIPdaWnd::Reset()
         pUIRankingWnd->ResetAll();
     if (pUILogsWnd)
         pUILogsWnd->ResetAll();
+    if (pUIEncyclopediaWnd)
+        pUIEncyclopediaWnd->Reset();
+    if (pUIRelationsWnd)
+        pUIRelationsWnd->ResetAll();
 }
 
 void CUIPdaWnd::SetCaption(pcstr text)
@@ -469,7 +523,7 @@ void RearrangeTabButtons(CUITabControl* pTab)
     }
 
     pTab->SetWidth(pos.x + 5.0f);
-    pos.x = pTab->GetWndPos().x - pos.x;
+    pos.x = pTab->GetWndPos().x;
     pos.y = pTab->GetWndPos().y;
     pTab->SetWndPos(pos);
 }

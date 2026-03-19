@@ -29,6 +29,7 @@
 #include "CustomDetector.h"
 #include "ai/monsters/basemonster/base_monster.h"
 #include "ai/trader/ai_trader.h"
+#include "ui/UIEncyclopediaWnd.h"
 
 void CActor::AddEncyclopediaArticle(const CInfoPortion* info_portion) const
 {

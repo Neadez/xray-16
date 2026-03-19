@@ -34,6 +34,8 @@ public:
     virtual ~CTorch();
 
     virtual void Load(LPCSTR section);
+    virtual void OnMoveToSlot(const SInvItemPlace& previous_place);
+    virtual void OnMoveToRuck(const SInvItemPlace& previous_place);
     virtual bool net_Spawn(CSE_Abstract* DC);
     virtual void net_Destroy();
     virtual void net_Export(NET_Packet& P); // export to server
@@ -62,6 +64,9 @@ public:
 protected:
     bool m_bNightVisionEnabled;
     bool m_bNightVisionOn;
+    shared_str m_NightVisionSect;
+
+    virtual bool install_upgrade_impl(LPCSTR section, bool test);
 
     CNightVisionEffector* m_night_vision;
     HUD_SOUND_COLLECTION m_sounds;

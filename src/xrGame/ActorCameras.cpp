@@ -25,6 +25,9 @@
 #include "IKLimbsController.h"
 #include "GamePersistent.h"
 
+ENGINE_API extern float psHUD_FOV;
+ENGINE_API extern float psHUD_FOV_def;
+
 void CActor::cam_Set(EActorCameras style)
 {
     CCameraBase* old_cam = cam_Active();
@@ -283,6 +286,25 @@ void CActor::cam_Update(float dt, float fFOV)
 {
     if (m_holder)
         return;
+
+	// HUD FOV Update
+	if (this == Level().CurrentControlEntity())
+	{
+		auto pItem = smart_cast<CHudItem*>(inventory().ActiveItem());
+		auto pDet = smart_cast<CHudItem*>(inventory().ItemFromSlot(DETECTOR_SLOT));
+
+		if (eacFirstEye == cam_active)
+		{
+			if (pItem)
+				psHUD_FOV = pItem->GetHudFov();
+			else if (pDet)
+				psHUD_FOV = pDet->GetHudFov();
+			else
+				psHUD_FOV = psHUD_FOV_def;
+		}
+		else
+			psHUD_FOV = psHUD_FOV_def;
+	}
 
     ZoneScoped;
 

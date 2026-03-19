@@ -39,14 +39,14 @@ void UITaskListWnd::init_from_xml(CUIXml& xml, LPCSTR path)
 
     m_background = UIHelper::CreateFrameWindow(xml, "background_frame", this);
     m_caption = UIHelper::CreateStatic(xml, "t_caption", this);
-    //	m_counter    = UIHelper::CreateStatic( xml, "t_counter", this );
+    m_counter    = UIHelper::CreateStatic( xml, "t_counter", this );
 
-    m_bt_close = UIHelper::Create3tButton(xml, "btn_close", this);
-    m_bt_close->SetAccelerator(kUI_BACK, false, 2);
+    //m_bt_close = UIHelper::Create3tButton(xml, "btn_close", this);
+    //m_bt_close->SetAccelerator(kUI_BACK, false, 2);
 
-    Register(m_bt_close);
-    AddCallback(m_bt_close, BUTTON_CLICKED, CUIWndCallback::void_function(this, &UITaskListWnd::OnBtnClose));
-    UI().Focus().UnregisterFocusable(m_bt_close);
+    //Register(m_bt_close);
+    //AddCallback(m_bt_close, BUTTON_CLICKED, CUIWndCallback::void_function(this, &UITaskListWnd::OnBtnClose));
+    //UI().Focus().UnregisterFocusable(m_bt_close);
 
     m_list = xr_new<CUIScrollView>();
     m_list->SetAutoDelete(true);
@@ -137,7 +137,7 @@ void UITaskListWnd::OnFocusLost()
 void UITaskListWnd::Update()
 {
     inherited::Update();
-    //	UpdateCounter();
+    UpdateCounter();
 }
 
 void UITaskListWnd::SendMessage(CUIWindow* pWnd, s16 msg, void* pData)
@@ -181,7 +181,7 @@ void UITaskListWnd::UpdateList()
     m_list->SetScrollPos(prev_scroll_pos);
 }
 
-/*
+
 void UITaskListWnd::UpdateCounter()
 {
     u32  m_progress_task_count = Level().GameTaskManager().GetTaskCount( eTaskStateInProgress );
@@ -192,7 +192,7 @@ void UITaskListWnd::UpdateCounter()
     xr_sprintf( buf, sizeof(buf), "%d / %d", task2_index, m_progress_task_count );
     m_counter->SetText( buf );
 }
-*/
+
 // - -----------------------------------------------------------------------------------------------
 
 UITaskListWndItem::UITaskListWndItem() : CUIWindow("UITaskListWndItem")
@@ -227,6 +227,8 @@ bool UITaskListWndItem::init_task(CGameTask* task, UITaskListWnd* parent)
     m_bt_view = UIHelper::CreateCheck(xml, "second_task_wnd:task_item:btn_view", this, false);
     m_st_story = UIHelper::CreateStatic(xml, "second_task_wnd:task_item:st_story", this, false);
     m_bt_focus = UIHelper::Create3tButton(xml, "second_task_wnd:task_item:btn_focus", this);
+    m_time = UIHelper::CreateStatic(xml, "second_task_wnd:task_item:t_time", this, false);
+    m_time_rem = UIHelper::CreateStatic(xml, "second_task_wnd:task_item:t_time_rem", this, false);
 
     m_color_states[stt_activ] = CUIXmlInit::GetColor(xml, "second_task_wnd:task_item:activ", 0, u32(-1));
     m_color_states[stt_unread] = CUIXmlInit::GetColor(xml, "second_task_wnd:task_item:unread", 0, u32(-1));
@@ -251,7 +253,7 @@ void UITaskListWndItem::Update()
     inherited::Update();
     update_view();
 
-    if (m_task && m_name->CursorOverWindow() && show_hint_can)
+    if (m_task && (m_name->CursorOverWindow() || m_st_story->CursorOverWindow()) && show_hint_can)
     {
         if (Device.dwTimeGlobal > (m_name->FocusReceiveTime() + 700 * Device.time_factor()))
         {
@@ -284,12 +286,23 @@ void UITaskListWndItem::update_view()
 
     if (m_st_story)
     {
-        if (m_task->GetTaskType() == eTaskTypeStoryline)
+        m_st_story->InitTexture(m_task->m_icon_texture_name.c_str());
+       /* if (m_task->GetTaskType() == eTaskTypeStoryline)
             m_st_story->InitTexture("ui_inGame2_PDA_icon_Primary_mission");
         else
-            m_st_story->InitTexture("ui_inGame2_PDA_icon_Secondary_mission");
+            m_st_story->InitTexture("ui_inGame2_PDA_icon_Secondary_mission");*/
     }
-
+    
+    m_time->TextItemControl()->SetText(InventoryUtilities::GetTimeAndDateAsString(m_task->m_ReceiveTime).c_str());
+    bool b_rem = (m_task->m_ReceiveTime != m_task->m_TimeToComplete);
+    m_time_rem->Show(b_rem);
+    if (b_rem)
+    {
+        string512 buff, buff2;
+        InventoryUtilities::GetTimePeriodAsString(buff, sizeof(buff), Level().GetGameTime(), m_task->m_TimeToComplete);
+        strconcat(sizeof(buff2), buff2, StringTable().translate("ui_st_time_remains").c_str(), " ", buff);
+        m_time_rem->TextItemControl()->SetText(buff2);
+    }
     m_name->TextItemControl()->SetTextST(m_task->m_Title.c_str());
     m_name->AdjustHeightToText();
     float h1 = m_name->GetWndPos().y + m_name->GetHeight() + 10.0f;
@@ -336,7 +349,7 @@ void UITaskListWndItem::SendMessage(CUIWindow* pWnd, s16 msg, void* pData)
         }
     }
 
-    if (pWnd == m_name)
+    if (pWnd == m_name || pWnd == m_st_story)
     {
         if (msg == BUTTON_DOWN)
         {

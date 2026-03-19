@@ -79,6 +79,7 @@ protected:
         eAttachAddon,
         eDetachAddon,
         eItemUse,
+        eUnload,
         eSndMax
     };
 
@@ -96,6 +97,8 @@ protected:
         eInventoryDetectorList,
 
         eInventoryBagList,
+
+        eInventoryTorchList,
 
         eTradeActorList,
         eTradeActorBagList,

@@ -31,6 +31,7 @@
 #include "WeaponRPG7.h"
 #include "CustomOutfit.h"
 #include "ActorHelmet.h"
+#include "Torch.h"
 #include "script_game_object.h" //Alundaio
 
 const LPCSTR g_inventory_upgrade_xml = "inventory_upgrade.xml";

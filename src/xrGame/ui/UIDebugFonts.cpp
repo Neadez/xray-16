@@ -15,7 +15,10 @@ CUIDebugFonts::CUIDebugFonts()
       m_background("Background")
 {
     AttachChild(&m_background);
-    InitDebugFonts({ 0, 0, UI_BASE_WIDTH, UI_BASE_HEIGHT });
+    if (UI().is_widescreen() && UI().new_widescreen())
+        InitDebugFonts({ 0, 0, UI_BASE_WIDTH_W, UI_BASE_HEIGHT });
+    else
+        InitDebugFonts({ 0, 0, UI_BASE_WIDTH, UI_BASE_HEIGHT });
 }
 
 void CUIDebugFonts::InitDebugFonts(Frect&& r)
@@ -50,7 +53,10 @@ void CUIDebugFonts::FillUpList()
     CFontManager::FONTS_VEC_IT it_e = v.end();
     Fvector2 pos, sz;
     pos.set(0, 0);
-    sz.set(UI_BASE_WIDTH, UI_BASE_HEIGHT);
+    if (UI().is_widescreen() && UI().new_widescreen())
+        sz.set(UI_BASE_WIDTH_W, UI_BASE_HEIGHT);
+    else
+        sz.set(UI_BASE_WIDTH, UI_BASE_HEIGHT);
     string256 str;
     for (; it != it_e; ++it)
     {

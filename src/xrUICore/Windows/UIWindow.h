@@ -95,6 +95,7 @@ public:
     void GetWndRect(Frect& res) const
     {
         const float width = (float)Device.dwWidth * (UI_BASE_WIDTH / (float)Device.dwWidth);
+        const float width_w = (float)Device.dwWidth * (UI_BASE_WIDTH_W / (float)Device.dwWidth);
         const float height = (float)Device.dwHeight * (UI_BASE_HEIGHT / (float)Device.dwHeight);
 
         switch (m_alignment)
@@ -114,7 +115,10 @@ public:
         }
         case waRight:
         {
-            res.set(width - m_wndSize.x, m_wndPos.y, width, m_wndPos.y + m_wndSize.y);
+            if (UI().is_widescreen() && UI().new_widescreen())
+                res.set(width_w - m_wndSize.x, m_wndPos.y, width_w, m_wndPos.y + m_wndSize.y);
+            else
+                res.set(width - m_wndSize.x, m_wndPos.y, width, m_wndPos.y + m_wndSize.y);
             break;
         }
         case waTop:

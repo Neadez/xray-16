@@ -73,7 +73,8 @@ public:
     virtual CScriptEntity* cast_script_entity() { return this; }
     virtual CBaseMonster* cast_base_monster() { return this; }
     virtual CGameObject* cast_game_object() { return this; }
-    virtual CInventoryOwner* cast_inventory_owner() override { return CallOfPripyatMode ? nullptr : this; }
+    //virtual CInventoryOwner* cast_inventory_owner() override { return CallOfPripyatMode ? nullptr : this; }
+    virtual CInventoryOwner* cast_inventory_owner() override { return this; }
 
 public:
     virtual void renderable_Render(u32 context_id, IRenderable* root) override { return inherited::renderable_Render(context_id, root); }
@@ -147,6 +148,9 @@ public:
 
     float GetSatiety() { return 0.5f; }
     void ChangeSatiety(float v) {}
+
+    float GetHydration() { return 0.5f; }
+    void ChangeHydration(float v) {}
 
     // ---------------------------------------------------------------------------------
     // Process scripts

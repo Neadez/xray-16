@@ -2,6 +2,8 @@
 #include "UITalkWnd.h"
 #include "UITalkDialogWnd.h"
 #include "Actor.h"
+#include "ActorEffector.h"
+#include "EffectorFall.h"
 #include "trade.h"
 #include "UIGameSP.h"
 #include "PDA.h"
@@ -34,7 +36,10 @@ CUITalkWnd::CUITalkWnd() : CUIDialogWnd(CUITalkWnd::GetDebugType())
 
 void CUITalkWnd::InitTalkWnd()
 {
-    inherited::SetWndRect({ 0, 0, UI_BASE_WIDTH, UI_BASE_HEIGHT });
+    if (UI().is_widescreen() && UI().new_widescreen())
+        inherited::SetWndRect(Frect().set(0, 0, UI_BASE_WIDTH_W, UI_BASE_HEIGHT));
+    else
+        inherited::SetWndRect(Frect().set(0, 0, UI_BASE_WIDTH, UI_BASE_HEIGHT));
 
     UITalkDialogWnd = xr_new<CUITalkDialogWnd>();
     UITalkDialogWnd->SetAutoDelete(true);
@@ -170,25 +175,35 @@ void UpdateCameraDirection(CGameObject* pTo)
 {
     CCameraBase* cam = Actor()->cam_Active();
 
+    Fmatrix res;
+    const auto visual = smart_cast<IKinematics*>(pTo->Visual());
+    const int m_head = visual->LL_BoneID("bip01_head");
+    res.mul_43(pTo->XFORM(), visual->LL_GetBoneInstance(m_head).mTransform);
+    Fvector des_pt = res.c;
+
     Fvector des_dir;
-    Fvector des_pt;
-    pTo->Center(des_pt);
-    des_pt.y += pTo->Radius() * 0.5f;
+    //Fvector des_pt;
+    //pTo->Center(des_pt);
+    //des_pt.y += pTo->Radius() * 0.5f;
 
     des_dir.sub(des_pt, cam->vPosition);
 
     float p, h;
     des_dir.getHP(h, p);
 
-    if (angle_difference(cam->yaw, -h) > 0.2)
-        cam->yaw = angle_inertion_var(cam->yaw, -h, 0.15f, 0.2f, PI_DIV_6, Device.fTimeDelta);
+    //if (angle_difference(cam->yaw, -h) > 0.2)
+    cam->yaw = angle_inertion_var(cam->yaw, -h, 0.02f, 0.08f, PI_DIV_6, Device.fTimeDelta);
 
-    if (angle_difference(cam->pitch, -p) > 0.2)
-        cam->pitch = angle_inertion_var(cam->pitch, -p, 0.15f, 0.2f, PI_DIV_6, Device.fTimeDelta);
+    //if (angle_difference(cam->pitch, -p) > 0.2)
+    cam->pitch = angle_inertion_var(cam->pitch, -p, 0.02f, 0.08f, PI_DIV_6, Device.fTimeDelta);
+
 }
 
 void CUITalkWnd::Update()
 {
+    const Fvector4& dof = Fvector4().set(0.0, 0.5, 5, 1.7);
+    Actor()->Cameras().AddCamEffector(xr_new<CEffectorDOF>(dof));
+
     //остановить разговор, если нужно
     if (g_actor && m_pActor && !m_pActor->IsTalking())
     {

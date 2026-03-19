@@ -15,6 +15,7 @@ public:
         QuestNpcs,
         SecondaryTasks,
         PrimaryObjects,
+        Camps,
 
         Filter_Count
     };

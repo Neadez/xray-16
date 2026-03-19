@@ -79,6 +79,7 @@ protected:
 
 private:
     shared_str m_sTipText;
+    shared_str m_sTipIcon;
     bool m_bNonscriptUsable;
     bool m_spawned;
     Flags32 m_server_flags;
@@ -373,6 +374,11 @@ public:
     virtual LPCSTR tip_text() override;
     virtual void set_tip_text(LPCSTR new_text) override;
     virtual void set_tip_text_default() override;
+
+    // ikonka появляющаяся при наведении на объект (если NULL, то нет)
+    virtual LPCSTR tip_icon() override;
+    virtual void set_tip_icon(LPCSTR new_icon) override;
+    virtual void set_tip_icon_default() override;
 
     //можно ли использовать объект стандартным (не скриптовым) образом
     virtual bool nonscript_usable() override;

@@ -68,6 +68,8 @@ public:
     void Init_StrInfoItem(CUIXml& xml_doc, LPCSTR item_str, UIItemType type);
     void Init_IconInfoItem(CUIXml& xml_doc, LPCSTR item_str, UIItemType type);
 
+    void InitMonsterCharacter(CBaseMonster* monster);
+
     void InitCharacter(u16 id);
     void ClearInfo();
     void InitCharacterMP(LPCSTR player_name, LPCSTR player_icon);

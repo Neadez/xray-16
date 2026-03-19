@@ -56,6 +56,7 @@ void CHelmet::Load(LPCSTR section)
     m_fHealthRestoreSpeed = READ_IF_EXISTS(pSettings, r_float, section, "health_restore_speed", 0.0f);
     m_fRadiationRestoreSpeed = READ_IF_EXISTS(pSettings, r_float, section, "radiation_restore_speed", 0.0f);
     m_fSatietyRestoreSpeed = READ_IF_EXISTS(pSettings, r_float, section, "satiety_restore_speed", 0.0f);
+    m_fHydrationRestoreSpeed = READ_IF_EXISTS(pSettings, r_float, section, "hydration_restore_speed", 0.0f);
     m_fPowerRestoreSpeed = READ_IF_EXISTS(pSettings, r_float, section, "power_restore_speed", 0.0f);
     m_fBleedingRestoreSpeed = READ_IF_EXISTS(pSettings, r_float, section, "bleeding_restore_speed", 0.0f);
     m_fPowerLoss = READ_IF_EXISTS(pSettings, r_float, section, "power_loss", 1.0f);
@@ -110,31 +111,31 @@ void CHelmet::OnH_A_Chield()
 void CHelmet::OnMoveToSlot(const SInvItemPlace& previous_place)
 {
     inherited::OnMoveToSlot(previous_place);
-    if (m_pInventory && (previous_place.type == eItemPlaceSlot))
-    {
-        CActor* pActor = smart_cast<CActor*>(H_Parent());
-        if (pActor)
-        {
-            CTorch* pTorch = smart_cast<CTorch*>(pActor->inventory().ItemFromSlot(TORCH_SLOT));
-            if (pTorch && pTorch->GetNightVisionStatus())
-                pTorch->SwitchNightVision(true, false);
-        }
-    }
+    //if (m_pInventory && (previous_place.type == eItemPlaceSlot))
+    //{
+    //    CActor* pActor = smart_cast<CActor*>(H_Parent());
+    //    if (pActor)
+    //    {
+    //        CTorch* pTorch = smart_cast<CTorch*>(pActor->inventory().ItemFromSlot(TORCH_SLOT));
+    //        if (pTorch && pTorch->GetNightVisionStatus())
+    //            pTorch->SwitchNightVision(true, false);
+    //    }
+    //}
 }
 
 void CHelmet::OnMoveToRuck(const SInvItemPlace& previous_place)
 {
     inherited::OnMoveToRuck(previous_place);
-    if (m_pInventory && (previous_place.type == eItemPlaceSlot))
-    {
-        CActor* pActor = smart_cast<CActor*>(H_Parent());
-        if (pActor)
-        {
-            CTorch* pTorch = smart_cast<CTorch*>(pActor->inventory().ItemFromSlot(TORCH_SLOT));
-            if (pTorch)
-                pTorch->SwitchNightVision(false);
-        }
-    }
+    //if (m_pInventory && (previous_place.type == eItemPlaceSlot))
+    //{
+    //    CActor* pActor = smart_cast<CActor*>(H_Parent());
+    //    if (pActor)
+    //    {
+    //        CTorch* pTorch = smart_cast<CTorch*>(pActor->inventory().ItemFromSlot(TORCH_SLOT));
+    //        if (pTorch)
+    //            pTorch->SwitchNightVision(false);
+    //    }
+    //}
 }
 
 void CHelmet::Hit(float hit_power, ALife::EHitType hit_type)
@@ -203,6 +204,7 @@ bool CHelmet::install_upgrade_impl(LPCSTR section, bool test)
     result |= process_if_exists(section, "health_restore_speed", &CInifile::r_float, m_fHealthRestoreSpeed, test);
     result |= process_if_exists(section, "radiation_restore_speed", &CInifile::r_float, m_fRadiationRestoreSpeed, test);
     result |= process_if_exists(section, "satiety_restore_speed", &CInifile::r_float, m_fSatietyRestoreSpeed, test);
+    result |= process_if_exists(section, "hydration_restore_speed", &CInifile::r_float, m_fHydrationRestoreSpeed, test);
     result |= process_if_exists(section, "power_restore_speed", &CInifile::r_float, m_fPowerRestoreSpeed, test);
     result |= process_if_exists(section, "bleeding_restore_speed", &CInifile::r_float, m_fBleedingRestoreSpeed, test);
 

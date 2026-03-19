@@ -619,7 +619,10 @@ void CUIMiniMap::Draw()
     tt_offset.y /= GetHeight();
 
     Fvector2 m_scale_;
-    m_scale_.set(float(Device.dwWidth) / UI_BASE_WIDTH, float(Device.dwHeight) / UI_BASE_HEIGHT);
+    if (UI().is_widescreen() && UI().new_widescreen())
+        m_scale_.set(float(Device.dwWidth) / UI_BASE_WIDTH_W, float(Device.dwHeight) / UI_BASE_HEIGHT);
+    else
+        m_scale_.set(float(Device.dwWidth) / UI_BASE_WIDTH, float(Device.dwHeight) / UI_BASE_HEIGHT);
 
     for (u32 idx = 0; idx < segments_count; ++idx)
     {

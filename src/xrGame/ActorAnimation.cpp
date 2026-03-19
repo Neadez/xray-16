@@ -147,6 +147,8 @@ void SActorState::CreateClimb(IKinematicsAnimated* K)
     xr_strcpy(base, "cl");
     legs_idle = K->ID_Cycle(strconcat(sizeof(buf), buf, base, "_idle_1"));
     m_torso_idle = K->ID_Cycle(strconcat(sizeof(buf), buf, base, "_torso_0_aim_0"));
+    m_torso_walk = K->ID_Cycle(strconcat(sizeof(buf), buf, base, "_torso_0_aim_0"));
+    m_torso_sprint = K->ID_Cycle(strconcat(sizeof(buf), buf, base, "_torso_0_aim_0"));
     m_walk.Create(K, base, "_run");
     m_run.Create(K, base, "_run");
 
@@ -202,7 +204,48 @@ void SActorState::Create(IKinematicsAnimated* K, LPCSTR base)
     m_torso[11].Create(K, base, "_12");
     m_torso[12].Create(K, base, "_13");
 
+    m_torso_idle = K->ID_Cycle(strconcat(sizeof(buf), buf, base, "_torso_0_idle_1"));
+    m_torso_walk = K->ID_Cycle(strconcat(sizeof(buf), buf, base, "_torso_0_aim_3"));
+    m_torso_sprint = K->ID_Cycle(strconcat(sizeof(buf), buf, base, "_torso_0_escape_0"));
+    m_head_idle = K->ID_Cycle("head_idle_0");
+    jump_begin = K->ID_Cycle(strconcat(sizeof(buf), buf, base, "_jump_begin"));
+    jump_idle = K->ID_Cycle(strconcat(sizeof(buf), buf, base, "_jump_idle"));
+    landing[0] = K->ID_Cycle(strconcat(sizeof(buf), buf, base, "_jump_end"));
+    landing[1] = K->ID_Cycle(strconcat(sizeof(buf), buf, base, "_jump_end_1"));
+
+    for (int k = 0; k < 12; ++k)
+        m_damage[k] = K->ID_FX(strconcat(sizeof(buf), buf, base, "_damage_", xr_itoa(k, buf1, 10)));
+}
+
+void SActorState::CreateCrouch(IKinematicsAnimated* K)
+{
+    string128 buf, buf1;
+    string16 base;
+    xr_strcpy(base, "cr");
+    legs_turn = K->ID_Cycle(strconcat(sizeof(buf), buf, base, "_turn"));
+    legs_idle = K->ID_Cycle(strconcat(sizeof(buf), buf, base, "_idle_0"));
+    death = K->ID_Cycle(strconcat(sizeof(buf), buf, base, "_death_0"));
+
+    m_walk.Create(K, base, "_walk");
+    m_run.Create(K, base, "_run");
+
+    m_torso[0].Create(K, base, "_1");
+    m_torso[1].Create(K, base, "_2");
+    m_torso[2].Create(K, base, "_3");
+    m_torso[3].Create(K, base, "_4");
+    m_torso[4].Create(K, base, "_5");
+    m_torso[5].Create(K, base, "_6");
+    m_torso[6].Create(K, base, "_7");
+    m_torso[7].Create(K, base, "_8");
+    m_torso[8].Create(K, base, "_9");
+    m_torso[9].Create(K, base, "_10");
+    m_torso[10].Create(K, base, "_11");
+    m_torso[11].Create(K, base, "_12");
+    m_torso[12].Create(K, base, "_13");
+
     m_torso_idle = K->ID_Cycle(strconcat(sizeof(buf), buf, base, "_torso_0_aim_0"));
+    m_torso_walk = K->ID_Cycle(strconcat(sizeof(buf), buf, base, "_torso_0_aim_0"));
+    m_torso_sprint = K->ID_Cycle(strconcat(sizeof(buf), buf, base, "_torso_0_aim_0"));
     m_head_idle = K->ID_Cycle("head_idle_0");
     jump_begin = K->ID_Cycle(strconcat(sizeof(buf), buf, base, "_jump_begin"));
     jump_idle = K->ID_Cycle(strconcat(sizeof(buf), buf, base, "_jump_idle"));
@@ -230,7 +273,8 @@ void SActorMotions::Create(IKinematicsAnimated* V)
     m_dead_stop = V->ID_Cycle("norm_dead_stop_0");
 
     m_normal.Create(V, "norm");
-    m_crouch.Create(V, "cr");
+    //m_crouch.Create(V, "cr");
+    m_crouch.CreateCrouch(V);
     // m_climb.Create	(V,"cr");
     m_climb.CreateClimb(V);
     m_sprint.Create(V);
@@ -582,6 +626,15 @@ void CActor::g_SetAnimation(u32 mstate_rl)
     {
         if (m_bAnimTorsoPlayed)
             M_torso = m_current_torso;
+        else if (mstate_rl & mcAnyMove)
+             {
+                 if (mstate_rl & mcSprint)
+                     M_torso = ST->m_torso_sprint;
+                 else if(bAccelerated)
+                     M_torso = ST->m_torso_walk;
+                 else
+                     M_torso = ST->m_torso_idle;
+             }
         else
             M_torso = ST->m_torso_idle;
     }
