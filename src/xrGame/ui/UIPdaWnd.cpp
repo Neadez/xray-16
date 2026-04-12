@@ -543,3 +543,11 @@ bool CUIPdaWnd::OnControllerAction(int axis, const ControllerAxisState& state, E
 
     return false;
 }
+
+void CUIPdaWnd::ActivateFlashIcon(bool flash)
+{
+    if (flash)
+    {
+        CurrentGameUI()->UIMainIngameWnd->SetFlashIconState_(CUIMainIngameWnd::efiPdaTask, true);
+    }
+}

@@ -89,6 +89,7 @@ void CActor::AddEncyclopediaArticle(const CInfoPortion* info_portion) const
 
         if (CurrentGameUI())
         {
+            CurrentGameUI()->GetPdaMenu().ActivateFlashIcon();
             CurrentGameUI()->UpdatePda();
         }
     }

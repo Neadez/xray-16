@@ -136,8 +136,11 @@ CGameTask* CGameTaskManager::GiveGameTaskToActor(CGameTask* t, u32 timeToComplet
     }
 
     //установить флажок необходимости прочтения тасков в PDA
-    if (CurrentGameUI())
+    if (CurrentGameUI()) 
+    {
+        CurrentGameUI()->GetPdaMenu().ActivateFlashIcon();
         CurrentGameUI()->UpdatePda();
+    }
 
     t->ChangeStateCallback();
 

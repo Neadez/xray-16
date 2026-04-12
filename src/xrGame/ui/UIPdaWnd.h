@@ -111,5 +111,7 @@ public:
     void UpdateRankingWnd();
     void UpdateRelationsWnd();
 
+    void ActivateFlashIcon(bool = true);
+
     pcstr GetDebugType() override { return "CUIPdaWnd"; }
 };
