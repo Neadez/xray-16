@@ -27,7 +27,10 @@ CUIEncyclopediaWnd::CUIEncyclopediaWnd() : CUIWindow(CUIEncyclopediaWnd::GetDebu
     prevArticlesCount = 0;
 }
 
-CUIEncyclopediaWnd::~CUIEncyclopediaWnd() { DeleteArticles(); }
+CUIEncyclopediaWnd::~CUIEncyclopediaWnd() 
+{ 
+    DeleteArticles(); 
+}
 
 bool CUIEncyclopediaWnd::Init()
 {

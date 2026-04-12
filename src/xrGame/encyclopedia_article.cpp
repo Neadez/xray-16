@@ -67,6 +67,7 @@ void CEncyclopediaArticle::load_shared(LPCSTR)
     data()->group = pXML->ReadAttrib(pNode, "group", "");
     //секция ltx, откуда читать данные
     LPCSTR ltx = pXML->Read(pNode, "ltx", 0, NULL);
+    LPCSTR texture = pXML->Read(pNode, "texture", 0, NULL);
 
     if (ltx)
     {
@@ -81,11 +82,12 @@ void CEncyclopediaArticle::load_shared(LPCSTR)
     }
     else
     {
-        if (pXML->NavigateToNode(pNode, "texture", 0))
+        if (texture)
         {
-            pXML->SetLocalRoot(pNode);
-            CUIXmlInit::InitTexture(*pXML, "", 0, &data()->image);
-            pXML->SetLocalRoot(pXML->GetRoot());
+            //pXML->SetLocalRoot(pNode);
+            //CUIXmlInit::InitTexture(*pXML, "", 0, &data()->image);
+            //pXML->SetLocalRoot(pXML->GetRoot());
+            data()->image.InitTexture(texture);
         }
     }
 

@@ -201,9 +201,11 @@ bool CUIWindow::OnMouseAction(float x, float y, EUIMessages mouse_action)
     //(последние в списке имеют высший приоритет)
     WINDOW_LIST::reverse_iterator it = m_ChildWndList.rbegin();
 
-    for (; it != m_ChildWndList.rend(); ++it)
+    for (int i = m_ChildWndList.size() - 1; it != m_ChildWndList.rend(); ++it, i--)
     {
         CUIWindow* w = (*it);
+        if (i < 0) // Dance Maniac: Костыль от вылета при открытии статей в энциклопедии
+            return false;
 
 		auto sw = smart_cast<CUIWindow*>(w);
 
