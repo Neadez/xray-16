@@ -41,12 +41,12 @@ void UITaskListWnd::init_from_xml(CUIXml& xml, LPCSTR path)
     m_caption = UIHelper::CreateStatic(xml, "t_caption", this);
     m_counter    = UIHelper::CreateStatic( xml, "t_counter", this );
 
-    //m_bt_close = UIHelper::Create3tButton(xml, "btn_close", this);
-    //m_bt_close->SetAccelerator(kUI_BACK, false, 2);
+    m_bt_close = UIHelper::Create3tButton(xml, "btn_close", this);
+    m_bt_close->SetAccelerator(kUI_BACK, false, 2);
 
-    //Register(m_bt_close);
-    //AddCallback(m_bt_close, BUTTON_CLICKED, CUIWndCallback::void_function(this, &UITaskListWnd::OnBtnClose));
-    //UI().Focus().UnregisterFocusable(m_bt_close);
+    Register(m_bt_close);
+    AddCallback(m_bt_close, BUTTON_CLICKED, CUIWndCallback::void_function(this, &UITaskListWnd::OnBtnClose));
+    UI().Focus().UnregisterFocusable(m_bt_close);
 
     m_list = xr_new<CUIScrollView>();
     m_list->SetAutoDelete(true);

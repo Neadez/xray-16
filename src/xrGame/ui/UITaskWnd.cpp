@@ -64,15 +64,15 @@ bool CUITaskWnd::Init()
     //AddCallback(m_pStoryLineTaskItem, WINDOW_LBUTTON_DB_CLICK,
     //    CUIWndCallback::void_function(this, &CUITaskWnd::OnTask1DbClicked));
 
-    //if (xml.NavigateToNode("secondary_task_item")) // XXX: replace with UIHelper
-    //{
-    //    Level().GameTaskManager().AllowMultipleTask(true);
-    //    m_pSecondaryTaskItem = xr_new<CUITaskItem>();
-    //    m_pSecondaryTaskItem->Init(xml, "secondary_task_item");
-    //    AttachChild(m_pSecondaryTaskItem);
-    //    m_pSecondaryTaskItem->SetAutoDelete(true);
-    //    AddCallback(m_pSecondaryTaskItem, WINDOW_LBUTTON_DB_CLICK, CUIWndCallback::void_function(this, &CUITaskWnd::OnTask2DbClicked));
-    //}
+    if (xml.NavigateToNode("secondary_task_item")) // XXX: replace with UIHelper
+    {
+        Level().GameTaskManager().AllowMultipleTask(true);
+        m_pSecondaryTaskItem = xr_new<CUITaskItem>();
+        m_pSecondaryTaskItem->Init(xml, "secondary_task_item");
+        AttachChild(m_pSecondaryTaskItem);
+        m_pSecondaryTaskItem->SetAutoDelete(true);
+        AddCallback(m_pSecondaryTaskItem, WINDOW_LBUTTON_DB_CLICK, CUIWndCallback::void_function(this, &CUITaskWnd::OnTask2DbClicked));
+    }
 
     //m_btn_focus = UIHelper::Create3tButton(xml, "btn_task_focus", this);
     //Register(m_btn_focus);
@@ -88,10 +88,10 @@ bool CUITaskWnd::Init()
     //    //m_btn_focus2->set_hint_wnd(hint_wnd);
     //}
 
-    //auto* btnTaskListWnd = UIHelper::Create3tButton(xml, "btn_second_task", this);
-    //AddCallback(btnTaskListWnd, BUTTON_CLICKED, CUIWndCallback::void_function(this, &CUITaskWnd::OnShowTaskListWnd));
-    //btnTaskListWnd->SetAccelerator(kSCORES, false, 2);
-    //btnTaskListWnd->SetAccelerator(kUI_ACTION_1, false, 3);
+    auto* btnTaskListWnd = UIHelper::Create3tButton(xml, "btn_second_task", this);
+    AddCallback(btnTaskListWnd, BUTTON_CLICKED, CUIWndCallback::void_function(this, &CUITaskWnd::OnShowTaskListWnd));
+    btnTaskListWnd->SetAccelerator(kSCORES, false, 2);
+    btnTaskListWnd->SetAccelerator(kUI_ACTION_1, false, 3);
 
     //m_second_task_index = UIHelper::CreateStatic(xml, "second_task_index", this, false);
 
@@ -103,7 +103,7 @@ bool CUITaskWnd::Init()
 
     m_pMapWnd->AttachChild(m_task_wnd);
     m_task_wnd->SetMessageTarget(this);
-    m_task_wnd->Show(true);
+    m_task_wnd->Show(false);
 
     m_map_legend_wnd = xr_new<UIMapLegend>();
     m_map_legend_wnd->SetAutoDelete(true);
