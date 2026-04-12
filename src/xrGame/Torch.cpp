@@ -86,6 +86,56 @@ void CTorch::Load(LPCSTR section)
         m_NightVisionSect = pSettings->r_string(section, "nightvision_sect");
     else
         m_NightVisionSect = "";
+
+    bool b_r2 = GEnv.Render->GenerationIsR2OrHigher();
+
+    IKinematics* K = smart_cast<IKinematics*>(Visual());
+    CInifile* pUserData = K->LL_UserData();
+    lanim = LALib.FindItem(pUserData->r_string(TORCH_DEFINITION, "color_animator"));
+    guid_bone = K->LL_BoneID(pUserData->r_string(TORCH_DEFINITION, "guide_bone"));
+    VERIFY(guid_bone != BI_NONE);
+
+    Fcolor clr = pUserData->r_fcolor(TORCH_DEFINITION, (b_r2) ? "color_r2" : "color");
+    fBrightness = clr.intensity();
+    float range = pUserData->r_float(TORCH_DEFINITION, (b_r2) ? "range_r2" : "range");
+    light_render->set_color(clr);
+    light_render->set_range(range);
+
+    if (b_r2)
+    {
+        bool useVolumetric = pUserData->read_if_exists<bool>(TORCH_DEFINITION, "volumetric_enabled", false);
+        light_render->set_volumetric(useVolumetric);
+        if (useVolumetric)
+        {
+            float volQuality = pUserData->read_if_exists<float>(TORCH_DEFINITION, "volumetric_quality", 1.f);
+            clamp(volQuality, 0.f, 1.f);
+            light_render->set_volumetric_quality(volQuality);
+
+            float volIntensity = pUserData->read_if_exists<float>(TORCH_DEFINITION, "volumetric_intensity", 1.f);
+            clamp(volIntensity, 0.f, 10.f);
+            light_render->set_volumetric_intensity(volIntensity);
+
+            float volDistance = pUserData->read_if_exists<float>(TORCH_DEFINITION, "volumetric_distance", 1.f);
+            clamp(volDistance, 0.f, 1.f);
+            light_render->set_volumetric_distance(volDistance);
+        }
+    }
+
+    Fcolor clr_o = pUserData->r_fcolor(TORCH_DEFINITION, (b_r2) ? "omni_color_r2" : "omni_color");
+    float range_o = pUserData->r_float(TORCH_DEFINITION, (b_r2) ? "omni_range_r2" : "omni_range");
+    light_omni->set_color(clr_o);
+    light_omni->set_range(range_o);
+
+    light_render->set_cone(deg2rad(pUserData->r_float(TORCH_DEFINITION, "spot_angle")));
+    light_render->set_texture(pUserData->r_string(TORCH_DEFINITION, "spot_texture"));
+
+    glow_render->set_texture(pUserData->r_string(TORCH_DEFINITION, "glow_texture"));
+    glow_render->set_color(clr);
+    glow_render->set_radius(pUserData->r_float(TORCH_DEFINITION, "glow_radius"));
+
+
+    m_delta_h = PI_DIV_2 - atan((range * 0.5f) / _abs(TORCH_OFFSET.x));
+
 }
 
 void CTorch::SwitchNightVision()
@@ -229,52 +279,7 @@ bool CTorch::net_Spawn(CSE_Abstract* DC)
     if (!inherited::net_Spawn(DC))
         return (FALSE);
 
-    bool b_r2 = GEnv.Render->GenerationIsR2OrHigher();
 
-    IKinematics* K = smart_cast<IKinematics*>(Visual());
-    CInifile* pUserData = K->LL_UserData();
-    R_ASSERT3(pUserData, "Empty Torch user data!", torch->get_visual());
-    lanim = LALib.FindItem(pUserData->r_string(TORCH_DEFINITION, "color_animator"));
-    guid_bone = K->LL_BoneID(pUserData->r_string(TORCH_DEFINITION, "guide_bone"));
-    VERIFY(guid_bone != BI_NONE);
-
-    Fcolor clr = pUserData->r_fcolor(TORCH_DEFINITION, (b_r2) ? "color_r2" : "color");
-    fBrightness = clr.intensity();
-    float range = pUserData->r_float(TORCH_DEFINITION, (b_r2) ? "range_r2" : "range");
-    light_render->set_color(clr);
-    light_render->set_range(range);
-
-    if (b_r2)
-    {
-        bool useVolumetric = pUserData->read_if_exists<bool>(TORCH_DEFINITION, "volumetric_enabled", false);
-        light_render->set_volumetric(useVolumetric);
-        if (useVolumetric)
-        {
-            float volQuality = pUserData->read_if_exists<float>(TORCH_DEFINITION, "volumetric_quality", 1.f);
-            clamp(volQuality, 0.f, 1.f);
-            light_render->set_volumetric_quality(volQuality);
-
-            float volIntensity = pUserData->read_if_exists<float>(TORCH_DEFINITION, "volumetric_intensity", 1.f);
-            clamp(volIntensity, 0.f, 10.f);
-            light_render->set_volumetric_intensity(volIntensity);
-
-            float volDistance = pUserData->read_if_exists<float>(TORCH_DEFINITION, "volumetric_distance", 1.f);
-            clamp(volDistance, 0.f, 1.f);
-            light_render->set_volumetric_distance(volDistance);
-        }
-    }
-
-    Fcolor clr_o = pUserData->r_fcolor(TORCH_DEFINITION, (b_r2) ? "omni_color_r2" : "omni_color");
-    float range_o = pUserData->r_float(TORCH_DEFINITION, (b_r2) ? "omni_range_r2" : "omni_range");
-    light_omni->set_color(clr_o);
-    light_omni->set_range(range_o);
-
-    light_render->set_cone(deg2rad(pUserData->r_float(TORCH_DEFINITION, "spot_angle")));
-    light_render->set_texture(pUserData->r_string(TORCH_DEFINITION, "spot_texture"));
-
-    glow_render->set_texture(pUserData->r_string(TORCH_DEFINITION, "glow_texture"));
-    glow_render->set_color(clr);
-    glow_render->set_radius(pUserData->r_float(TORCH_DEFINITION, "glow_radius"));
 
     //включить/выключить фонарик
     Switch(torch->m_active);
@@ -284,8 +289,6 @@ bool CTorch::net_Spawn(CSE_Abstract* DC)
         SwitchNightVision(torch->m_nightvision_active, false);
     // else
     //	SwitchNightVision	(false, false);
-
-    m_delta_h = PI_DIV_2 - atan((range * 0.5f) / _abs(TORCH_OFFSET.x));
 
     return (TRUE);
 }
@@ -515,11 +518,37 @@ bool CTorch::install_upgrade_impl(LPCSTR section, bool test)
 {
     bool result = inherited::install_upgrade_impl(section, test);
 
+    bool b_r2 = GEnv.Render->GenerationIsR2OrHigher();
+    IKinematics* K = smart_cast<IKinematics*>(Visual());
+    CInifile* pUserData = K->LL_UserData();
+
     LPCSTR str{};
+    float flo;
     bool result2 = process_if_exists_set(section, "nightvision_sect", &CInifile::r_string, str, test);
     if (result2 && !test)
     {
         m_NightVisionSect._set(str);
+    }
+    result |= result2;
+
+    result2 = process_if_exists_set(section, "range", &CInifile::r_float, flo, test);
+    if (result2 && !test)
+    {
+        light_render->set_range(flo);
+    }
+    result |= result2;
+
+    result2 = process_if_exists_set(section, "spot_angle", &CInifile::r_float, flo, test);
+    if (result2 && !test)
+    {
+        light_render->set_cone(deg2rad(flo));
+    }
+    result |= result2;
+
+    result2 = process_if_exists_set(section, "color_animator", &CInifile::r_string, str, test);
+    if (result2 && !test)
+    {
+        lanim = LALib.FindItem(str);
     }
     result |= result2;
 
