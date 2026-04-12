@@ -32,6 +32,7 @@
 #include "UIScriptWnd.h"
 #include "ActorEffector.h"
 #include "EffectorFall.h"
+#include "GamePersistent.h"
 
 constexpr pcstr PDA_XML = "pda.xml";
 
@@ -256,6 +257,7 @@ void CUIPdaWnd::InitSounds(CUIXml& uiXml)
 
 void CUIPdaWnd::Show(bool status)
 {
+    const Fvector4& dof = Fvector4().set(0.0, 0.5, 5, 100000);
     inherited::Show(status);
     if (status)
     {
@@ -270,6 +272,7 @@ void CUIPdaWnd::Show(bool status)
             UITabControl->SetActiveTab(subdialog);
         }
         PlaySnd(eSndOpen);
+        Actor()->Cameras().AddCamEffector(xr_new<CEffectorDOF>(dof));
     }
     else
     {
@@ -283,6 +286,8 @@ void CUIPdaWnd::Show(bool status)
         g_btnHint->Discard();
         g_statHint->Discard();
         PlaySnd(eSndClose);
+        GamePersistent().RestoreEffectorDOF();
+        Actor()->Cameras().RemoveCamEffector(eCEDOF);
     }
 }
 

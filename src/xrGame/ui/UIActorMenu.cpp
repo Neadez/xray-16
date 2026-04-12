@@ -2,6 +2,8 @@
 #include "UIActorMenu.h"
 #include "UIActorStateInfo.h"
 #include "Actor.h"
+#include "ActorEffector.h"
+#include "EffectorFall.h"
 #include "UIGameSP.h"
 #include "Inventory.h"
 #include "inventory_item.h"
@@ -37,6 +39,7 @@
 #include "xrUICore/PropertiesBox/UIPropertiesBox.h"
 #include "UIMainIngameWnd.h"
 #include "trade.h"
+#include "GamePersistent.h"
 
 void CUIActorMenu::SetActor(CInventoryOwner* io)
 {
@@ -154,17 +157,21 @@ void CUIActorMenu::PlaySnd(eActorMenuSndAction a)
 void CUIActorMenu::SendMessage(CUIWindow* pWnd, s16 msg, void* pData) { CUIWndCallback::OnEvent(pWnd, msg, pData); }
 void CUIActorMenu::Show(bool status)
 {
+    const Fvector4& dof = Fvector4().set(0.0, 0.5, 5, 100000);
     inherited::Show(status);
     if (status)
     {
         SetMenuMode(m_currMenuMode);
         PlaySnd(eSndOpen);
         m_ActorStateInfo->UpdateActorInfo(m_pActorInvOwner);
+        Actor()->Cameras().AddCamEffector(xr_new<CEffectorDOF>(dof));
     }
     else
     {
         PlaySnd(eSndClose);
         SetMenuMode(mmUndefined);
+        GamePersistent().RestoreEffectorDOF();
+        Actor()->Cameras().RemoveCamEffector(eCEDOF);
     }
     m_ActorStateInfo->Show(status);
     m_message_static = nullptr;

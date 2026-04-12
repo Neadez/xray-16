@@ -16,6 +16,7 @@
 #include "xrEngine/CameraBase.h"
 #include "UIXmlInit.h"
 #include "xrUICore/Buttons/UI3tButton.h"
+#include "GamePersistent.h"
 
 CUITalkWnd::CUITalkWnd() : CUIDialogWnd(CUITalkWnd::GetDebugType())
 {
@@ -201,8 +202,6 @@ void UpdateCameraDirection(CGameObject* pTo)
 
 void CUITalkWnd::Update()
 {
-    const Fvector4& dof = Fvector4().set(0.0, 0.5, 5, 1.7);
-    Actor()->Cameras().AddCamEffector(xr_new<CEffectorDOF>(dof));
 
     //остановить разговор, если нужно
     if (g_actor && m_pActor && !m_pActor->IsTalking())
@@ -246,11 +245,15 @@ void CUITalkWnd::Update()
 void CUITalkWnd::Draw() { inherited::Draw(); }
 void CUITalkWnd::Show(bool status)
 {
+    const Fvector4& dof = Fvector4().set(0.0, 0.5, 5, 100000);
+
     inherited::Show(status);
     if (status)
     {
         InitTalkDialog();
         InventoryUtilities::SendInfoToLuaScripts("ui_talk_show");
+        Actor()->Cameras().AddCamEffector(xr_new<CEffectorDOF>(dof));
+        g_fov *= 0.6;
     }
     else
     {
@@ -266,6 +269,10 @@ void CUITalkWnd::Show(bool status)
                 m_pActor->StopTalk();
 
             m_pActor = NULL;
+
+            GamePersistent().RestoreEffectorDOF();
+            Actor()->Cameras().RemoveCamEffector(eCEDOF);
+            g_fov /= 0.6;
         }
     }
 }
