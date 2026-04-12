@@ -44,6 +44,7 @@ protected:
     Fvector2 m_upgrade_pos;
     CUIStatic* m_unique;
     Fvector2 m_unique_pos;
+    CUIStatic* m_quest;
 
     virtual void UpdateItemText();
     void init();

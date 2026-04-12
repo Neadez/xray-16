@@ -28,6 +28,7 @@ CUICellItem::CUICellItem()
     m_upgrade = NULL;
     m_unique = NULL;
     m_weight = NULL;
+    m_quest = NULL;
     m_pConditionState = NULL;
     m_drawn_frame = 0;
     SetAccelerator(0);
@@ -79,15 +80,20 @@ void CUICellItem::init()
     m_upgrade->SetAutoDelete(true);
     AttachChild(m_upgrade);
     CUIXmlInit::InitStatic(uiXml, "cell_item_upgrade", 0, m_upgrade);
-    m_upgrade_pos = m_upgrade->GetWndPos();
+    //m_upgrade_pos = m_upgrade->GetWndPos();
     m_upgrade->Show(false);
 
     m_unique = xr_new<CUIStatic>("Unique");
     m_unique->SetAutoDelete(true);
     AttachChild(m_unique);
     CUIXmlInit::InitStatic(uiXml, "cell_item_unique", 0, m_unique);
-    m_unique_pos = m_unique->GetWndPos();
     m_unique->Show(false);
+
+    m_quest = xr_new<CUIStatic>("Quest");
+    m_quest->SetAutoDelete(true);
+    AttachChild(m_quest);
+    CUIXmlInit::InitStatic(uiXml, "cell_item_quest", 0, m_quest);
+    m_quest->Show(false);
 
     // Try progress first and then progess
     m_pConditionState = UIHelper::CreateProgressBar(uiXml, "condition_progress_bar", this, false);
@@ -131,6 +137,7 @@ void CUICellItem::Update()
     }
 
     PIItem item = (PIItem)m_pData;
+    bool is_quest = item->IsQuestItem();
 
     if (m_weight)
     {
@@ -164,6 +171,21 @@ void CUICellItem::Update()
             m_weight->Show(false);
     }
 
+    if (m_quest)
+    {
+        if (is_quest)
+        {
+            if (item)
+            {
+                Fvector2 pos;
+                pos.x = GetWndSize().x - m_quest->GetWidth() - 1.f;
+                pos.y = GetWndSize().y - m_quest->GetHeight() - 1.f;
+                m_quest->SetWndPos(pos);
+            }
+            m_quest->Show(true);
+        }
+    }
+
     if (m_unique)
     { 
         if (pSettings->line_exist(item->m_section_id, "unique")) 
@@ -173,13 +195,8 @@ void CUICellItem::Update()
             {
                 m_unique->InitTexture(icon);
                 Fvector2 pos;
-                pos.set(m_unique_pos);
-                const float y = GetWndSize().y;
-                const float y1 = m_unique->GetHeight();
-                pos.y += y - y1;
-                const float x = GetWndSize().x;
-                const float x1 = m_unique->GetWidth();
-                pos.x += x - x1;
+                pos.x = GetWndSize().x - m_unique->GetWidth() - 1.f;
+                pos.y = GetWndSize().y - m_unique->GetHeight() - 1.f;
                 m_unique->SetWndPos(pos);
             }
             m_unique->Show(true);
@@ -191,16 +208,13 @@ void CUICellItem::Update()
     {
         if (item)
         {
-            //		Fvector2 size      = GetWndSize();
-            //		Fvector2 up_size = m_upgrade->GetWndSize();
-            //		pos.x = size.x - up_size.x - 4.0f;
             Fvector2 pos;
-            pos.set(m_upgrade_pos);
-            if (ChildsCount())
-            {
-                const float textSize = m_text ? m_text->GetWndSize().x : 0.f;
-                pos.x += textSize + 2.0f;
-            }
+            pos.x = GetWndSize().x - m_upgrade->GetWidth() - 1.f;
+            pos.y = GetWndSize().y - m_upgrade->GetHeight() - 1.f;
+            float UniSize = 0.f;
+            if (m_unique->IsShown())
+                UniSize = m_unique->GetWidth();
+            pos.x -= UniSize + 1.0f;
             m_upgrade->SetWndPos(pos);
         }
         m_upgrade->Show(m_has_upgrade);
