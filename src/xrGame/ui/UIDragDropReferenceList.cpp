@@ -89,6 +89,7 @@ void CUIDragDropReferenceList::SetItem(CUICellItem* itm, Ivector2 cell_pos)
     ref->TextureOn();
     ref->SetTextureColor(color_rgba(255, 255, 255, 255));
     ref->SetStretchTexture(true);
+    itm->m_weight->Show(false);
 
     CUICell& C = m_container->GetCellAt(cell_pos);
     if (C.m_item != itm)

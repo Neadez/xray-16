@@ -49,6 +49,7 @@ protected:
     void init();
 
 public:
+    CUIStatic* m_weight;
     CUICellItem();
     ~CUICellItem() override;
 

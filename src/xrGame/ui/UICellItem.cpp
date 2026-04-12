@@ -27,6 +27,7 @@ CUICellItem::CUICellItem()
     //-	m_mark				= NULL;
     m_upgrade = NULL;
     m_unique = NULL;
+    m_weight = NULL;
     m_pConditionState = NULL;
     m_drawn_frame = 0;
     SetAccelerator(0);
@@ -63,6 +64,11 @@ void CUICellItem::init()
     CUIXmlInit::InitStatic(uiXml, "cell_item_text", 0, m_text);
     m_text->Show(false);
 
+    m_weight = xr_new<CUIStatic>("Weight");
+    m_weight->SetAutoDelete(true);
+    AttachChild(m_weight);
+    CUIXmlInit::InitStatic(uiXml, "cell_item_weight", 0, m_weight);
+    m_weight->Show(true);
     /*	m_mark					= new CUIStatic("Mark");
         m_mark->SetAutoDelete	( true );
         AttachChild				( m_mark );
@@ -125,6 +131,38 @@ void CUICellItem::Update()
     }
 
     PIItem item = (PIItem)m_pData;
+
+    if (m_weight)
+    {
+        if (item)
+        {
+            Fvector2 pos = m_weight->GetWndPos();
+            m_weight->AdjustHeightToText();
+            m_weight->AdjustWidthToText();
+            float BarSize = 0.f;
+            if (m_pConditionState->IsShown())
+                BarSize = m_pConditionState->GetHeight() + 2.f;
+            pos.y = GetWndSize().y - m_weight->GetHeight() - BarSize;
+            m_weight->SetWndPos(pos);
+        }
+        float weight = item->Weight();
+        string256 str;
+        shared_str kg_str = "kg";
+        StringTable().translate("st_kg", kg_str);
+        if (!fis_zero(weight))
+        {
+            weight = item->CInventoryItem::Weight();
+            for (u32 j = 0; j < ChildsCount(); ++j)
+            {
+                PIItem jitem = (PIItem)Child(j)->m_pData;
+                weight += jitem->CInventoryItem::Weight();
+            }
+            xr_sprintf(str, "%3.2f %s", weight, kg_str.c_str());
+            m_weight->SetText(str);
+        }
+        else
+            m_weight->Show(false);
+    }
 
     if (m_unique)
     { 
