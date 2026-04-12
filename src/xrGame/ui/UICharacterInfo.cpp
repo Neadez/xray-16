@@ -420,4 +420,5 @@ void CUICharacterInfo::InitMonsterCharacter(CBaseMonster* monster)
     {
         m_icons[eIconOver]->Show(true);
     }
+    m_bForceUpdate = true;
 }
